@@ -8,4 +8,6 @@ public interface IClassifier {
 
     public Map<String, Double> predict(String[] featureVector);
 
+    public String getResult();
+
 }

@@ -1,34 +1,8 @@
 package classifier.maxent.gis;
 
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- * 
- *   http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStreamReader;
-import java.text.DecimalFormat;
-
 import opennlp.model.Context;
 import opennlp.model.EvalParameters;
 import opennlp.model.IndexHashTable;
-import opennlp.model.Prior;
-import opennlp.model.UniformPrior;
 
 /**
  * A maximum entropy model which has been trained using the Generalized Iterative Scaling procedure
@@ -41,11 +15,12 @@ public final class GISModel {
     /** Mapping between predicates/contexts and an integer representing them. */
     protected IndexHashTable<String> pmap;
     /** The names of the outcomes. */
-    protected String[] outcomeNames;
+    protected String[] labels;
     /** Parameters for the model. */
     protected EvalParameters evalParams;
+    
     /** Prior distribution for this model. */
-    protected Prior prior;
+    protected UniformPrior prior;
 
     /** The type of the model. */
     protected ModelType modelType;
@@ -63,27 +38,12 @@ public final class GISModel {
      * @param outcomeNames The names of the outcomes this model predicts.
      * @param correctionConstant The maximum number of active features which occur in an event.
      * @param correctionParam The parameter associated with the correction feature.
-     */
-    public GISModel(Context[] params, String[] predLabels, String[] outcomeNames, int correctionConstant,
-            double correctionParam) {
-        this(params, predLabels, outcomeNames, correctionConstant, correctionParam, new UniformPrior());
-    }
-
-    /**
-     * Creates a new model with the specified parameters, outcome names, and predicate/feature
-     * labels.
-     * 
-     * @param params The parameters of the model.
-     * @param predLabels The names of the predicates used in this model.
-     * @param outcomeNames The names of the outcomes this model predicts.
-     * @param correctionConstant The maximum number of active features which occur in an event.
-     * @param correctionParam The parameter associated with the correction feature.
      * @param prior The prior to be used with this model.
      */
     public GISModel(Context[] params, String[] predLabels, String[] outcomeNames, int correctionConstant,
-            double correctionParam, Prior prior) {
+            double correctionParam, UniformPrior prior) {
         this.pmap = new IndexHashTable<String>(predLabels, 0.7d);
-        this.outcomeNames = outcomeNames;
+        this.labels = outcomeNames;
         this.evalParams = new EvalParameters(params, correctionParam, correctionConstant, outcomeNames.length);
 
         this.prior = prior;
@@ -101,35 +61,27 @@ public final class GISModel {
      *         double[] are the outcome ids, and the actual string representation of the outcomes
      *         can be obtained from the method getOutcome(int i).
      */
-    public final double[] eval(String[] context) {
-        return (eval(context, new double[evalParams.getNumOutcomes()]));
-    }
-
-    public final double[] eval(String[] context, float[] values) {
-        return (eval(context, values, new double[evalParams.getNumOutcomes()]));
-    }
-
-    public final double[] eval(String[] context, double[] outsums) {
-        return eval(context, null, outsums);
-    }
 
     /**
      * Use this model to evaluate a context and return an array of the likelihood of each outcome
      * given that context.
      * 
-     * @param context The names of the predicates which have been observed at the present decision
-     *            point.
+     * @param featureVector The names of the predicates which have been observed at the present
+     *            decision point.
      * @param outsums This is where the distribution is stored.
      * @return The normalized probabilities for the outcomes given the context. The indexes of the
      *         double[] are the outcome ids, and the actual string representation of the outcomes
      *         can be obtained from the method getOutcome(int i).
      */
-    public final double[] eval(String[] context, float[] values, double[] outsums) {
-        int[] scontexts = new int[context.length];
-        for (int i = 0; i < context.length; i++) {
-            Integer ci = pmap.get(context[i]);
+    public final double[] eval(String[] featureVector, float[] values) {
+        double[] outsums = new double[evalParams.getNumOutcomes()];
+
+        int[] scontexts = new int[featureVector.length];
+        for (int i = 0; i < featureVector.length; i++) {
+            Integer ci = pmap.get(featureVector[i]);
             scontexts[i] = ci == null ? -1 : ci;
         }
+
         prior.logPrior(outsums, scontexts, values);
         return GISModel.eval(scontexts, values, outsums, evalParams);
     }
@@ -205,8 +157,8 @@ public final class GISModel {
         return prior;
     }
 
-    public final String getOutcome(int i) {
-        return outcomeNames[i];
+    public final String getLabelFromIndex(int i) {
+        return labels[i];
     }
 
     public int getNumOutcomes() {
@@ -231,7 +183,7 @@ public final class GISModel {
         Object[] data = new Object[5];
         data[0] = evalParams.getParams();
         data[1] = pmap;
-        data[2] = outcomeNames;
+        data[2] = labels;
         data[3] = new Integer((int) evalParams.getCorrectionConstant());
         data[4] = new Double(evalParams.getCorrectionParam());
         return data;
