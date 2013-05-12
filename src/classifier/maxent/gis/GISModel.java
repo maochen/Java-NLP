@@ -82,24 +82,8 @@ public final class GISModel {
             scontexts[i] = ci == null ? -1 : ci;
         }
 
-        prior.logPrior(outsums, scontexts, values);
+        prior.logPrior(outsums, scontexts);
         return GISModel.eval(scontexts, values, outsums, evalParams);
-    }
-
-    /**
-     * Use this model to evaluate a context and return an array of the likelihood of each outcome
-     * given the specified context and the specified parameters.
-     * 
-     * @param context The integer values of the predicates which have been observed at the present
-     *            decision point.
-     * @param prior The prior distribution for the specified context.
-     * @param model The set of parametes used in this computation.
-     * @return The normalized probabilities for the outcomes given the context. The indexes of the
-     *         double[] are the outcome ids, and the actual string representation of the outcomes
-     *         can be obtained from the method getOutcome(int i).
-     */
-    public static double[] eval(int[] context, double[] prior, EvalParameters model) {
-        return eval(context, null, prior, model);
     }
 
     /**

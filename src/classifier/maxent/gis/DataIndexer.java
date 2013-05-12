@@ -69,7 +69,7 @@ public class DataIndexer {
      * @param counter The predicate counters.
      * @param cutoff The cutoff which determines whether a predicate is included.
      */
-    protected static void update(String[] ec, Set predicateSet, Map<String, Integer> counter, int cutoff) {
+    protected static void update(String[] ec, Set<String> predicateSet, Map<String, Integer> counter, int cutoff) {
         for (int j = 0; j < ec.length; j++) {
             Integer i = counter.get(ec[j]);
             if (i == null) {
@@ -147,17 +147,15 @@ public class DataIndexer {
      */
     public DataIndexer(List<String[]> trainingData, int cutoff) {
         Map<String, Integer> predicateIndex = new HashMap<String, Integer>();
-        LinkedList<Event> events;
-        List eventsToCompare;
-
         System.out.println("Indexing events using cutoff of " + cutoff + "\n");
 
         System.out.print("\tComputing event counts...  ");
-        events = computeEventCounts(trainingData, predicateIndex, cutoff);
+        LinkedList<Event> events = computeEventCounts(trainingData, predicateIndex, cutoff);
         System.out.println("done. " + events.size() + " events");
 
         System.out.print("\tIndexing...  ");
-        eventsToCompare = index(events, predicateIndex);
+        List eventsToCompare = index(events, predicateIndex);
+        
         // done with event list
         events = null;
         // done with predicates

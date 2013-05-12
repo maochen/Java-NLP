@@ -27,7 +27,7 @@ import opennlp.model.MutableContext;
  * @version $Revision: 1.7 $, $Date: 2010/09/06 08:02:18 $
  */
 public final class GISTrainer {
-    
+
     /**
      * Specifies whether unseen context/outcome pairs should be estimated as occur very
      * infrequently.
@@ -99,7 +99,7 @@ public final class GISTrainer {
     private MutableContext[] modelExpects;
 
     /** This is the prior distribution that the model uses for training. */
-    private UniformPrior prior;
+    // private UniformPrior prior;
 
     /** Observed expectation of correction feature. */
     private double cfObservedExpect;
@@ -127,7 +127,7 @@ public final class GISTrainer {
      *         opennlp.maxent.io.GISModelWriter object.
      */
 
-    // 183 -188
+    // 143 -148
     public GISModel trainModel(int iterations, DataIndexer di, int cutoff) {
 
         /************** Incorporate all of the needed info ******************/
@@ -138,7 +138,6 @@ public final class GISTrainer {
         predicateCounts = di.predCounts;
         numTimesEventsSeen = di.numTimesEventsSeen;
         numUniqueEvents = contexts.length;
-        this.prior = new UniformPrior();
         // printTable(contexts);
 
         outcomeLabels = di.outcomeLabels;
@@ -147,7 +146,7 @@ public final class GISTrainer {
         outcomeList = di.outcomeList;
 
         predLabels = di.predLabels;
-        prior.setLabels(outcomeLabels, predLabels);
+
         numPreds = predLabels.length;
 
         display("\tNumber of Event Tokens: " + numUniqueEvents + "\n");
@@ -295,11 +294,15 @@ public final class GISTrainer {
         double prevLL = 0.0;
         double currLL = 0.0;
         display("Performing " + iterations + " iterations.\n");
+
+        UniformPrior prior = new UniformPrior();
+        prior.setLabels(outcomeLabels, predLabels);
+
         for (int i = 1; i <= iterations; i++) {
             if (i < 10) display("  " + i + ":  ");
             else if (i < 100) display(" " + i + ":  ");
             else display(i + ":  ");
-            currLL = nextIteration(correctionConstant);
+            currLL = nextIteration(correctionConstant, prior);
             if (i > 1) {
                 if (prevLL > currLL) {
                     System.err.println("Model Diverging: loglikelihood decreased");
@@ -347,7 +350,7 @@ public final class GISTrainer {
     }
 
     /* Compute one iteration of GIS and return log-likelihood. */
-    private double nextIteration(int correctionConstant) {
+    private double nextIteration(int correctionConstant, UniformPrior prior) {
         // compute contribution of p(a|b_i) for each feature and the new
         // correction parameter
         double loglikelihood = 0.0;
@@ -355,14 +358,10 @@ public final class GISTrainer {
         int numEvents = 0;
         int numCorrect = 0;
         for (int ei = 0; ei < numUniqueEvents; ei++) {
-            if (values != null) {
-                prior.logPrior(modelDistribution, contexts[ei], values[ei]);
-                GISModel.eval(contexts[ei], values[ei], modelDistribution, evalParams);
-            }
-            else {
-                prior.logPrior(modelDistribution, contexts[ei]);
-                GISModel.eval(contexts[ei], modelDistribution, evalParams);
-            }
+
+            prior.logPrior(modelDistribution, contexts[ei]);
+            GISModel.eval(contexts[ei], values[ei], modelDistribution, evalParams);
+
             for (int j = 0; j < contexts[ei].length; j++) {
                 int pi = contexts[ei][j];
                 if (predicateCounts[pi] >= cutoff) {
