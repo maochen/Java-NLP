@@ -30,9 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import opennlp.model.ComparableEvent;
-import opennlp.model.Event;
-
 /**
  * An indexer for maxent model data which handles cutoffs for uncommon contextual predicates and
  * provides a unique integer index for each of the predicates and maintains event values.
@@ -40,6 +37,133 @@ import opennlp.model.Event;
  * @author Tom Morton
  */
 public class DataIndexer {
+
+    /**
+     * A maxent event representation which we can use to sort based on the predicates indexes
+     * contained in the events.
+     * 
+     * @author Jason Baldridge
+     * @version $Revision: 1.2 $, $Date: 2010/09/06 08:02:18 $
+     */
+    public class ComparableEvent implements Comparable {
+        public int outcome;
+        public int[] predIndexes;
+        public int seen = 1; // the number of times this event
+                             // has been seen.
+
+        public float[] values;
+
+        public ComparableEvent(int oc, int[] pids, float[] values) {
+            outcome = oc;
+            if (values == null) {
+                Arrays.sort(pids);
+            }
+            else {
+                sort(pids, values);
+            }
+            this.values = values; // needs to be sorted like pids
+            predIndexes = pids;
+        }
+
+        public int compareTo(Object o) {
+            ComparableEvent ce = (ComparableEvent) o;
+            if (outcome < ce.outcome) return -1;
+            else if (outcome > ce.outcome) return 1;
+
+            int smallerLength = (predIndexes.length > ce.predIndexes.length ? ce.predIndexes.length
+                    : predIndexes.length);
+
+            for (int i = 0; i < smallerLength; i++) {
+                if (predIndexes[i] < ce.predIndexes[i]) return -1;
+                else if (predIndexes[i] > ce.predIndexes[i]) return 1;
+                if (values != null && ce.values != null) {
+                    if (values[i] < ce.values[i]) return -1;
+                    else if (values[i] > ce.values[i]) return 1;
+                }
+                else if (values != null) {
+                    if (values[i] < 1) return -1;
+                    else if (values[i] > 1) return 1;
+                }
+                else if (ce.values != null) {
+                    if (1 < ce.values[i]) return -1;
+                    else if (1 > ce.values[i]) return 1;
+                }
+            }
+
+            if (predIndexes.length < ce.predIndexes.length) return -1;
+            else if (predIndexes.length > ce.predIndexes.length) return 1;
+
+            return 0;
+        }
+
+        public String toString() {
+            StringBuffer s = new StringBuffer().append(outcome).append(":");
+            for (int i = 0; i < predIndexes.length; i++) {
+                s.append(" ").append(predIndexes[i]);
+                if (values != null) {
+                    s.append("=").append(values[i]);
+                }
+            }
+            return s.toString();
+        }
+
+        private void sort(int[] pids, float[] values) {
+            for (int mi = 0; mi < pids.length; mi++) {
+                int min = mi;
+                for (int pi = mi + 1; pi < pids.length; pi++) {
+                    if (pids[min] > pids[pi]) {
+                        min = pi;
+                    }
+                }
+                int pid = pids[mi];
+                pids[mi] = pids[min];
+                pids[min] = pid;
+                float val = values[mi];
+                values[mi] = values[min];
+                values[min] = val;
+            }
+        }
+    }
+
+    /**
+     * The context of a decision point during training. This includes contextual predicates and an
+     * outcome.
+     * 
+     * @author Jason Baldridge
+     * @version $Revision: 1.2 $, $Date: 2010/09/06 08:02:18 $
+     */
+    static class Event {
+        private String outcome;
+        private String[] context;
+        private float[] values;
+
+        public Event(String outcome, String[] context, float[] values) {
+            this.outcome = outcome;
+            this.context = context;
+            this.values = values;
+        }
+
+        public String toString() {
+            StringBuffer sb = new StringBuffer();
+            sb.append(outcome).append(" [");
+            if (context.length > 0) {
+                sb.append(context[0]);
+                if (values != null) {
+                    sb.append("=" + values[0]);
+                }
+            }
+            for (int ci = 1; ci < context.length; ci++) {
+                sb.append(" ").append(context[ci]);
+                if (values != null) {
+                    sb.append("=" + values[ci]);
+                }
+            }
+            sb.append("]");
+            return sb.toString();
+        }
+
+    }
+
     private int numEvents;
 
     /** The predicate/context names. */
@@ -155,7 +279,7 @@ public class DataIndexer {
 
         System.out.print("\tIndexing...  ");
         List eventsToCompare = index(events, predicateIndex);
-        
+
         // done with event list
         events = null;
         // done with predicates
@@ -168,10 +292,6 @@ public class DataIndexer {
         System.out.println("Done indexing.");
     }
 
-   
-
-    
-
     /**
      * Reads events from <tt>eventStream</tt> into a linked list. The predicates associated with
      * each event are counted and any which occur at least <tt>cutoff</tt> times are added to the
@@ -183,7 +303,7 @@ public class DataIndexer {
      * @return a <code>TLinkedList</code> value
      */
     private LinkedList<Event> computeEventCounts(List<String[]> trainingData, Map<String, Integer> predicatesInOut,
-            int cutoff)  {
+            int cutoff) {
         Set predicateSet = new HashSet();
         Map<String, Integer> counter = new HashMap<String, Integer>();
         LinkedList<Event> events = new LinkedList<Event>();
@@ -199,15 +319,14 @@ public class DataIndexer {
             Event ev = createEvent(buf.toString().trim());
 
             // --------------
-            System.out.print("Context: " + Arrays.toString(ev.getContext()));
-            System.out.print("| OutCome: " + ev.getOutcome());
-            System.out.println("| Value: " + Arrays.toString(ev.getValues()));
+            System.out.print("Context: " + Arrays.toString(ev.context));
+            System.out.print("| OutCome: " + ev.outcome);
+            System.out.println("| Value: " + Arrays.toString(ev.values));
 
             // ------------
-            
-            
+
             events.addLast(ev);
-            update(ev.getContext(), predicateSet, counter, cutoff);
+            update(ev.context, predicateSet, counter, cutoff);
         }
 
         predCounts = new int[predicateSet.size()];
@@ -301,21 +420,21 @@ public class DataIndexer {
         return array;
     }
 
-    protected List index(LinkedList<Event> events, Map<String, Integer> predicateIndex) {
+    protected List<Event> index(LinkedList<Event> events, Map<String, Integer> predicateIndex) {
         Map<String, Integer> omap = new HashMap<String, Integer>();
 
         int numEvents = events.size();
         int outcomeCount = 0;
-        List eventsToCompare = new ArrayList(numEvents);
+        List eventsToCompare = new ArrayList<Event>(numEvents);
         List<Integer> indexedContext = new ArrayList<Integer>();
 
         for (int eventIndex = 0; eventIndex < numEvents; eventIndex++) {
             Event ev = (Event) events.removeFirst();
-            String[] econtext = ev.getContext();
+            String[] econtext = ev.context;
             ComparableEvent ce;
 
             int ocID;
-            String oc = ev.getOutcome();
+            String oc = ev.outcome;
 
             if (omap.containsKey(oc)) {
                 ocID = omap.get(oc);
@@ -338,11 +457,11 @@ public class DataIndexer {
                 for (int ci = 0; ci < cons.length; ci++) {
                     cons[ci] = indexedContext.get(ci);
                 }
-                ce = new ComparableEvent(ocID, cons, ev.getValues());
+                ce = new ComparableEvent(ocID, cons, ev.values);
                 eventsToCompare.add(ce);
             }
             else {
-                System.err.println("Dropped event " + ev.getOutcome() + ":" + Arrays.asList(ev.getContext()));
+                System.err.println("Dropped event " + ev.outcome + ":" + Arrays.asList(ev.context));
             }
             // recycle the TIntArrayList
             indexedContext.clear();

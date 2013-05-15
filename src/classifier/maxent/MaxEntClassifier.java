@@ -1,6 +1,10 @@
 package classifier.maxent;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -49,7 +53,7 @@ public class MaxEntClassifier implements IClassifier {
         }
         if (!hasReal) realVals = null;
         // ------------
-        
+
         ocs = model.eval(featureVector, realVals);
 
         // <Group Tag, Probability>
@@ -77,6 +81,22 @@ public class MaxEntClassifier implements IClassifier {
         }
 
         return maxTag;
+    }
+
+    public void persist(String loc) {
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(loc))) {
+            out.writeObject(model);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void readModel(String loc) {
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(loc));) {
+            model = (GISModel) in.readObject();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public MaxEntClassifier(boolean usesmoothing, double smoothingObv) {
@@ -189,6 +209,11 @@ public class MaxEntClassifier implements IClassifier {
 
         MaxEntClassifier maxent = new MaxEntClassifier(false, 0);
         maxent.train(traindata);
+
+        maxent.persist("fixture/maxentModel.txt");
+        maxent.model = null;
+        maxent.readModel("fixture/maxentModel.txt");
+
         List<String[]> predictData = new ArrayList<String[]>();
         predictData.add(new String[] { "home", "pdiff=0.6875", "ptwins=0.5" });
         predictData.add(new String[] { "home", "pdiff=1.0625", "ptwins=0.5" });

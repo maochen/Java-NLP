@@ -1,6 +1,8 @@
 package classifier.maxent.gis;
 
-public class UniformPrior {
+import java.io.Serializable;
+
+public class UniformPrior implements Serializable {
 
     private int numOutcomes;
     private double r;

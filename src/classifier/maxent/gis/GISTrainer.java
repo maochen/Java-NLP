@@ -1,7 +1,7 @@
 package classifier.maxent.gis;
 
-import opennlp.model.EvalParameters;
-import opennlp.model.MutableContext;
+import classifier.maxent.gis.GISModel.EvalParameters;
+import classifier.maxent.gis.GISModel.Context;
 
 /**
  * An implementation of Generalized Iterative Scaling. The reference paper for this implementation
@@ -90,13 +90,13 @@ public final class GISTrainer {
     private String[] predLabels;
 
     /** Stores the observed expected values of the features based on training data. */
-    private MutableContext[] observedExpects;
+    private Context[] observedExpects;
 
     /** Stores the estimated parameter value of each predicate during iteration */
-    private MutableContext[] params;
+    private Context[] params;
 
     /** Stores the expected values of the features based on the current models */
-    private MutableContext[] modelExpects;
+    private Context[] modelExpects;
 
     /** This is the prior distribution that the model uses for training. */
     // private UniformPrior prior;
@@ -197,9 +197,9 @@ public final class GISTrainer {
         // the way the model's expectations are approximated in the
         // implementation, this is cancelled out when we compute the next
         // iteration of a parameter, making the extra divisions wasteful.
-        params = new MutableContext[numPreds];
-        modelExpects = new MutableContext[numPreds];
-        observedExpects = new MutableContext[numPreds];
+        params = new Context[numPreds];
+        modelExpects = new Context[numPreds];
+        observedExpects = new Context[numPreds];
 
         // The model does need the correction constant and the correction feature. The correction
         // constant
@@ -237,18 +237,18 @@ public final class GISTrainer {
                     }
                 }
             }
-            params[pi] = new MutableContext(outcomePattern, new double[numActiveOutcomes]);
-            modelExpects[pi] = new MutableContext(outcomePattern, new double[numActiveOutcomes]);
-            observedExpects[pi] = new MutableContext(outcomePattern, new double[numActiveOutcomes]);
+            params[pi] = new Context(outcomePattern, new double[numActiveOutcomes]);
+            modelExpects[pi] = new Context(outcomePattern, new double[numActiveOutcomes]);
+            observedExpects[pi] = new Context(outcomePattern, new double[numActiveOutcomes]);
             for (int aoi = 0; aoi < numActiveOutcomes; aoi++) {
                 int oi = outcomePattern[aoi];
-                params[pi].setParameter(aoi, 0.0);
-                modelExpects[pi].setParameter(aoi, 0.0);
+                params[pi].parameters[aoi] = 0.0;
+                modelExpects[pi].parameters[aoi] = 0.0;
                 if (predCount[pi][oi] > 0) {
-                    observedExpects[pi].setParameter(aoi, predCount[pi][oi]);
+                    observedExpects[pi].parameters[aoi] = predCount[pi][oi];
                 }
                 else if (useSimpleSmoothing) {
-                    observedExpects[pi].setParameter(aoi, smoothingObservation);
+                    observedExpects[pi].parameters[aoi] = smoothingObservation;
                 }
             }
         }
@@ -324,14 +324,14 @@ public final class GISTrainer {
 
     // modeled on implementation in Zhang Le's maxent kit
     private double gaussianUpdate(int predicate, int oid, int n, double correctionConstant) {
-        double param = params[predicate].getParameters()[oid];
+        double param = params[predicate].parameters[oid];
         double x = 0.0;
         double x0 = 0.0;
         double f;
         double tmp;
         double fp;
-        double modelValue = modelExpects[predicate].getParameters()[oid];
-        double observedValue = observedExpects[predicate].getParameters()[oid];
+        double modelValue = modelExpects[predicate].parameters[oid];
+        double observedValue = observedExpects[predicate].parameters[oid];
         for (int i = 0; i < 50; i++) {
             tmp = modelValue * Math.exp(correctionConstant * x0);
             f = tmp + (param + x0) / sigma - observedValue;
@@ -365,15 +365,15 @@ public final class GISTrainer {
             for (int j = 0; j < contexts[ei].length; j++) {
                 int pi = contexts[ei][j];
                 if (predicateCounts[pi] >= cutoff) {
-                    int[] activeOutcomes = modelExpects[pi].getOutcomes();
+                    int[] activeOutcomes = modelExpects[pi].outcomes;
                     for (int aoi = 0; aoi < activeOutcomes.length; aoi++) {
                         int oi = activeOutcomes[aoi];
                         if (values != null && values[ei] != null) {
-                            modelExpects[pi].updateParameter(aoi, modelDistribution[oi] * values[ei][j]
-                                    * numTimesEventsSeen[ei]);
+                            modelExpects[pi].parameters[aoi] += modelDistribution[oi] * values[ei][j]
+                                    * numTimesEventsSeen[ei];
                         }
                         else {
-                            modelExpects[pi].updateParameter(aoi, modelDistribution[oi] * numTimesEventsSeen[ei]);
+                            modelExpects[pi].parameters[aoi] += modelDistribution[oi] * numTimesEventsSeen[ei];
                         }
                     }
                     if (useSlackParameter) {
@@ -406,12 +406,12 @@ public final class GISTrainer {
 
         // compute the new parameter values
         for (int pi = 0; pi < numPreds; pi++) {
-            double[] observed = observedExpects[pi].getParameters();
-            double[] model = modelExpects[pi].getParameters();
-            int[] activeOutcomes = params[pi].getOutcomes();
+            double[] observed = observedExpects[pi].parameters;
+            double[] model = modelExpects[pi].parameters;
+            int[] activeOutcomes = params[pi].outcomes;
             for (int aoi = 0; aoi < activeOutcomes.length; aoi++) {
                 if (useGaussianSmoothing) {
-                    params[pi].updateParameter(aoi, gaussianUpdate(pi, aoi, numEvents, correctionConstant));
+                    params[pi].parameters[aoi] += gaussianUpdate(pi, aoi, numEvents, correctionConstant);
                 }
                 else {
                     if (model[aoi] == 0) {
@@ -419,10 +419,9 @@ public final class GISTrainer {
                     }
                     // params[pi].updateParameter(aoi,(Math.log(observed[aoi]) -
                     // Math.log(model[aoi])));
-                    params[pi].updateParameter(aoi,
-                            ((Math.log(observed[aoi]) - Math.log(model[aoi])) / correctionConstant));
+                    params[pi].parameters[aoi] += (Math.log(observed[aoi]) - Math.log(model[aoi])) / correctionConstant;
                 }
-                modelExpects[pi].setParameter(aoi, 0.0); // re-initialize to 0.0's
+                modelExpects[pi].parameters[aoi] = 0.0; // re-initialize to 0.0's
             }
         }
         if (CFMOD > 0.0 && useSlackParameter)

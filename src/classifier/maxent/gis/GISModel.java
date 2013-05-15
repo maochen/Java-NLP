@@ -1,8 +1,7 @@
 package classifier.maxent.gis;
 
-import opennlp.model.Context;
-import opennlp.model.EvalParameters;
-import opennlp.model.IndexHashTable;
+import java.io.Serializable;
+import java.util.Arrays;
 
 /**
  * A maximum entropy model which has been trained using the Generalized Iterative Scaling procedure
@@ -11,14 +10,222 @@ import opennlp.model.IndexHashTable;
  * @author Tom Morton and Jason Baldridge
  * @version $Revision: 1.6 $, $Date: 2010/09/06 08:02:18 $
  */
-public final class GISModel {
+public final class GISModel implements Serializable {
+
+    /**
+     * The {@link IndexHashTable} is a hash table which maps entries of an array to their index in
+     * the array. All entries in the array must be unique otherwise a well-defined mapping is not
+     * possible.
+     * <p>
+     * The entry objects must implement {@link Object#equals(Object)} and {@link Object#hashCode()}
+     * otherwise the behavior of this class is undefined.
+     * <p>
+     * The implementation uses a hash table with open addressing and linear probing.
+     * <p>
+     * The table is thread safe and can concurrently accessed by multiple threads, thread safety is
+     * achieved through immutability. Though its not strictly immutable which means, that the table
+     * must still be safely published to other threads.
+     */
+    static class IndexHashTable<T> implements Serializable{
+
+        private final Object keys[];
+        private final int values[];
+
+        /**
+         * Initializes the current instance. The specified array is copied into the table and later
+         * changes to the array do not affect this table in any way.
+         * 
+         * @param mapping the values to be indexed, all values must be unique otherwise a
+         *            well-defined mapping of an entry to an index is not possible
+         * @param loadfactor the load factor, usually 0.7
+         * 
+         * @throws IllegalArgumentException if the entries are not unique
+         */
+        public IndexHashTable(T mapping[], double loadfactor) {
+            if (loadfactor <= 0 || loadfactor > 1)
+                throw new IllegalArgumentException("loadfactor must be larger than 0 "
+                        + "and equal to or smaller than 1!");
+
+            int arraySize = (int) (mapping.length / loadfactor) + 1;
+
+            keys = new Object[arraySize];
+            values = new int[arraySize];
+
+            for (int i = 0; i < mapping.length; i++) {
+                int startIndex = (mapping[i].hashCode() & 0x7fffffff) % keys.length;
+                // indexForHash(mapping[i].hashCode(), keys.length);
+
+                int index = searchKey(startIndex, null, true);
+
+                if (index == -1) throw new IllegalArgumentException("Array must contain only unique keys!");
+
+                keys[index] = mapping[i];
+                values[index] = i;
+            }
+        }
+
+        private int searchKey(int startIndex, Object key, boolean insert) {
+
+            for (int index = startIndex; true; index = (index + 1) % keys.length) {
+
+                // The keys array contains at least one null element, which guarantees
+                // termination of the loop
+                if (keys[index] == null) {
+                    if (insert) return index;
+                    else return -1;
+                }
+
+                if (keys[index].equals(key)) {
+                    if (!insert) return index;
+                    else return -1;
+                }
+            }
+        }
+
+        /**
+         * Retrieves the index for the specified key.
+         * 
+         * @param key
+         * @return the index or -1 if there is no entry to the keys
+         */
+        public int get(T key) {
+
+            int startIndex = (key.hashCode() & 0x7fffffff) % keys.length;
+            // indexForHash(key.hashCode(), keys.length);
+            int index = searchKey(startIndex, key, false);
+
+            return (index != -1) ? values[index] : -1;
+        }
+
+        // /**
+        // * Retrieves the size.
+        // *
+        // * @return the number of elements in this map.
+        // */
+        // public int size() {
+        // return size;
+        // }
+        //
+        // @SuppressWarnings("unchecked")
+        // public T[] toArray(T array[]) {
+        // for (int i = 0; i < keys.length; i++) {
+        // if (keys[i] != null)
+        // array[values[i]] = (T) keys[i];
+        // }
+        //
+        // return array;
+        // }
+    }
+
+    /**
+     * Class which associates a real valued parameter or expected value with a particular contextual
+     * predicate or feature. This is used to store maxent model parameters as well as model and
+     * empirical expected values.
+     * 
+     */
+    static class Context implements Serializable{
+
+        /** The real valued parameters or expected values for this context. */
+        protected double[] parameters;
+        /** The outcomes which occur with this context. */
+        protected int[] outcomes;
+
+        /**
+         * Creates a new parameters object with the specified parameters associated with the
+         * specified outcome pattern.
+         * 
+         * @param outcomePattern Array of outcomes for which parameters exists for this context.
+         * @param parameters Parameters for the outcomes specified.
+         */
+        public Context(int[] outcomePattern, double[] parameters) {
+            this.outcomes = outcomePattern;
+            this.parameters = parameters;
+        }
+
+        public boolean contains(int outcome) {
+            return (Arrays.binarySearch(outcomes, outcome) >= 0);
+        }
+
+    }
+
+    static class EvalParameters implements Serializable{
+
+        /**
+         * Mapping between outcomes and paramater values for each context. The integer
+         * representation of the context can be found using <code>pmap</code>.
+         */
+        private Context[] params;
+        /** The number of outcomes being predicted. */
+        private final int numOutcomes;
+        /**
+         * The maximum number of feattures fired in an event. Usually refered to a C. This is used
+         * to normalize the number of features which occur in an event.
+         */
+        private double correctionConstant;
+
+        /** Stores inverse of the correction constant, 1/C. */
+        private final double constantInverse;
+        /** The correction parameter of the model. */
+        private double correctionParam;
+
+        /**
+         * Creates a set of paramters which can be evaulated with the eval method.
+         * 
+         * @param params The parameters of the model.
+         * @param correctionParam The correction paramter.
+         * @param correctionConstant The correction constant.
+         * @param numOutcomes The number of outcomes.
+         */
+        public EvalParameters(Context[] params, double correctionParam, double correctionConstant, int numOutcomes) {
+            this.params = params;
+            this.correctionParam = correctionParam;
+            this.numOutcomes = numOutcomes;
+            this.correctionConstant = correctionConstant;
+            this.constantInverse = 1.0 / correctionConstant;
+        }
+
+        /*
+         * (non-Javadoc)
+         * 
+         * @see opennlp.model.EvalParameters#getParams()
+         */
+        public Context[] getParams() {
+            return params;
+        }
+
+        /*
+         * (non-Javadoc)
+         * 
+         * @see opennlp.model.EvalParameters#getNumOutcomes()
+         */
+        public int getNumOutcomes() {
+            return numOutcomes;
+        }
+
+        public double getCorrectionConstant() {
+            return correctionConstant;
+        }
+
+        public double getConstantInverse() {
+            return constantInverse;
+        }
+
+        public double getCorrectionParam() {
+            return correctionParam;
+        }
+
+        public void setCorrectionParam(double correctionParam) {
+            this.correctionParam = correctionParam;
+        }
+    }
+
     /** Mapping between predicates/contexts and an integer representing them. */
     protected IndexHashTable<String> pmap;
     /** The names of the outcomes. */
     protected String[] labels;
     /** Parameters for the model. */
     protected EvalParameters evalParams;
-    
+
     /** Prior distribution for this model. */
     protected UniformPrior prior;
 
@@ -108,8 +315,8 @@ public final class GISModel {
         for (int ci = 0; ci < context.length; ci++) {
             if (context[ci] >= 0) {
                 Context predParams = params[context[ci]];
-                activeOutcomes = predParams.getOutcomes();
-                activeParameters = predParams.getParameters();
+                activeOutcomes = predParams.outcomes;
+                activeParameters = predParams.parameters;
                 if (values != null) {
                     value = values[ci];
                 }
