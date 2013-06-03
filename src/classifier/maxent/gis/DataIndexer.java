@@ -45,7 +45,7 @@ public class DataIndexer {
      * @author Jason Baldridge
      * @version $Revision: 1.2 $, $Date: 2010/09/06 08:02:18 $
      */
-    public class ComparableEvent implements Comparable {
+    public class ComparableEvent implements Comparable<ComparableEvent> {
         public int outcome;
         public int[] predIndexes;
         public int seen = 1; // the number of times this event
@@ -65,8 +65,8 @@ public class DataIndexer {
             predIndexes = pids;
         }
 
-        public int compareTo(Object o) {
-            ComparableEvent ce = (ComparableEvent) o;
+        public int compareTo(ComparableEvent o) {
+            ComparableEvent ce = o;
             if (outcome < ce.outcome) return -1;
             else if (outcome > ce.outcome) return 1;
 
@@ -278,7 +278,7 @@ public class DataIndexer {
         System.out.println("done. " + events.size() + " events");
 
         System.out.print("\tIndexing...  ");
-        List eventsToCompare = index(events, predicateIndex);
+        List<Event> eventsToCompare = index(events, predicateIndex);
 
         // done with event list
         events = null;
@@ -304,7 +304,7 @@ public class DataIndexer {
      */
     private LinkedList<Event> computeEventCounts(List<String[]> trainingData, Map<String, Integer> predicatesInOut,
             int cutoff) {
-        Set predicateSet = new HashSet();
+        Set<String> predicateSet = new HashSet<String>();
         Map<String, Integer> counter = new HashMap<String, Integer>();
         LinkedList<Event> events = new LinkedList<Event>();
 
@@ -331,7 +331,7 @@ public class DataIndexer {
 
         predCounts = new int[predicateSet.size()];
         int index = 0;
-        for (Iterator pi = predicateSet.iterator(); pi.hasNext(); index++) {
+        for (Iterator<String> pi = predicateSet.iterator(); pi.hasNext(); index++) {
             String predicate = (String) pi.next();
             predCounts[index] = counter.get(predicate);
             predicatesInOut.put(predicate, index);
