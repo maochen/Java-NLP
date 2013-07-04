@@ -1,8 +1,11 @@
 package knn;
 
-public class KNNDTO {
+//T is the label type and id type, typically is string.
+
+public class KNNDTO<T> {
+    private T id;
     private double[] vector;
-    private String key;
+    private T label;
     private double distance;
 
     public double getDistance() {
@@ -21,17 +24,26 @@ public class KNNDTO {
         this.vector = vector;
     }
 
-    public String getKey() {
-        return key;
+    public T getLabel() {
+        return label;
     }
 
-    public void setKey(String key) {
-        this.key = key;
+    public void setLabel(T label) {
+        this.label = label;
     }
 
-    public KNNDTO(double[] vector, String key) {
+    public T getId() {
+        return id;
+    }
+
+    public void setId(T id) {
+        this.id = id;
+    }
+
+    public KNNDTO(T id, double[] vector, T label) {
+        this.id = id;
         this.vector = vector;
-        this.key = key;
+        this.label = label;
     }
 
     public KNNDTO() {
