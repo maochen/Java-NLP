@@ -6,14 +6,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Protected, should not exposed.
+ * 
+ * @author MaochenG
+ */
 public class KNNEngine {
 
     protected class DistanceComparator implements Comparator<KNNDTO<String>> {
         public int compare(KNNDTO<String> turple1, KNNDTO<String> turple2) {
             double diff = turple1.getDistance() - turple2.getDistance();
 
-            if (Math.abs(diff) < Double.MIN_VALUE) return 0;
-            else if (diff > 0) return 1;
+            if (Math.abs(diff) < Double.MIN_VALUE)
+                return 0;
+            else if (diff > 0)
+                return 1;
             else return -1;
         }
 
@@ -23,17 +30,13 @@ public class KNNEngine {
     private List<KNNDTO<String>> trainRecordList;
     private int k;
 
-    public void initialize(KNNDTO<String> predict, List<KNNDTO<String>> trainRecordList, int k) {
-        if (k % 2 == 0) {
-            throw new RuntimeException("K should be odd for voting!");
-        }
-
+    void initialize(KNNDTO<String> predict, List<KNNDTO<String>> trainRecordList, int k) {
         this.predict = predict;
         this.trainRecordList = trainRecordList;
         this.k = k;
     }
 
-    public void EuclideanDistance() {
+    void EuclideanDistance() {
         for (KNNDTO<String> record : trainRecordList) {
             if (predict.getVector().length != record.getVector().length) {
                 throw new RuntimeException("2 Vectors must has same dimension.");
@@ -51,7 +54,7 @@ public class KNNEngine {
 
     }
 
-    public void ChebyshevDistance() {
+    void ChebyshevDistance() {
         for (KNNDTO<String> record : trainRecordList) {
             if (predict.getVector().length != record.getVector().length) {
                 throw new RuntimeException("2 Vectors must has same dimension.");
@@ -68,7 +71,7 @@ public class KNNEngine {
         }
     }
 
-    public void ManhattanDistance() {
+    void ManhattanDistance() {
         for (KNNDTO<String> record : trainRecordList) {
             if (predict.getVector().length != record.getVector().length) {
                 throw new RuntimeException("2 Vectors must has same dimension.");
@@ -85,7 +88,7 @@ public class KNNEngine {
         }
     }
 
-    public String getResult() {
+    String getResult() {
         Map<String, Integer> resultMap = new HashMap<String, Integer>();
         Collections.sort(trainRecordList, new DistanceComparator());
 
@@ -103,14 +106,23 @@ public class KNNEngine {
 
         String maxVote = "";
         int maxCount = 0;
+        int maxCountEntryNumber = 0; // equal vote
+
         for (String label : resultMap.keySet()) {
             int currentCount = resultMap.get(label);
-            if (currentCount > maxCount) {
+
+            if (currentCount == maxCount) {
+                maxCountEntryNumber++;
+            }
+            else if (currentCount > maxCount) {
                 maxCount = currentCount;
                 maxVote = label;
+                maxCountEntryNumber = 1;
             }
+
         }
 
+        if (maxCountEntryNumber != 1) System.out.println("Equal Max Vote, just grab the first max!");
         return maxVote;
 
     }

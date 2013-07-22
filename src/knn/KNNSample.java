@@ -1,6 +1,7 @@
 package knn;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class KNNSample {
@@ -8,34 +9,33 @@ public class KNNSample {
     public static void main(String[] args) {
         int k = 3;
 
-        double[] vectorA = new double[] { 9, 32, 65.1 };
-        KNNDTO<String> studentA = new KNNDTO<String>("vectorA", vectorA, "A");
+        String[] vectorA = new String[] { "9", "32", "65.1", "A" };
+        String[] vectorB = new String[] { "12", "65", "86.1", "C" };
+        String[] vectorC = new String[] { "19", "54", "45.1", "C" };
 
-        double[] vectorB = new double[] { 12, 65, 86.1 };
-        KNNDTO<String> studentB = new KNNDTO<String>("vectorB", vectorB, "C");
+        List<String[]> trainList = new ArrayList<String[]>();
+        trainList.add(vectorA);
+        trainList.add(vectorB);
+        trainList.add(vectorC);
 
-        double[] vectorC = new double[] { 19, 54, 45.1 };
-        KNNDTO<String> studentC = new KNNDTO<String>("vectorC", vectorC, "C");
+        String[] newVector = new String[] { "74", "55", "22" };
 
-        List<KNNDTO<String>> trainingSet = new ArrayList<KNNDTO<String>>();
-        trainingSet.add(studentA);
-        trainingSet.add(studentB);
-        trainingSet.add(studentC);
+        KNN knn = new KNN(trainList);
 
-        double[] newVector = new double[] { 74, 55, 22 };
-        KNNDTO<String> newStudent = new KNNDTO<String>("predictionVector", newVector, "");
-
-        KNNEngine engine = new KNNEngine();
-        engine.initialize(newStudent, trainingSet, k);
-        engine.EuclideanDistance();
-
-        System.out.println(engine.getResult());
-
-        for (KNNDTO<String> entry : trainingSet) {
-            System.out.println("Distance to " + entry.getId() + " : " + entry.getDistance() + " | label: "
-                    + entry.getLabel());
-        }
-
+        System.out.println("Euclidean Distance:");
+        String result = knn.predict(newVector, k, 0);
+        System.out.println("Prediction data: " + Arrays.toString(newVector) + " -> " + result);
+        System.out.println(knn.getDetails());
+        
+        System.out.println("Chebyshev Distance:");
+        result = knn.predict(newVector, k, 1);
+        System.out.println("Prediction data: " + Arrays.toString(newVector) + " -> " + result);
+        System.out.println(knn.getDetails());
+        
+        System.out.println("Manhattan Distance:");
+        result = knn.predict(newVector, k, 2);
+        System.out.println("Prediction data: " + Arrays.toString(newVector) + " -> " + result);
+        System.out.println(knn.getDetails());
     }
 
 }
