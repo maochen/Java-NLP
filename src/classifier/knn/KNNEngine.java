@@ -1,4 +1,4 @@
-package knn;
+package classifier.knn;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -7,11 +7,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Protected, should not exposed.
+ * Should not exposed.
  * 
  * @author MaochenG
  */
-public class KNNEngine {
+public final class KNNEngine {
 
     protected class DistanceComparator implements Comparator<KNNDTO<String>> {
         public int compare(KNNDTO<String> turple1, KNNDTO<String> turple2) {
@@ -30,13 +30,13 @@ public class KNNEngine {
     private List<KNNDTO<String>> trainRecordList;
     private int k;
 
-    void initialize(KNNDTO<String> predict, List<KNNDTO<String>> trainRecordList, int k) {
+    public void initialize(KNNDTO<String> predict, List<KNNDTO<String>> trainRecordList, int k) {
         this.predict = predict;
         this.trainRecordList = trainRecordList;
         this.k = k;
     }
 
-    void EuclideanDistance() {
+    public void EuclideanDistance() {
         for (KNNDTO<String> record : trainRecordList) {
             if (predict.getVector().length != record.getVector().length) {
                 throw new RuntimeException("2 Vectors must has same dimension.");
@@ -54,7 +54,7 @@ public class KNNEngine {
 
     }
 
-    void ChebyshevDistance() {
+    public void ChebyshevDistance() {
         for (KNNDTO<String> record : trainRecordList) {
             if (predict.getVector().length != record.getVector().length) {
                 throw new RuntimeException("2 Vectors must has same dimension.");
@@ -71,7 +71,7 @@ public class KNNEngine {
         }
     }
 
-    void ManhattanDistance() {
+    public void ManhattanDistance() {
         for (KNNDTO<String> record : trainRecordList) {
             if (predict.getVector().length != record.getVector().length) {
                 throw new RuntimeException("2 Vectors must has same dimension.");
@@ -88,7 +88,7 @@ public class KNNEngine {
         }
     }
 
-    String getResult() {
+    public String getResult() {
         Map<String, Integer> resultMap = new HashMap<String, Integer>();
         Collections.sort(trainRecordList, new DistanceComparator());
 
@@ -123,6 +123,7 @@ public class KNNEngine {
         }
 
         if (maxCountEntryNumber != 1) System.out.println("Equal Max Vote, just grab the first max!");
+        predict.setLabel(maxVote);
         return maxVote;
 
     }

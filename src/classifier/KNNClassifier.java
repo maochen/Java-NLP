@@ -1,9 +1,12 @@
-package knn;
+package classifier;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import classifier.knn.KNNDTO;
+import classifier.knn.KNNEngine;
 
 /**
  * Simple Wrapper, Id is based on the input sequential.
@@ -11,12 +14,14 @@ import java.util.Map;
  * @author MaochenG
  * 
  */
-public class KNN {
+public class KNNClassifier implements IClassifier {
 
     private List<KNNDTO<String>> trainSetDTOList;
     private KNNDTO<String> predictDTO;
 
     private int idCounter;
+    private int k;
+    private int mode;
 
     private KNNEngine engine;
 
@@ -36,12 +41,44 @@ public class KNN {
         KNNDTO<String> entryDTO = new KNNDTO<String>(idCounter++, vector, label);
         return entryDTO;
     }
-
+    
+    @Override
     // mode: 0 - EuclideanDistance, 1 - ChebyshevDistance, 2 - ManhattanDistance
-    public String predict(String[] predict, int k, int mode) {
+    public void setParameter(Map<String, String> paraMap) {
+        if (paraMap.containsKey("k")) this.k = Integer.parseInt(paraMap.get("k"));
+        if (paraMap.containsKey("mode")) this.mode = Integer.parseInt(paraMap.get("mode"));
+    }
+
+    public KNNClassifier() {
+        this.idCounter = 0;
+        this.k = 1;
+        this.mode = 0;
+        engine = new KNNEngine();
+    }
+
+    /**
+     * train() method for knn is just used for loading trainingdata!!
+     */
+    @Override
+    public IClassifier train(List<String[]> trainingdata) {
+        this.trainSetDTOList = new ArrayList<KNNDTO<String>>();
+
+        for (String[] entry : trainingdata) {
+            this.trainSetDTOList.add(inputConverter(entry, false));
+        }
+
+        return this;
+    }
+
+    /**
+     * Return the predict to every other train vector's distance.
+     * 
+     * @return return by Id which is ordered by input sequential.
+     */
+    @Override
+    public Map<String, Double> predict(String[] predict) {
         predictDTO = inputConverter(predict, true);
         engine.initialize(predictDTO, trainSetDTOList, k);
-
         if (mode == 1) {
             engine.ChebyshevDistance();
         }
@@ -52,31 +89,19 @@ public class KNN {
             engine.EuclideanDistance();
         }
 
-        return engine.getResult();
-    }
+        engine.getResult();
 
-    /**
-     * Return the predict to every other train vector's distance.
-     * 
-     * @return return by Id which is ordered by input sequential.
-     */
-    public Map<Integer, Double> getDetails() {
-        Map<Integer, Double> outputMap = new HashMap<Integer, Double>();
+        Map<String, Double> outputMap = new HashMap<String, Double>();
 
         for (KNNDTO<String> dtos : trainSetDTOList) {
-            outputMap.put(dtos.getId(), dtos.getDistance());
+            outputMap.put(String.valueOf(dtos.getId()), dtos.getDistance());
         }
         return outputMap;
     }
 
-    public KNN(List<String[]> trainSet) {
-        this.idCounter = 0;
-        engine = new KNNEngine();
-        this.trainSetDTOList = new ArrayList<KNNDTO<String>>();
-
-        for (String[] entry : trainSet) {
-            this.trainSetDTOList.add(inputConverter(entry, false));
-        }
-
+    @Override
+    public String getResult() {
+        return predictDTO.getLabel();
     }
+
 }

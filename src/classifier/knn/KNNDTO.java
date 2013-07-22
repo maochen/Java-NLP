@@ -1,17 +1,17 @@
-package knn;
+package classifier.knn;
 
 //T is the label type, typically is string.
 /**
- * Protected, should not exposed.
+ * Should not exposed.
  * @author MaochenG
  */
-public class KNNDTO<T> {
+public final class KNNDTO<T> {
     private int id;
     private double[] vector;
     private T label;
     private double distance;
 
-    double getDistance() {
+    public double getDistance() {
         return distance;
     }
 
@@ -27,7 +27,7 @@ public class KNNDTO<T> {
         this.vector = vector;
     }
 
-    T getLabel() {
+    public T getLabel() {
         return label;
     }
 
@@ -35,7 +35,7 @@ public class KNNDTO<T> {
         this.label = label;
     }
 
-    int getId() {
+    public int getId() {
         return id;
     }
 
@@ -43,7 +43,7 @@ public class KNNDTO<T> {
         this.id = id;
     }
 
-    KNNDTO(int id, double[] vector, T label) {
+    public KNNDTO(int id, double[] vector, T label) {
         this.id = id;
         this.vector = vector;
         this.label = label;

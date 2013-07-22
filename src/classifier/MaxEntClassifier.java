@@ -1,4 +1,4 @@
-package classifier.maxent;
+package classifier;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -99,6 +99,11 @@ public class MaxEntClassifier implements IClassifier {
         }
     }
 
+    @Override
+    public void setParameter(Map<String, String> paraMap) {
+        // TODO Auto-generated method stub   
+    }
+    
     public MaxEntClassifier(boolean usesmoothing, double smoothingObv) {
         this.USE_SMOOTHING = usesmoothing;
         this.SMOOTHING_OBSERVATION = smoothingObv;
@@ -207,12 +212,12 @@ public class MaxEntClassifier implements IClassifier {
         traindata.add(new String[] { "home", "pdiff=0.8125", "ptwins=0.5714", "lose" });
         traindata.add(new String[] { "away", "pdiff=0.9375", "ptwins=0.4545", "lose" });
 
-        MaxEntClassifier maxent = new MaxEntClassifier(false, 0);
+        IClassifier maxent = new MaxEntClassifier(false, 0);
         maxent.train(traindata);
 
-        maxent.persist("fixture/maxentModel.txt");
-        maxent.model = null;
-        maxent.readModel("fixture/maxentModel.txt");
+        ((MaxEntClassifier)maxent).persist("fixture/maxentModel.txt");
+        ((MaxEntClassifier)maxent).model = null;
+        ((MaxEntClassifier)maxent).readModel("fixture/maxentModel.txt");
 
         List<String[]> predictData = new ArrayList<String[]>();
         predictData.add(new String[] { "home", "pdiff=0.6875", "ptwins=0.5" });
@@ -232,4 +237,5 @@ public class MaxEntClassifier implements IClassifier {
         }
 
     }
+
 }
