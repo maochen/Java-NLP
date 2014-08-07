@@ -1,4 +1,4 @@
-package org.maochen.wordCorrection;
+package org.maochen.wordcorrection;
 
 import org.junit.Before;
 import org.junit.Test;

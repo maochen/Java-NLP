@@ -1,4 +1,4 @@
-package org.maochen.wordCorrection;
+package org.maochen.wordcorrection;
 
 public class StringProcessor {
     public String[] tokenize(String str) {

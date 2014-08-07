@@ -1,4 +1,4 @@
-package main.java.org.maochen;
+package org.maochen;
 
 import java.util.HashMap;
 import java.util.Iterator;
