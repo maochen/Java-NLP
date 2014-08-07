@@ -1,13 +1,9 @@
-package classifier.knn;
+package org.maochen.classifier.knn;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.maochen.classifier.IClassifier;
+import org.maochen.classifier.KNNClassifier;
 
-import classifier.IClassifier;
-import classifier.KNNClassifier;
+import java.util.*;
 
 public class KNNSample {
 

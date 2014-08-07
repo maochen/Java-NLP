@@ -1,11 +1,9 @@
-package wordCorrection;
-
-import static org.junit.Assert.*;
+package org.maochen.wordCorrection;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import wordCorrection.StringProcessor;
+import static org.junit.Assert.assertEquals;
 
 public class StringProcessorTest {
     StringProcessor sp;

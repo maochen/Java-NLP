@@ -1,4 +1,4 @@
-package classifier.knn;
+package org.maochen.classifier.knn;
 
 //T is the label type, typically is string.
 /**

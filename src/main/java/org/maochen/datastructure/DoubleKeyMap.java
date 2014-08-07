@@ -1,4 +1,4 @@
-package datastructure;
+package org.maochen.datastructure;
 
 import java.io.Serializable;
 import java.util.ArrayList;

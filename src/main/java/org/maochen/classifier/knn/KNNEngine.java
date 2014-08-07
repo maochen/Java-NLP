@@ -1,4 +1,4 @@
-package classifier.knn;
+package org.maochen.classifier.knn;
 
 import java.util.Collections;
 import java.util.Comparator;

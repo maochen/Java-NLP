@@ -1,18 +1,17 @@
-package classifier;
+package org.maochen.classifier;
+
+import org.maochen.classifier.knn.KNNDTO;
+import org.maochen.classifier.knn.KNNEngine;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import classifier.knn.KNNDTO;
-import classifier.knn.KNNEngine;
-
 /**
  * Simple Wrapper, Id is based on the input sequential.
- * 
- * @author MaochenG
- * 
+ *
+ * @author Maochen
  */
 public class KNNClassifier implements IClassifier {
 
@@ -41,7 +40,7 @@ public class KNNClassifier implements IClassifier {
         KNNDTO<String> entryDTO = new KNNDTO<String>(idCounter++, vector, label);
         return entryDTO;
     }
-    
+
     @Override
     // mode: 0 - EuclideanDistance, 1 - ChebyshevDistance, 2 - ManhattanDistance
     public void setParameter(Map<String, String> paraMap) {
@@ -60,10 +59,10 @@ public class KNNClassifier implements IClassifier {
      * train() method for knn is just used for loading trainingdata!!
      */
     @Override
-    public IClassifier train(List<String[]> trainingdata) {
+    public IClassifier train(List<String[]> trainingData) {
         this.trainSetDTOList = new ArrayList<KNNDTO<String>>();
 
-        for (String[] entry : trainingdata) {
+        for (String[] entry : trainingData) {
             this.trainSetDTOList.add(inputConverter(entry, false));
         }
 
@@ -72,7 +71,7 @@ public class KNNClassifier implements IClassifier {
 
     /**
      * Return the predict to every other train vector's distance.
-     * 
+     *
      * @return return by Id which is ordered by input sequential.
      */
     @Override
@@ -81,11 +80,9 @@ public class KNNClassifier implements IClassifier {
         engine.initialize(predictDTO, trainSetDTOList, k);
         if (mode == 1) {
             engine.ChebyshevDistance();
-        }
-        else if (mode == 2) {
+        } else if (mode == 2) {
             engine.ManhattanDistance();
-        }
-        else {
+        } else {
             engine.EuclideanDistance();
         }
 

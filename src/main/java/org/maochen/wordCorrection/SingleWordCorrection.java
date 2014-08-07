@@ -1,18 +1,10 @@
-package wordCorrection;
+package org.maochen.wordCorrection;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
+import org.maochen.datastructure.DoubleKeyMap;
+
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
-
-import datastructure.DoubleKeyMap;
 
 public class SingleWordCorrection {
     static class Model implements Serializable {
@@ -208,7 +200,7 @@ public class SingleWordCorrection {
         model.persist(filename);
     }
 
-    public void restoreMode(String filename) throws IOException, ClassNotFoundException {
+    public void restoreModel(String filename) throws IOException, ClassNotFoundException {
         model.restore(filename);
     }
 
@@ -218,14 +210,14 @@ public class SingleWordCorrection {
         }
     }
 
-    public static void main(String[] args) throws IOException, ClassNotFoundException {
+    public static void main(String[] args) throws IOException {
+        String path = SingleWordCorrection.class.getClassLoader().getResource("big.txt").getFile();
         SingleWordCorrection swc = new SingleWordCorrection();
-        // swc.buildModel("fixture/big.txt");
-        // swc.persistModel("fixture/model.dat");
-        swc.restoreMode("fixture/model.dat");
-        args[0] = "prob";
-        String word = args[0];
-        String pred = swc.predict(word);
-        System.out.println(word + "->" + pred);
+        swc.buildModel(path);
+        swc.persistModel("model.dat");
+        // swc.restoreModel("model.dat");
+        String word = "prob";
+        String predict = swc.predict(word);
+        System.out.println(word + "->" + predict);
     }
 }
