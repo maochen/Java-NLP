@@ -10,5 +10,5 @@ NLP Stuff
 	<li>Rewrap maxent classifier</li>
 </ul>
 
-Castor Guan<br />
+Maochen<br />
 Founded by 03/03/2013
