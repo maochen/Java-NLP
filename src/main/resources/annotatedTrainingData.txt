@@ -24198,3 +24198,6 @@ We_gave_him_a_big_carrot_for_a_nose. declarative
 Let_me_help_you_make_one_this_year. imperative
 Clarify_for_me_the_concept. interrogative
 What_Bob_said_was_wrong. declarative
+Clarify_for_me_if_I_have_a_car. interrogative
+Show_me_the_concept. imperative
+Define_for_me_the_formula. interrogative
