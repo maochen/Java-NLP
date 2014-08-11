@@ -8,6 +8,7 @@ NLP Stuff
 	<li>KNN Algorithm</li>
 	<li>Single word correction</li>
 	<li>Rewrap maxent classifier</li>
+	<li>Sentence type classifier</li>
 </ul>
 
 Maochen<br />
