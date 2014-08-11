@@ -47,7 +47,7 @@ It_is_a_way_for_the_country_to_make_money_with_the_international_trade. declarat
 Yes,_it_is_all_a_part_of_the_billions_of_dollars_that_are_made_every_year. declarative
 It_seems_like_a_very_complicated_job. declarative
 Good_luck_with_your_interview. declarative
-Thank_you_very_much. imperative
+Thank_you_very_much. declarative 
 Joe,_what_time_does_our_Math_class_start? interrogative
 I_am_sure_it_starts_at_11_AM. declarative
 I_don’t_want_to_go. declarative
@@ -208,7 +208,7 @@ Hi_there,_what_have_you_been_up_to_lately? interrogative
 I_have_been_looking_for_universities_to_apply_to. declarative
 Really? interrogative
 So_have_I! interrogative
-Cool! imperative
+Cool! declarative
 For_what_semester_will_you_apply? interrogative
 I_will_apply_for_the_fall_semester. declarative
 How_about_you? interrogative
@@ -293,7 +293,6 @@ Okay,_me_too. declarative
 You_want_to_add_me_on_Facebook_now? interrogative
 Sure,_I’ll_be_on_soon. declarative
 I_will_be_waiting. declarative
-Hello. declarative
 Are_you_Mr._Johnson? interrogative
 I_am. declarative
 Nice_to_meet_you_I_am_Mr._Smith. declarative
@@ -484,7 +483,7 @@ That_does_make_sense. declarative
 Immigration_is_wonderful_thing,_though! declarative
 Yes_it_is. declarative
 Good_afternoon,_do_you_know_where_the_bus_stop_is? interrogative
-Hello,_the_bus_stop_is_down_the_street. declarative
+The_bus_stop_is_down_the_street. declarative
 I’m_new_to_the_area,_can_you_show_me_exactly_where? interrogative
 Sure,_just_go_down_two_blocks_and_it’s_on_your_left. imperative
 I_have_$3.00_in_change,_will_that_be_enough_for_the_bus_fare? interrogative
@@ -568,7 +567,6 @@ Hey,_I_don’t_mind! declarative
 Me_either! declarative
 Well,_lets_get_in_the_car_so_we_can_go_to_the_store! declarative
 Sounds_like_a_plan! declarative
-Hello_Mrs._Robinson declarative
 How_are_you? interrogative
 I’m_fine_thank_you. declarative
 I’m_glad. declarative
@@ -841,8 +839,8 @@ Not_bad. declarative
 Yourself? interrogative
 Good,_I_just_got_my_Halloween_costume. declarative
 What_are_you_going_as? interrogative
-Spiderman. imperative
-Yup. imperative
+Spiderman. declarative
+Yup. declarative
 Do_you_have_a_costume? interrogative
 No,_not_yet. declarative
 Well,_do_you_have_any_ideas_of_what_you_want_to_go_as? interrogative
@@ -864,7 +862,7 @@ Yeah,_that_was_the_best_part_of_Halloween. declarative
 Well,_I_hope_you_decide_on_something_great. declarative
 I’ll_see_you_at_the_party,_right? interrogative
 I’ll_see_you_then. declarative
-Bye imperative
+Bye declarative
 Ok,_bye. declarative
 Welcome_to_your_first_martial_arts_lesson. imperative
 For_your_first_lesson_we_will_be_learning_basic_punches,_and_blocks. declarative
@@ -896,7 +894,7 @@ Place_your_arm_in_front_of_your_body_and_make_it_stiff_as_a_brick_wall. imperati
 Like_this? interrogative
 You_are_making_progress. declarative
 Thank_you,_Sensei. imperative
-Hey. imperative
+Hey. declarative
 What_are_you_doing_this_weekend? interrogative
 I_don’t_have_any_plans. declarative
 I_am_going_to_my_uncle’s_cottage_in_the_countryside. declarative
@@ -973,7 +971,7 @@ I’ve_never_ridden_a_train_before. declarative
 Business_class_is_one_of_the_nicer_classes. declarative
 Okay,_I’ll_take_one_business_class_ticket,_then. declarative
 Alright,_that_will_be_$30. declarative
-Okay! imperative
+Okay! declarative
 Now,_what_am_I_allowed_to_bring? interrogative
 Anything_you_bring_must_weigh_less_than_50_lbs. declarative
 That’s_fine;_all_I_have_is_my_purse. declarative
@@ -1053,7 +1051,7 @@ I’ve_had_so_much_cotton_candy. declarative
 I_had_three_hot_dogs_today! declarative
 Wow. imperative
 I’m_surprised_you_haven’t_gotten_sick. declarative
-Me_too,_especially_after_riding_that_spinning_ride. imperative
+Me_too,_especially_after_riding_that_spinning_ride. declarative
 That_was_a_lot_of_fun! declarative
 I_liked_the_ferris_wheel,_too. declarative
 Yeah,_you_could_see_for_miles_and_miles_at_the_top! declarative
@@ -1132,7 +1130,7 @@ A_traffic_accident_always_has_bad_effects. declarative
 It’s_going_to_cost_a_lot_for_the_people_who_were_in_the_accident. declarative
 There’s_also_going_to_be_major_traffic_around,_so_be_careful. declarative
 Okay,_we_all_need_to_be_extra_careful. declarative
-Hello_miss,_how_may_I_help_you? interrogative
+How_may_I_help_you? interrogative
 Hi_there! imperative
 I’m_looking_for_some_fancy_shoes. declarative
 Alright,_do_you_have_any_color_or_style_in_mind? interrogative
@@ -1163,7 +1161,7 @@ Will_you_be_running_in_them? interrogative
 I_need_new_sneakers_to_use_when_I_exercise. declarative
 Alright,_we_have_a_bunch_of_running_shoes_on_this_wall. declarative
 Alright,_can_I_have_those_black_ones_at_the_top? interrogative
-Sure. imperative
+Sure. declarative
 Here_they_are,_size_7. declarative
 Would_you_like_to_try_them_on? interrogative
 Yes_please. declarative
@@ -1177,7 +1175,7 @@ Have_a_nice_day! imperative
 You_too,_thanks! declarative
 Hi_there. imperative
 Hi,_it’s_good_to_see_you. declarative
-Likewise. imperative
+Likewise. declarative
 What’s_new? interrogative
 Nothing_very_exciting. imperative
 What’s_new_with_you? interrogative
@@ -1194,9 +1192,9 @@ Next_time_will_be_better. declarative
 So_who_are_your_comedy_influences? interrogative
 Ah,_there_are_so_many. declarative
 Well,_name_a_few_that_most_influenced_you. imperative
-All_of_the_comedy_greats_like_Pryor,_Carlin,_Kaufman,_and_so_on. imperative
+All_of_the_comedy_greats_like_Pryor,_Carlin,_Kaufman,_and_so_on. declarative
 What_about_recent_comedians_who_you_would_like_to_be_compared_to? interrogative
-Some_new_comedians_I_think_are_really_funny_are_Anthony_Jeselnik_and_Rob_Delaney. imperative
+Some_new_comedians_I_think_are_really_funny_are_Anthony_Jeselnik_and_Rob_Delaney. declarative
 I’ve_never_heard_of_them. declarative
 It_must_be_tough_because_humor_is_so_subjective. declarative
 Yeah,_seriously. declarative
@@ -1452,8 +1450,6 @@ It’s_the_truth! declarative
 I_know,_I’m_just_kidding. declarative
 I’m_happy_for_you_guys! declarative
 Thanks,_we_are_in_love. declarative
-Hey_Tina. imperative
-Hello_Kate. imperative
 I_heard_that_you_and_Bill_are_dating. declarative
 Is_that_true? interrogative
 Well,_we_have_been_out_a_few_times. declarative
@@ -1463,8 +1459,7 @@ We_spoke_last_night_and_we_decided_we_want_to_go_slow. declarative
 He_just_had_a_bad_breakup_with_a_girl_he_dated_for_a_long_time_so_he_wants_to_take_things_slow. declarative
 I_forgot_he_was_dating_someone. declarative
 What_was_her_name? interrogative
-Jenny. imperative
-Oh_yea. imperative
+Jenny. declarative
 I_heard_that_was_a_messy_breakup. declarative
 I_don’t_know_the_details_but_I’m_just_glad_it’s_over. declarative
 Bill_is_a_great_guy. declarative
@@ -1608,8 +1603,10 @@ Did_the_other_driver_receive_a_ticket_too? interrogative
 Yes,_their_ticket_was_higher_because_they_did_not_have_insurance_while_driving. declarative
 I_wonder_if_the_other_driver_knew_how_important_it_is_to_have_car_insurance. declarative
 If_she_did_not_know_before_the_accident,_I_hope_she_knows_now. declarative
-Hello imperative
+Hello imperative 
+Hello. imperative
 Hi imperative
+Hi. imperative
 I’m_very_glad_to_see_you_I_wasn’t_sure_if_you_were_alive. declarative
 I’m_glad_to_see_you_too. declarative
 That_was_a_terrible_earthquake. declarative
@@ -1694,7 +1691,7 @@ Why_is_that_important? interrogative
 The_freedom_of_making_my_own_hours_gives_me_more_time_to_take_care_of_my_family. declarative
 Now_I_understand_and_can_explain_it_to_my_class. declarative
 Hey_buddy. declarative
-Well. imperative
+Well. declarative
 I_haven’t_seen_you_in_a_while. declarative
 Yeah,_I’ve_been_busy_on_the_internet. declarative
 On_Facebook_and_Twitter? interrogative
@@ -1771,7 +1768,7 @@ Yeah,_those_are_nice_and_reasonably_priced. declarative
 I_wanted_one_I_could_travel_around_with_me! declarative
 Then_laptop_is_the_way_to_go! declarative
 Do_you_know_how_much_money_do_they_cost? interrogative
-Anywhere_from_$300.00_to_$1,000.00. imperative
+Anywhere_from_$300.00_to_$1,000.00. declarative
 Wow,_that_much? interrogative
 Yeah,_the_best_ones_are_around_$900-$1,000.00. declarative
 Well,_I_have_to_do_some_research_before_I_buy! declarative
@@ -1851,7 +1848,7 @@ What_have_you_heard? interrogative
 One_of_my_good_friends_had_a_terrible_time. declarative
 How_come? interrogative
 He_said_it_was_too_crowded_and_people_were_too_rowdy. declarative
-Interesting. imperative
+Interesting. declarative
 But_you_heard_some_good_things_too? interrogative
 Yeah,_another_friend_of_mine_had_a_great_time_being_one_of_those_rowdy_people. declarative
 I’ll_have_to_make_an_educated_decision. declarative
@@ -1903,7 +1900,7 @@ I_do_a_small_amount_of_foundation,_then_I_put_on_eyeliner,_and_I_finish_with_lip
 You_only_do_a_small_amount? interrogative
 Yeah,_I_try_to_make_it_as_natural_as_possible. declarative
 Natural_beauty_really_is_the_best_kind. declarative
-Hello,_how_may_I_help_you? interrogative
+How_may_I_help_you? interrogative
 Hi_there,_I’d_like_to_rent_a_car. declarative
 Alright,_how_long_will_you_need_it? interrogative
 I’ll_only_need_it_for_three_days. declarative
@@ -2007,7 +2004,7 @@ Yeah,_I_have_three_in_each_ear,_and_my_belly_button_is_pierced. declarative
 That’s_pretty_cool. declarative
 What_color_is_the_piercing? interrogative
 It’s_a_green_gem_on_a_silver_bar. declarative
-Sounds_cute. imperative
+Sounds_cute. declarative
 I_love_wearing_green,_it_looks_good_on_me. declarative
 My_favorite_color_to_wear_is_black. declarative
 You_know_what_they_say_–_black_is_slimming! declarative
@@ -2020,7 +2017,6 @@ Yeah,_but_it’s_so_cute! declarative
 I_suppose. declarative
 Hey,_we_should_get_going. declarative
 Alright,_let’s_go_shopping! declarative
-Hello? interrogative
 Hi_Kelly,_it’s_Sam. declarative
 Hi_Sam,_how_are_you_doing? interrogative
 I_just_got_back_from_a_concert. declarative
@@ -2048,7 +2044,7 @@ I_think_you’ll_really_like_them. declarative
 I’m_always_looking_for_new_music. declarative
 Is_Drive_A_similar_to_My_Chemical_Romance_and_The_Used? interrogative
 They_are_more_punk_rock. declarative
-But_they_are_very_high_energy_and_their_songs_are_very_catchy. imperative
+But_they_are_very_high_energy_and_their_songs_are_very_catchy. declarative
 Oh_good. declarative
 I_can_listen_to_them_when_I’m_running_on_my_treadmill. declarative
 Yeah,_it’s_great_music_for_working_out. declarative
@@ -2095,7 +2091,7 @@ I_think_I_know_a_man_who_sells_slippers. declarative
 Where? interrogative
 Take_your_next_left_and_his_booth_should_be_there. imperative
 Where_are_you_buying_your_fish? interrogative
-From_whoever_offers_me_the_best_price. imperative
+From_whoever_offers_me_the_best_price. declarative
 There_is_a_good_fisherman_a_little_further_down_this_way. declarative
 What_fish_does_he_sell? interrogative
 He_sells_many_kinds. declarative
@@ -2115,7 +2111,7 @@ What_are_you_doing_right_now? interrogative
 I_was_discussing_politics. declarative
 Oh,_then_what_are_your_political_beliefs? interrogative
 I_believe_that_democracy_is_great,_since_it_lets_us_have_a_small_part_in_running_our_country. declarative
-Me_too,_but_how_do_you_feel_about_our_politicians? imperative
+Me_too,_but_how_do_you_feel_about_our_politicians? interrogative
 I_think_they_do_well_in_our_government,_and_I_definitely_agree_with_some_of_their_ideas. declarative
 Do_you_think_Obama_would_be_serve_another_term_in_2012? interrogative
 I_don’t_really_know_because_there_are_other_good_candidates_that_support_my_beliefs. declarative
@@ -2137,7 +2133,7 @@ Okay,_and_he_will_be_answering_questions_from_listeners. declarative
 Wow,_that’s_awesome. declarative
 Let’s_go_hear_what_he’ll_say. imperative
 Want_to_listen_to_some_music? interrogative
-OK. imperative
+OK. declarative
 Why_don’t_you_pick_something? interrogative
 I_have_a_lot_of_new_CDs_on_my_desk. declarative
 I_haven’t_heard_of_some_of_these_bands. declarative
@@ -2183,7 +2179,7 @@ You_can_borrow_the_CD_if_you_want. declarative
 Hi,_what_can_I_get_for_you? interrogative
 What_are_your_specials? interrogative
 Today_ground_beef_is_half_price. declarative
-Oh. imperative
+Oh. declarative
 I_don’t_need_ground_beef. declarative
 What_can_I_get_for_you_instead? interrogative
 I_would_like_to_buy_sandwich_meats. declarative
@@ -2259,7 +2255,7 @@ Doing_physical_exercises_like_yoga_really_relaxes_the_mind,_too. declarative
 The_mind_and_body_are_connected_in_everything. declarative
 When_I_feel_good_physically,_I_tend_to_be_in_a_better_mood. declarative
 I_hate_getting_stressed_out. declarative
-Same. imperative
+Same. declarative
 I_get_really_tired_and_my_body_aches. declarative
 I_usually_have_trouble_sleeping_when_I’m_stressed. declarative
 Is_it_because_you’re_not_tired? interrogative
@@ -2280,7 +2276,7 @@ I_agree,_as_long_as_you’re_not_getting_too_stressed_out! declarative
 Yeah,_that’s_when_you_have_to_relax_a_bit. declarative
 I_think_I_want_to_go_do_some_relaxing_right_now. declarative
 Cool,_I’ll_come_with_you! declarative
-Hello,_welcome_to_Smith’s_Grocer. declarative
+Welcome_to_Smith’s_Grocer. declarative
 Hi,_I_was_wondering_about_your_sales? interrogative
 We_have_a_special_on_all_dairy_products_and_chips. declarative
 I_need_a_few_dairy_products. declarative
@@ -2359,12 +2355,10 @@ I’ll_have_to_find_some! declarative
 Look_in_the_yellow_pages! imperative
 Thank_you,_I_will! imperative
 Good_luck,_I_know_you’ll_take_home_first_place. declarative
-Hello_John declarative
-Hello_Mr._Jones declarative
 Thank_you_for_coming_for_your_employee_evaluation. imperative
 I’m_glad_I_can_be_here. declarative
 Let’s_get_started_then. imperative
-Ok imperative
+Ok declarative
 John,_I_have_your_paperwork_here_and_you_have_received_a_great_evaluation. declarative
 Thank_you_sir. imperative
 You_are_very_efficient_in_your_work_and_treat_customers_well. declarative
@@ -2503,7 +2497,6 @@ Even_though_you’re_in_the_back,_they’re_still_pretty_smart,_and_they_pay_att
 We_should_probably_pay_more_attention. declarative
 Yeah,_class_isn’t_that_bad. declarative
 Let’s_go! imperative
-  imperative
 Good_afternoon! declarative
 Hello! imperative
 Are_you_looking_for_a_book_in_particular? interrogative
@@ -2562,7 +2555,7 @@ Hey_man declarative
 Hey! imperative
 Good_to_see_you. imperative
 Not_bad,_you? interrogative
-Hot. imperative
+Hot. declarative
 Too_hot. declarative
 Can_you_believe_this_summer_we’re_having? interrogative
 I’ve_been_working_as_a_roofer_this_summer. declarative
@@ -2584,7 +2577,7 @@ I_get_to_work_in_air_conditioning,_so_I_shouldn’t_really_complain. declarative
 Lucky. imperative
 Just_a_boring_office_job,_but_it_keeps_me_out_of_the_sun_so_I’m_happy. declarative
 You’re_not_a_real_“summer_guy”_are_you? interrogative
-Nope. imperative
+Nope. declarative
 I’m_just_waiting_for_fall_to_get_here_so_I_can_feel_a_cool_breeze_on_my_face. declarative
 Yeah,_that_will_be_nice. declarative
 Until_then,_I’m_beating_the_heat_with_plenty_of_water_and_AC. declarative
@@ -2593,14 +2586,6 @@ And_you_enjoy_the_sun. declarative
 I_gotta_run_but_I’m_sure_I’ll_talk_to_you_later. declarative
 It_was_good_running_into_you. declarative
 Catch_you_later. imperative
-Your_Name_(required) declarative
-Your_Email_(required) declarative
-Subject imperative
-Your_Message declarative
-Subscription imperative
-Enter_your_email_address: imperative
-Delivered_by_FeedBurner imperative
-About_|_Privacy_Policy_|_Contact imperative
 Were_you_able_to_get_funding_for_your_startup? interrogative
 Yes,_but_not_as_much_as_we_need. declarative
 It_is_exciting. declarative
@@ -2639,7 +2624,7 @@ For_very_long_distances,_I_use_a_train_or_an_airplane. declarative
 It_would_be_great_to_use_an_airplane. declarative
 That’s_because_it’s_very_fast_for_any_far_away_destination. declarative
 I’ll_start_to_ride_a_bike_to_get_to_my_workplace. declarative
-Good_because_it’s_the_most_physically_active_way_to_go_there. imperative
+Good_because_it’s_the_most_physically_active_way_to_go_there. declarative
 And_I’ll_become_more_fit. declarative
 If_you’re_dedicated_to_biking,_then_you_will_save_more_money_on_gas. declarative
 Biking_as_a_mode_of_transportation_holds_a_lot_of_benefits. declarative
@@ -2795,7 +2780,7 @@ Tell_her_congratulations. imperative
 Who_do_you_think_will_win_the_next_campaign? interrogative
 I_think_Obama_is_going_to_win. declarative
 I’m_positive_I_like_his_motives_and_stand_points. declarative
-Me_too,_but_he_doesn’t_seem_worthy_enough_to_be_in_such_a_position. imperative
+Me_too,_but_he_doesn’t_seem_worthy_enough_to_be_in_such_a_position. declarative
 No,_I_still_prefer_him_over_the_other_candidate_in_the_election. declarative
 Alright_so_who_are_you_voting_for? interrogative
 I’ll_still_vote_for_Obama. declarative
@@ -2829,7 +2814,7 @@ I_need_to_ask_my_parents_more_about_my_other_family_members. declarative
 Do_your_parents_even_keep_connections_with_others? interrogative
 I_think_so,_since_I_do_hear_them_talk_about_my_cousins_sometimes. declarative
 I_hope_your_parents_keep_you_in_contact_with_them. declarative
-Me_too,_since_I’m_really_curious. imperative
+Me_too,_since_I’m_really_curious. declarative
 I_would_be_more_closer_with_them. declarative
 There_should_also_be_a_family_reunion. declarative
 That_would_be_awesome,_since_I_don’t_think_we_ever_had_one. declarative
@@ -2899,7 +2884,7 @@ Based_on_your_credit_report_and_excellent_credit_score,_your_interest_rate_will_
 That_is_great! declarative
 Where_do_I_sign? interrogative
 Just_fill_out_this_remaining_paperwork_and_we_will_get_you_into_your_new_home. imperative
-Fine. imperative
+Fine. declarative
 I’m_doing_well. declarative
 I’m_looking_to_volunteer_here. declarative
 Oh_good! declarative
@@ -2973,7 +2958,7 @@ Was_it_late_at_night? interrogative
 My_dad_was_pretty_tired_from_driving. declarative
 How_is_he? interrogative
 He’s_okay. declarative
-He didn’t break_any_bones,_but_he_cut_his_head. imperative
+He_didn’t_break_any_bones,_but_he_cut_his_head. imperative
 Oh,_that’s_why_he_had_stitches_on_his_head. declarative
 Everyone_else_is_fine. declarative
 So,_what’s_it_like_staying_in_a_hospital? interrogative
@@ -3009,7 +2994,7 @@ I_will_do_that_then. declarative
 I_believe_you_will_be_satisfied_with_a_savings_account. declarative
 Once_I_have_more_money_can_I_change_the_account_to_a_checking_account? interrogative
 You_will_need_to_sign_these_papers. declarative
-Hello,_Do_you_think_it’s_healthy_being_a_vegetarian? interrogative
+Do_you_think_it’s_healthy_being_a_vegetarian? interrogative
 Yes_it_is_completely_healthy. declarative
 Do_you_think_I_should_be_a_Vegetarian? interrogative
 Yes,_it_helps_you_not_slaughter_those_helpless_animals. declarative
@@ -3110,7 +3095,7 @@ On_the_highway,_you’ll_reach_it_in_no_time. declarative
 That’s_awesome. declarative
 It_should_be_the_third_or_fourth_exit_off_of_the_highway. declarative
 There_will_be_signs_too,_right? interrogative
-Yeah;_look_for_the_green_signs_that_say_Beach. imperative
+I_am_looking_for_the_green_signs_that_say_Beach. declarative
 They’ll_take_you_right_to_it. declarative
 Perfect! imperative
 I’m_not_lost_after_all! declarative
@@ -3317,7 +3302,6 @@ Then_we_can_go_over_what_is_done_and_split_up_what_is_left. declarative
 Exactly,_and_that_way_you_will_be_sure_that_the_project_is_done_correctly. declarative
 Thank_you_for_your_help,_I_will_call_them_for_a_meeting_in_the_morning. declarative
 Hi_there,_my_name_is_Jane! declarative
-Hi_Jane! imperative
 I’m_Jessica. declarative
 It’s_nice_to_meet_you. declarative
 Nice_to_meet_you_too. declarative
@@ -3325,9 +3309,9 @@ Do_you_like_meeting_new_people? interrogative
 I_love_meeting_new_people. declarative
 I_get_a_bit_nervous_when_I_meet_new_people. declarative
 Some_times,_I_don’t_know_what_to_say. declarative
-Same_here. imperative
+Same_here. declarative
 I_don’t_want_to_offend_people. declarative
-neither_do_I. imperative
+neither_do_I. declarative
 First_impressions_aren’t_that_important,_though. declarative
 I_think_they_are_very_important. declarative
 They_can_be,_but_a_lot_of_times_they_are_wrong. declarative
@@ -3372,9 +3356,9 @@ Do_your_drugs_have_side_effects? interrogative
 Yes,_my_drugs_only_have_small_side_effects_though. declarative
 My_doctor_said_that_most_drugs_have_side_effects,_but_most_of_them_are_minor. declarative
 I_was_scared_about_side_effects_being_harmful_to_your_body. declarative
-Me_too,_but_I_found_out_only_some_drugs_are_harmful. imperative
+Me_too,_but_I_found_out_only_some_drugs_are_harmful. declarative
 I’m_glad_that_my_drugs_are_mostly_safe. declarative
-Nice. imperative
+Nice. declarative
 Mine_are_also. declarative
 Do_you_know_any_other_people_who_take_drugs_for_their_health? interrogative
 Yes,_some_of_my_friends_and_family_do. declarative
@@ -3383,7 +3367,7 @@ It’s_because_they_are_growing_older. declarative
 And_their_bodies_aren’t_just_the_same. declarative
 Anyway,_bye,_I’m_going_to_the_pharmacy_now. declarative
 See_you_later! imperative
-Good_morning,_I_would_like_to_apply_for_a_credit_card. declarative
+I_would_like_to_apply_for_a_credit_card. declarative
 Please_have_a_seat. imperative
 Which_credit_card_interested_you_the_most? interrogative
 I_wanted_to_apply_for_a_Mastercard_please. declarative
@@ -3429,7 +3413,7 @@ A_monster_truck? interrogative
 It’s_so_fun. declarative
 I_tried_to_run_over_the_chickens_but_it_won’t_let_you. declarative
 Why_don’t_we_start_with_just_driving_around_so_I_can_get_used_to_the_controls_then_we_can_race_later. interrogative
-Sounds_good_to_me. imperative
+Sounds_good_to_me. declarative
 I_think_I’ll_go_with_the_motorcycle. declarative
 Those_are_fun_to_go_over_jumps_with. declarative
 I’m_going_to_drive_the_monster_truck. declarative
@@ -3471,8 +3455,7 @@ And_the_animation_was_all_shaky,_which_made_it_neat! declarative
 What_was_it_called? interrogative
 I_don’t_remember_for_sure. declarative
 Well,_guess! imperative
-I_believe_it_was_called,_Dr. declarative
-Katz,_Professional_Therapist! imperative
+I_believe_it_was_called,_Dr._Katz,_Professional_Therapist! declarative
 Well,_I’m_going_to_the_movie_store,_I’ll_look_it_up. declarative
 If_they_have_it,_make_sure_you_rent_it! imperative
 I_will,_I_love_funny_television. declarative
@@ -3558,7 +3541,7 @@ We_could_stop_and_get_some_pancakes. declarative
 Yeah,_pancakes_sounds_good. declarative
 I_know_a_great_breakfast_dinner,_next_to_the_mall. declarative
 We_can_go_shopping_right_afterwards! declarative
-Sounds_like_a_plan_to_me! imperative
+Sounds_like_a_plan_to_me! declarative
 Now_we_just_need_to_stop_at_the_bank_and_get_some_money declarative
 Yes,_money_is_important_when_we’re_going_shopping! declarative
 How_much_should_I_get_out? interrogative
@@ -3627,12 +3610,12 @@ She’ll_love_that. declarative
 I_hope_so. declarative
 I_want_to_do_something_else_special_for_her,_too. declarative
 Do_you_have_any_romantic_ideas? interrogative
-Hmm. imperative
+Hmm. declarative
 You_could_always_write_her_a_poem. declarative
 That’s_a_great_idea! declarative
 Yeah,_I_did_that_for_my_girlfriend_a_few_years_ago_and_she_still_has_it. declarative
 That’s_much_better_than_a_piece_of_jewelry_that_might_break_or_get_lost. declarative
-Definitely. imperative
+Definitely. declarative
 So_what_are_you_doing_with_your_girlfriend_this_Valentine’s_Day? interrogative
 I’m_taking_her_to_see_a_show_in_the_city. declarative
 Oh,_that_will_be_fun. declarative
@@ -3648,7 +3631,6 @@ Well,_I_just_got_into_online_dating. declarative
 How’s_that_going? interrogative
 It’s_kind_of_slow_so_far. declarative
 What_site_are_you_on? interrogative
-Match.com imperative
 You_know,_my_uncle_had_some_real_success_on_that_site. declarative
 Yeah,_a_couple_of_my_friends_have,_too. declarative
 Is_that_why_you_decided_to_try_it? interrogative
@@ -3668,7 +3650,7 @@ Well,_good_luck_on_your_internet_dating! declarative
 You_too! imperative
 I’ll_talk_to_you_later. declarative
 Hey_there! imperative
-Nothing_really. imperative
+Nothing_really. declarative
 I’m_about_to_go_to_the_park_to_fly_my_kite. declarative
 You_fly_kites? interrogative
 Yeah,_I_make_them_too. declarative
@@ -3750,7 +3732,7 @@ Ok,_I’ve_got_the_ingredients_on_the_table. declarative
 Now_what? interrogative
 Mix_up_the_sugar,_butter_and_salt_in_a_mixing_bowl_while_I_heat_up_the_milk. imperative
 Then_we’ll_mix_it_together. declarative
-Got_it. imperative
+Got_it. declarative
 Ok,_now_when_that_is_all_combined,_we_add_the_butter_and_let_it_melt_in. declarative
 Then_we_can_add_the_eggs_and_yeast. declarative
 Then_the_flour? interrogative
@@ -3773,7 +3755,7 @@ Go_ahead_and_put_more_on. imperative
 Cover_the_dough_thoroughly. imperative
 Ok,_that’s_done. declarative
 Now_you_can_sprinkle_the_white_sugar_over_top_of_the_brown_sugar_and_then_sprinkle_on_the_cinnamon. declarative
-Done. imperative
+Done. declarative
 Now_we_roll_the_dough_up,_cut_it_into_slices,_let_it_rise_a_bit_and_bake_the_cinnamon_rolls_for_30_to_40_minutes. declarative
 Did_you_hear_who_won_the_election? interrogative
 I_can't_believe_that_Obama_won. declarative
@@ -3858,7 +3840,7 @@ I'm_not_sure_where_to_pick_up_my_ballot. declarative
 I_can_assist_you. declarative
 How_are_you_going_to_help_me? interrogative
 I_actually_work_here. declarative
-Fabulous. imperative
+Fabulous. declarative
 Do_you_have_ID? interrogative
 I_have_it_right_here. declarative
 Here's_your_ballot_card. declarative
@@ -3976,7 +3958,7 @@ You're_working_there_this_year? interrogative
 I_work_there_every_year. declarative
 How_are_you_able_to_work_at_the_polling_place? interrogative
 I_applied_for_the_job_online. declarative
-Sounds_like_fun. imperative
+Sounds_like_fun. declarative
 It's_a_fun_job. declarative
 They_don't_pay_a_lot,_do_they? interrogative
 They_pay_enough. declarative
@@ -4505,7 +4487,7 @@ Maybe_you_can_come_next_time. declarative
 I'll_make_sure_and_come_to_your_next_party. declarative
 I'll_look_for_you_at_my_next_party. declarative
 I'll_be_there. declarative
-Hello,_may_I_speak_to_Alice_please? interrogative
+May_I_speak_to_Alice_please? interrogative
 This_is_she. declarative
 I've_been_trying_to_call_you_all_day. declarative
 I_was_cleaning_up. declarative
@@ -4526,7 +4508,7 @@ I_want_to_do_something_tomorrow_with_you. declarative
 What_did_you_have_in_mind? interrogative
 I_was_thinking_about_seeing_a_movie. declarative
 Okay,_let's_go_see_a_movie. declarative
-Until_then. imperative
+Until_then. declarative
 Is_Alice_available? interrogative
 You're_talking_to_her. declarative
 I've_called_you_a_hundred_times_today. declarative
@@ -4564,7 +4546,7 @@ I_went_to_school_today. declarative
 Did_you_go_to_school? interrogative
 I_couldn't_go_to_school_today,_I_was_sick. declarative
 I'd_be_happy_to_give_you_the_assignments_from_English_class. declarative
-Thank_you_very_much,_that's_kind_of_you. imperative
+Thank_you_very_much,_that's_kind_of_you. declarative
 Don't_mention_it. imperative
 When_you_miss_a_day_of_school,_I'll_be_happy_to_give_you_the_English_assignments. declarative
 That_is_greatly_appreciated_and_I_hope_you_feel_well_enough_to_go_to_school_tomorrow. declarative
@@ -4573,7 +4555,7 @@ I_didn't_realize_that. declarative
 Nobody_has_told_me_anything_about_your_party. declarative
 Did_you_want_to_go? interrogative
 When_does_it_start? interrogative
-At_8:00_p.m. imperative
+At_8:00_p.m. declarative
 What's_going_on_with_you? interrogative
 I_had_no_idea. declarative
 I_didn't_hear_anything_about_it. declarative
@@ -4617,7 +4599,7 @@ I'm_kind_of_mad_that_I_didn't_go. declarative
 It_was_a_great_game. declarative
 What_was_the_score_at_the_end_of_the_game? interrogative
 Our_team_won_101-98. declarative
-Sounds_like_it_was_a_close_game. imperative
+Sounds_like_it_was_a_close_game. declarative
 That's_the_reason_it_was_such_a_great_game. declarative
 The_next_game,_I_will_definitely_be_there. declarative
 I_was_meaning_to_ask_you_if_you_saw_the_basketball_game_on_Friday. declarative
@@ -4641,7 +4623,7 @@ You've_seen_it_before? interrogative
 Yes,_I_saw_that_movie_the_first_day_it_came_out_in_theaters. declarative
 Didn't_you_laugh_through_the_whole_movie? interrogative
 That_movie_brought_tears_to_my_eyes. declarative
-Mine_too. imperative
+Mine_too. declarative
 I_have_it_on_DVD_at_my_house_if_you_want_to_come_over_and_watch_it. declarative
 Sure,_let's_go. declarative
 Which_movie_is_your_favorite_to_watch? interrogative
@@ -4680,7 +4662,7 @@ I_am_going_to_see_a_movie_with_a_friend_of_mine. declarative
 Would_you_like_to_see_a_movie_with_me_and_my_friend? interrogative
 Do_you_know_what_movie_you're_going_to_watch? interrogative
 I_don't_know,_but_was_there_a_certain_movie_you_wanted_to_see? declarative
-None_that_I_can_think_of. imperative
+None_that_I_can_think_of. declarative
 Well,_would_you_like_to_go? interrogative
 Thank_you_for_inviting_me,_but_I_think_I'll_pass. imperative
 Another_time_then. declarative
@@ -5003,15 +4985,15 @@ Yeah,_let's_do_that. declarative
 Okay,_until_next_time_then. declarative
 I'll_call_you_so_we_can_set_that_up. declarative
 Talk_to_you_then. imperative
-All_right,_see_you. imperative
-See_you. imperative
+All_right,_see_you. declarative
+See_you. declarative
 Thanks_for_coming_to_see_me_today. imperative
 It's_no_problem. declarative
 I_was_really_missing_you_anyway. declarative
 I_missed_you_too. declarative
 Why_haven't_you_tried_to_come_see_me_then? interrogative
 I've_been_really_busy. declarative
-Working. imperative
+Working. declarative
 I_would've_come_to_see_you_sooner,_but_I've_been_busy_too. declarative
 What_have_you_been_doing? interrogative
 I've_been_working_too. declarative
@@ -5087,7 +5069,6 @@ Did_it_get_any_better? interrogative
 I'm_still_feeling_under_the_weather. declarative
 Would_you_like_anything_for_your_stomach? interrogative
 I_took_something_earlier. declarative
-Get_better. imperative
 Why_didn't_you_go_to_school_yesterday? interrogative
 I_stayed_home_because_I_wasn't_feeling_well. declarative
 What_was_your_problem? interrogative
@@ -5182,7 +5163,6 @@ That's_OK. declarative
 I_will_eat_my_eggs_and_bacon,_and_you_can_take_my_pancakes_back. declarative
 Good,_sir. declarative
 I_will_take_care_of_that_right_away. declarative
-Thank_you_so_much! imperative
 I_believe_you_ordered_the_Grand_Slam_breakfast. declarative
 Oh,_good! declarative
 You_know,_I_am_looking_at_my_plate_and_I_ordered_scrambled_eggs,_not_fried. declarative
@@ -5323,7 +5303,7 @@ Is_that_everything? interrogative
 That'll_be_all. declarative
 You're_welcome,_and_your_total_is_$5.48. declarative
 What_can_I_get_for_you? interrogative
-Hello,_may_I_have_a_double_cheeseburger? interrogative
+May_I_have_a_double_cheeseburger? interrogative
 With_everything_on_it? interrogative
 Did_you_want_fries_with_your_order? interrogative
 May_I_get_a_large_order_of_curly_fries? interrogative
@@ -5355,7 +5335,6 @@ Usually_people_leave_15_percent,_but_this_was_exceptional_service. declarative
 I_am_thinking_that_maybe_20_percent_would_be_appropriate. declarative
 I_agree_that_20_percent_would_be_just_about_right. declarative
 OK,_so_that_will_bring_her_tip_to_$7.20. declarative
-Add_it_to_the_$36.00_and_the_total_is_$43.20. imperative
 Yes,_what_a_nice_dinner_that_was! interrogative
 We'll_have_to_make_sure_to_come_back_here_again_real_soon. declarative
 Would_you_like_some_more_coffee? interrogative
@@ -5433,7 +5412,6 @@ Yes,_could_you_please_bring_us_a_pitcher_of_margaritas_and_four_glasses_while_we
 I'll_put_your_drink_order_in_and_be_right_back_to_get_your_dinner_order. declarative
 We'll_be_ready_to_order_by_the_time_you_get_back! declarative
 I_am_your_waitress,_Mary. declarative
-Hello,_Mary. imperative
 We_are_all_pretty_hungry_tonight! declarative
 While_you_are_looking_over_the_menu,_can_I_interest_you_in_an_appetizer? interrogative
 An_appetizer_sounds_good. declarative
@@ -5446,7 +5424,6 @@ Good,_I'll_take_that_then. declarative
 Would_you_like_to_split_that_and_choose_another_appetizer_for_half_price_to_share? interrogative
 In_that_case,_we'll_also_take_an_order_of_onion_rings. declarative
 My_name_is_Mary,_and_I_will_be_your_waitress_tonight. declarative
-Thank_you,_Mary. imperative
 We_have_been_looking_forward_to_trying_out_this_restaurant. declarative
 Before_your_main_course,_would_you_like_to_order_an_appetizer? interrogative
 Sure,_that_sounds_great. declarative
@@ -5459,7 +5436,6 @@ OK,_I'll_take_one_order_of_that. declarative
 You_could_choose_another_appetizer_for_half_price_to_share. declarative
 Please_add_on_an_order_of_onion_rings. imperative
 My_name_is_Mary,_and_I_will_be_your_server_this_evening. declarative
-Hi_Mary. imperative
 We_are_really_looking_forward_to_a_great_meal_here. declarative
 Can_I_interest_you_in_an_appetizer_to_start_out? interrogative
 I_would_love_an_appetizer. declarative
@@ -5601,7 +5577,7 @@ That_sounds_like_a_good_choice_for_me. declarative
 May_I_have_one,_please? interrogative
 Can_I_bring_that_to_you_on_the_rocks,_or_would_you_like_it_blended? interrogative
 Please_bring_it_to_me_on_the_rocks. imperative
-Salt_or_no_salt? imperative
+Salt_or_no_salt? interrogative
 I_would_like_it_with_no_salt,_please. declarative
 Can_I_take_your_drink_order? interrogative
 Where_is_your_wine_list? interrogative
@@ -5642,7 +5618,6 @@ The_reviewer_loved_it! declarative
 Would_that_be_a_place_that_you_might_like_to_go_to_for_your_birthday? interrogative
 That_would_work_out_great! declarative
 Why_don't_we_call_and_get_a_reservation? interrogative
-3 imperative
 Devi,_do_you_have_a_favorite_place_that_you_would_like_to_go_to_for_your_birthday_dinner? interrogative
 I_am_kind_of_at_a_loss_right_now_to_think_of_some_place_special. declarative
 I've_got_a_great_guidebook_here_of_local_restaurants. declarative
@@ -5670,7 +5645,7 @@ See_you_at_7:00_this_Tuesday,_Mr._Foster. imperative
 Thank_you_so_much. imperative
 I_appreciate_your_help. declarative
 This_is_Shogun_Restaurant. declarative
-Hello,_I_need_to_make_a_dinner_reservation. declarative
+I_need_to_make_a_dinner_reservation. declarative
 Can_you_tell_me_what_night_you_will_be_coming? interrogative
 We_will_be_coming_to_your_restaurant_on_Tuesday_night. declarative
 What_time_will_you_be_dining_with_us? interrogative
@@ -6237,7 +6212,7 @@ That_really_does_not_work_for_me. declarative
 It_doesn't_matter,_you_need_to_get_some_sleep. declarative
 How_about_I_tire_myself_out,_and_then_fall_asleep_when_I'm_tired? interrogative
 Then_you're_not_going_to_go_to_sleep. declarative
-Don't_worry,_I'll_make_sure_and_get_to_sleep_in_a_little_while. declarative
+I'll_make_sure_and_get_to_sleep_in_a_little_while. declarative
 I_want_you_in_bed,_right_now,_so_sweet_dreams. declarative
 Sleep_well_yourself. imperative
 Isn't_it_past_your_bedtime_already? interrogative
@@ -6686,7 +6661,6 @@ The_key_might_not_work. declarative
 Then_I'll_have_to_call_the_plumber. declarative
 If_it_works_or_doesn't_work,_it_doesn't_matter_much_to_me. declarative
 Yes,_but_I_prefer_to_fix_things_now_instead_of_later. declarative
-Hello,_Tom? interrogative
 This_is_Hannah_in_4C. declarative
 Hi,_Hannah. imperative
 What_can_I_do_for_you? interrogative
@@ -6814,7 +6788,7 @@ Put_the_key_in_and_try_turning_it_to_the_right. imperative
 I_can't_get_it_to_work. declarative
 Could_you_return_to_the_manager's_office? interrogative
 I_have_another_key_that_I_would_like_you_to_try. declarative
-Good_morning. declarative
+Good_morning. imperative
 Could_I_speak_with_the_manager,_please? interrogative
 I_am_the_assistant_manager. declarative
 Is_there_something_I_can_help_you_with? interrogative
@@ -6888,7 +6862,7 @@ It_just_started_today. declarative
 I_will_send_a_plumber_up_to_fix_it_right_now. declarative
 That_would_be_fabulous. declarative
 I'm_sorry_about_the_problem. declarative
-Hello,_how_are_you_doing_today? interrogative
+How_are_you_doing_today? interrogative
 I'm_great. declarative
 I_wanted_to_ask_about_the_apartment_for_rent. declarative
 I_was_wondering_if_the_apartment_is_located_in_a_nice_area. declarative
@@ -7023,7 +6997,7 @@ You_can_pay_for_it,_and_I_can_reimburse_you. declarative
 Or_he_can_bill_me_directly. declarative
 I_didn't_want_to_get_stuck_with_the_bill. declarative
 I_will_bill_the_kid's_parents_if_I_ever_find_out_which_kid_did_it. declarative
-Hello,_I'm_John_Smith_in_unit_23. declarative
+I'm_John_Smith_in_unit_23. declarative
 Am_I_speaking_to_the_apartment_manager? interrogative
 This_is_he. declarative
 My_window_that_faces_the_empty_lot_is_broken. declarative
@@ -7106,7 +7080,7 @@ I_won't_be_able_to_fix_it_at_the_moment. declarative
 I_will_not_rent_the_apartment_with_that_leaking_faucet. declarative
 If_that's_the_case,_then_I_will_fix_the_faucet. declarative
 Thanks_for_understanding. imperative
-Hello,_it's_nice_to_meet_you. declarative
+It's_nice_to_meet_you. declarative
 It's_great_meeting_you_too. declarative
 Did_you_just_move_in? interrogative
 I_moved_in_this_past_weekend. declarative
@@ -7246,7 +7220,6 @@ Come_on_by_my_office,_and_pick_up_your_keys. imperative
 Sounds_great! imperative
 Tell_me_your_phone_number. interrogative
 My_office_number_is_626-555-3000. declarative
-Hello,_John. imperative
 Terry_Evans_here. declarative
 I'm_happy_to_give_you_some_good_news. declarative
 The_apartment_owner_likes_you. declarative
@@ -7347,7 +7320,7 @@ It_is_unsafe_because_people_can't_see_where_they_are_walking_and_could_have_an_a
 When_it_gets_dark_tonight,_I_will_take_a_look. declarative
 I_appreciate_your_concern. declarative
 May_I_speak_with_the_property_manager,_please? interrogative
-Hello,_this_is_the_property_manager. declarative
+This_is_the_property_manager. declarative
 During_that_horrible_rainstorm_last_night,_my_roof_began_to_leak. declarative
 What_room_was_the_leak_in? interrogative
 It_was_in_our_bedroom. declarative
@@ -7434,7 +7407,7 @@ I_would_love_to_go_with_you! declarative
 I'll_be_leaving_around_ten_o'clock. declarative
 I'll_pick_you_up. declarative
 Hi,_I_just_moved_in_next_door_and_have_a_few_questions. declarative
-Hello,_and_welcome_to_our_building. imperative
+Welcome_to_our_building. imperative
 I_would_be_happy_to_help_you_with_your_questions. declarative
 You_all_seem_like_a_very_pleasant_group_of_tenants. declarative
 We_all_try_and_help_each_other_out_when_we_can. declarative
@@ -7610,7 +7583,7 @@ Would_you_like_anything_else_special? interrogative
 That's_the_most_important_thing. declarative
 Give_me_a_few_days,_and_I'll_call_you_when_I've_found_something. imperative
 Thank_you_so_much_for_all_your_help. imperative
-Hello,_I'm_calling_about_the_apartment. declarative
+I'm_calling_about_the_apartment. declarative
 What_would_you_like_to_know? interrogative
 I_just_wanted_to_find_out_some_details_about_the_apartment. declarative
 Like_what,_exactly? interrogative
@@ -7653,7 +7626,7 @@ Do_you_know_what_direction_that_bus_travels? interrogative
 If_you_check_online,_you_can_get_that_kind_of_information. declarative
 Okay,_I'll_just_go_online. declarative
 Good_luck_with_your_search. declarative
-Hello,_I_was_hoping_you_could_give_me_more_info_about_your_apartment. declarative
+I_was_hoping_you_could_give_me_more_info_about_your_apartment. declarative
 I_can_try_to_help_you. declarative
 Is_there_access_to_public_transportation_near_the_apartment? interrogative
 I'm_pretty_sure_there's_a_bus_stop_within_walking_distance. declarative
@@ -7786,7 +7759,6 @@ $850_a_month_is_not_enough_money. declarative
 Would_you_please_reconsider? interrogative
 That's_my_final_offer. declarative
 Take_it_or_leave_it. imperative
-Hello,_this_is_Betty. declarative
 Hi,_Betty. imperative
 Larry_here. imperative
 How_many_smoke_detectors_are_in_your_apartment? interrogative
@@ -7795,11 +7767,10 @@ Are_the_batteries_fresh? interrogative
 Both_batteries_are_good. declarative
 I_need_to_come_by_and_check_them_myself. declarative
 No_problem,_when_are_you_coming_by? interrogative
-Thursday_at_noon. imperative
+Thursday_at_noon. declarative
 I'll_let_myself_in_if_you're_not_there. declarative
 Okay,_remember_to_lock_my_door_when_you_leave. imperative
 I'll_be_in_and_out_of_there_in_just_a_few_minutes. declarative
-Hello,_Betty. imperative
 This_is_Larry. declarative
 How_many_smoke_detectors_are_on_your_ceiling? interrogative
 I_have_two_smoke_detectors. declarative
@@ -7812,7 +7783,6 @@ You_don't_have_to_be_there. declarative
 I_won't_be_home. declarative
 Just_remember_to_lock_my_door,_okay? interrogative
 You_won't_even_know_that_I've_been_there. declarative
-Hello,_Betty_speaking. imperative
 Hey,_Betty. imperative
 Tell_me_how_many_smoke_detectors_you_have,_please. interrogative
 This_apartment_came_with_one,_and_I_installed_another_one. declarative
@@ -7889,7 +7859,7 @@ If_I_were_you,_I_would_buy_a_personal_one_for_the_kitchen. declarative
 How_do_I_exit_the_building_in_case_of_a_fire? interrogative
 There_is_a_card_that_has_escape_routes_posted_on_the_inside_of_your_front_door. declarative
 Hi,_can_I_speak_with_the_apartment_manager,_please? interrogative
-Hello,_this_is_the_apartment_manager_speaking. declarative
+This_is_the_apartment_manager_speaking. declarative
 I'm_calling_about_the_apartment_for_rent_on_Main_Street. declarative
 Would_you_be_interested_in_seeing_the_apartment? interrogative
 I_would_love_to_see_it. declarative
@@ -7901,7 +7871,7 @@ I_used_to_live_in_that_area. declarative
 I'll_give_you_an_application_form_when_I_see_you. declarative
 Do_I_need_to_bring_anything? interrogative
 Just_bring_yourself. imperative
-Hello,_I_was_wondering_if_I_could_talk_with_the_apartment_manager. declarative
+I_was_wondering_if_I_could_talk_with_the_apartment_manager. declarative
 I_am_the_apartment_manager. declarative
 I_was_wondering_if_the_apartment_on_Main_Street_is_still_available. declarative
 Yes,_it's_still_vacant. declarative
@@ -8022,7 +7992,7 @@ I_am_sorry_if_my_party_kept_you_up. declarative
 It's_all_right,_but_next_time_could_you_try_to_keep_it_down? declarative
 I_will_try_to. declarative
 Thank_you,_because_that_would_be_great. imperative
-Good_morning,_is_this_the_Renter's_Hotline? interrogative
+Is_this_the_Renter's_Hotline? interrogative
 Yes,_what_can_I_help_you_with? interrogative
 I_have_a_question_about_discrimination_in_housing. declarative
 What_type_of_discrimination? interrogative
@@ -8042,7 +8012,7 @@ When_I_showed_up_on_his_doorstep,_he_seemed_bothered_by_my_appearance. declarati
 Is_there_anything_else_that_made_you_feel_he_was_using_race_as_a_factor_in_who_he_rented_to? interrogative
 As_I_walked_through_the_apartment_building_all_I_saw_were_people_who_were_the_same_race_as_the_manager. declarative
 It_is_not_easy_to_prove_racial_discrimination,_but_please_go_to_our_website_which_can_help_you_file_a_formal_complaint. declarative
-Hello,_is_this_the_Legal_Advice_Line? interrogative
+Is_this_the_Legal_Advice_Line? interrogative
 You_are_in_the_right_department. declarative
 I_think_that_the_landlord_where_I_am_trying_to_rent_an_apartment_may_be_discriminating_against_me. declarative
 Discrimination_is_a_pretty_broad_term. declarative
@@ -8184,7 +8154,7 @@ I_think_I_might_just_go_stay_with_my_boyfriend. declarative
 If_you_have_another_place_to_stay,_you_will_get_fifty_dollars_for_the_night. declarative
 What_other_safety_precautions_do_we_need_to_take? interrogative
 The_letter_you_received_includes_a_checklist_that_tells_you_how_to_store_your_food. declarative
-Hello,_this_is_Albert. declarative
+This_is_Albert. declarative
 I'm_Jack. declarative
 You_called_about_the_room_for_rent. declarative
 Are_you_still_interested? interrogative
@@ -8258,7 +8228,6 @@ Just_call_me_when_you're_ready_to_move_your_stuff_over_here. imperative
 How_about_if_I_come_over_tomorrow_afternoon? declarative
 Just_ring_the_doorbell. declarative
 I'll_be_here_all_day. declarative
-Hello,_Albert_speaking. imperative
 This_is_Jack. declarative
 Oh,_yes. declarative
 Would_you_mind_answering_a_couple_of_questions? interrogative
@@ -8283,8 +8252,6 @@ Okay,_I_think_we'll_be_good_roommates. declarative
 Just_call_me_when_you're_ready_to_move_in. imperative
 I_can_move_in_by_tomorrow_afternoon. declarative
 I_was_planning_on_being_home_tomorrow_anyway. declarative
-Hello,_Albert_here. imperative
-Hi,_Albert. imperative
 Are_you_still_thinking_about_renting_a_room? interrogative
 Yes,_I_need_a_room_badly. declarative
 Can_I_ask_you_a_few_questions? interrogative
@@ -8312,7 +8279,7 @@ Call_me_when_you're_coming_over. imperative
 I_can_get_all_packed_tonight_and_be_there_tomorrow. declarative
 Just_come_on_over_anytime. imperative
 I'll_be_here_the_whole_day. declarative
-Hello,_I_was_just_responding_to_your_ad. declarative
+I_was_just_responding_to_your_ad. declarative
 Which_ad_is_that? interrogative
 The_ad_for_a_roommate. declarative
 Are_you_interested? interrogative
@@ -8375,9 +8342,7 @@ Are_we_moving_the_furniture_to_a_house_or_an_apartment? interrogative
 To_my_new_house. imperative
 We_can_do_the_move_for_you,_but_first_I'm_going_to_need_some_more_information. declarative
 I'll_give_you_all_the_information_you_need. declarative
-Hello,_Nicole? interrogative
 This_is_Jimmy_in_309. declarative
-Hello,_Jimmy. imperative
 You're_not_going_to_believe_this. declarative
 Believe_me,_I_think_I've_heard_everything. declarative
 I_can't_find_my_mailbox_key. declarative
@@ -8446,7 +8411,7 @@ No,_I_doubt_that_there's_anything_important_in_my_mailbox,_if_there's_anything_a
 Well,_if_there's_no_emergency,_I_can_make_you_two_more_keys_on_Wednesday. declarative
 All_my_fan_mail_can_wait_till_then. declarative
 Have_$4_for_me,_and_I'll_give_you_a_receipt. imperative
-Good_afternoon,_Jim. declarative
+Good_afternoon,_Jim. imperative
 This_is_Olivia. declarative
 Oh,_hi,_Olivia. declarative
 When_are_you_leaving? interrogative
@@ -8464,7 +8429,6 @@ Anyway,_it's_been_nice_knowing_you_for_these_past_few_years. declarative
 You,_too. imperative
 Keep_in_touch,_and_good_luck_with_your_new_job. imperative
 How's_it_going,_Jim? interrogative
-Hello,_Olivia. imperative
 I_wanted_to_let_you_know_that_I_have_to_move_out. declarative
 When_are_you_moving? interrogative
 The_thirtieth_of_June. declarative
@@ -8518,7 +8482,6 @@ Then_they're_out_of_there. declarative
 I_appreciate_what_a_good_apartment_manager_you've_been_these_past_few_years. declarative
 It's_been_nice_knowing_you,_too. declarative
 Good_luck_teaching_LES. declarative
-Hello,_Jim. imperative
 Hi,_there. imperative
 You_should_know_that_I'll_be_moving_out_in_a_while. declarative
 Gee,_that's_too_bad. declarative
@@ -8634,7 +8597,6 @@ I_live_here_alone. declarative
 Have_you_noticed_any_strangers_or_parked_cars_around_here_recently? interrogative
 I_really_haven't_been_home_very_much_lately. declarative
 Let's_figure_out_what_is_missing_and_see_if_there_are_any_fingerprints_left_behind. imperative
-Hello,_Nicole_here. imperative
 Nicole,_this_is_Richard. declarative
 I_think_you_know_why_I'm_calling. declarative
 Oh,_it's_about_the_rent. declarative
@@ -10012,7 +9974,6 @@ I'd_like_to_reserve_a_hotel_room. declarative
 That_should_be_no_problem. declarative
 May_I_have_your_full_name,_please? interrogative
 My_name_is_John_Sandals. declarative
-Hello,_Mr._Sandals. imperative
 My_name_is_Michelle. declarative
 What_days_do_you_need_that_reservation,_sir? interrogative
 I'm_planning_to_visit_New_York_from_Friday,_April_14_until_Monday,_April_17. declarative
@@ -11747,7 +11708,7 @@ Does_this_happen_all_the_time_or_maybe_a_little_more_in_the_cold_weather? interr
 I've_noticed_that_it_is_worse_when_I_am_under_stress,_like_during_finals_week. declarative
 I_feel_that_you_should_see_a_pulmonary_specialist_to_check_for_asthma. declarative
 I_appreciate_the_referral,_doctor. declarative
-Good_morning,_how_have_you_been_doing? interrogative
+How_have_you_been_doing? interrogative
 I_haven't_been_able_to_take_a_deep_breath_lately,_and_I_need_to_know_why. declarative
 Have_you_had_any_type_of_bug_lately? interrogative
 No,_I've_been_feeling_fairly_good_most_of_the_time. declarative
@@ -11793,8 +11754,7 @@ If_I_need_to_use_my_insurance,_are_the_payments_the_same_for_a_PPO_and_HMO? inte
 By_going_to_the_providers_on_the_HMO_list,_you_save_money_in_out-of-pocket_expenses. declarative
 Can_you_give_me_a_comparison_between_a_PPO_and_an_HMO? interrogative
 We_can_mail_you_a_questionnaire_and_when_we_have_all_of_your_information,_we_will_mail_you_a_quote. declarative
-I_have_a_doctor's_appointment_scheduled_with_Dr. declarative
-Smith,_and_I_need_to_change_it. imperative
+I_have_a_doctor's_appointment_scheduled_with_Dr._Smith,_and_I_need_to_change_it. declarative
 What_day_did_you_have_it_scheduled_for? interrogative
 My_appointment_was_on_Tuesday. declarative
 What_time_was_it_scheduled_for? interrogative
@@ -11805,8 +11765,7 @@ I_would_like_to_switch_it_to_next_Friday. declarative
 I_would_like_to_come_in_at_10:00_in_the_morning. declarative
 Fine,_I_will_pencil_that_in_right_now. declarative
 We_will_see_you_then. declarative
-I_scheduled_an_appointment_with_Dr. declarative
-Smith,_and_I_can't_make_it_on_that_day. imperative
+I_scheduled_an_appointment_with_Dr._Smith,_and_I_can't_make_it_on_that_day. declarative
 What_day_was_your_appointment_on? interrogative
 My_appointment_was_on_Monday. declarative
 What_time_had_you_chosen? interrogative
@@ -11818,8 +11777,7 @@ What_time_would_be_best_for_you? interrogative
 I_want_to_come_in_at_2:00_in_the_afternoon. declarative
 I_am_writing_you_down_for_that_time. declarative
 We_look_forward_to_seeing_you. declarative
-Good_morning,_I_made_an_appointment_with_Dr. declarative
-Smith,_but_I_have_to_change_it. imperative
+I_made_an_appointment_with_Dr._Smith,_but_I_have_to_change_it. declarative
 When_you_made_your_appointment,_what_day_did_you_choose? interrogative
 My_appointment_was_on_Wednesday. declarative
 At_what_time_was_that_appointment? interrogative
@@ -11839,13 +11797,10 @@ I_have_openings_on_Tuesday_or_Wednesday. declarative
 Which_would_be_best_for_you? interrogative
 I_need_an_appointment_on_Tuesday. declarative
 Fine,_I_am_putting_you_down_for_9:00_on_that_day. declarative
-Would_you_like_to_see_Dr. interrogative
-Smith_or_Dr. imperative
-Jones? interrogative
-I_would_like_to_see_Dr. declarative
-Jones. imperative
+Would_you_like_to_see_Dr._Smith_or_Dr._Jones? interrogative
+I_would_like_to_see_Dr._Jones. declarative
 I_can_schedule_you_with_him_with_no_problem. declarative
-Good_morning,_I_would_like_to_make_a_doctor's_appointment. declarative
+I_would_like_to_make_a_doctor's_appointment. declarative
 Can_you_describe_your_health_concern? interrogative
 I_have_been_having_skin_problems_that_aren't_going_away. declarative
 Are_you_in_any_pain? interrogative
@@ -11853,8 +11808,7 @@ Except_for_the_rash,_I_feel_fine. declarative
 Would_Tuesday_or_Wednesday_be_best_for_you? interrogative
 I_would_like_to_come_in_on_Tuesday. declarative
 I_will_write_you_in_for_that_day_at_4:00. declarative
-You_can_see_either_Dr. declarative
-Smith. imperative
+You_can_see_either_Dr._Smith. declarative
 I_will_write_you_in_on_that_doctor's_schedule. declarative
 I_need_to_come_in_and_see_the_doctor. declarative
 Are_you_scheduling_a_check-up,_or_are_you_ill? interrogative
@@ -11865,9 +11819,7 @@ I_have_times_available_for_Tuesday_or_Wednesday. declarative
 Which_one_would_work_best_for_you? interrogative
 I_want_to_come_in_on_Wednesday. declarative
 I_can_fit_you_in_on_that_day_at_10:00. declarative
-Dr. imperative
 Jones_is_available. declarative
-I_would_prefer_Dr. declarative
 You_can_see_the_doctor_of_your_choice_then,_and_we_will_see_you_at_your_scheduled_appointment_time. declarative
 Is_this_Professor_Clark's_office? interrogative
 This_is_Professor_Clark_speaking. declarative
@@ -11881,7 +11833,7 @@ How_long_will_you_be_out_of_class? interrogative
 I_should_be_able_to_return_by_next_Monday. declarative
 Well,_thanks_for_calling_and_letting_me_know_you_will_be_absent. declarative
 I_hope_you_feel_better_soon. declarative
-Good_morning,_may_I_speak_with_Professor_Clark,_please? interrogative
+May_I_speak_with_Professor_Clark,_please? interrogative
 You_are_speaking_with_Professor_Clark. declarative
 Professor,_I_am_Kalia_from_your_morning_literature_class. declarative
 I_ran_my_car_into_a_tree_yesterday_and_need_to_miss_a_few_days_of_school. declarative
@@ -12001,7 +11953,7 @@ Drinking_liquids_and_getting_rest_is_a_good_idea_with_a_cold. declarative
 My_grandmother_thinks_that_honey_and_whiskey_is_a_good_cure_for_a_cold. declarative
 You_could_always_go_to_the_pharmacy_if_it_gets_worse_and_you_want_suggestions. declarative
 If_things_don't_get_better_in_a_few_days,_I_will_look_for_some_other_solutions. declarative
-Good_morning,_how_are_you_doing_today? interrogative
+How_are_you_doing_today? interrogative
 I_have_been_feeling_pretty_good,_Dr. declarative
 So,_I_can_see_by_your_chart_that_you_are_here_for_your_annual_physical. declarative
 Yes,_I_am_playing_on_the_tennis_team_this_year,_and_they_are_requiring_me_to_get_a_physical_exam. declarative
@@ -12014,7 +11966,7 @@ We_will_be_checking_for_blood_sugar,_cholesterol,_and_white_blood_cell_count. de
 I_have_been_working_hard_to_stay_healthy. declarative
 I_hope_the_tests_turn_out_well. declarative
 So_how_are_we_feeling_today? interrogative
-Things_are_going_well_for_me,_Dr. declarative
+Things_are_going_well_for_me. declarative
 Am_I_correct_in_thinking_that_you_are_here_for_your_annual_physical? interrogative
 Yes,_I_am_applying_for_new_health_insurance,_and_I_need_a_physical_examination_to_qualify. declarative
 Your_basic_physical_exam_will_include_lungs,_heart,_blood_levels,_and_eyes,_ears,_and_nose. declarative
@@ -12458,7 +12410,7 @@ We_will_pump_air_into_this_cuff_to_get_a_reading. declarative
 When_you_get_the_reading,_what_information_does_it_give_you? interrogative
 It_tells_me_how_hard_your_heart_pumps_blood_and_how_much_your_arteries_relax_at_rest. declarative
 I_am_hoping_that_this_test_goes_well_for_me. declarative
-Good_morning,_is_this_Ryan? interrogative
+Is_this_Ryan? interrogative
 You_are_speaking_with_Ryan. declarative
 Ryan,_this_is_Malia,_and_I_need_to_call_in_sick_today. declarative
 I_went_hiking_and_have_terrible_poison_oak. declarative
@@ -13591,7 +13543,7 @@ OK,_can_you_help_me_figure_out_what_I_should_insure_my_car_for? interrogative
 I_will_look_it_up_on_the_Blue_Book_list_and_we_will_factor_in_its_condition. declarative
 What_else_do_I_need_to_consider? interrogative
 Yes,_you_need_to_figure_in_liability_for_damage_to_the_other_car_as_well_as_injury_issues_as_well. declarative
-Good_morning,_I_need_to_buy_car_insurance_for_the_used_car_I_just_bought. declarative
+I_need_to_buy_car_insurance_for_the_used_car_I_just_bought. declarative
 Yes,_no_problem. declarative
 Do_you_have_your_registration_and_Certificate_of_Ownership_with_you? interrogative
 Yes,_it_is_all_right_here. declarative
@@ -14393,8 +14345,7 @@ Want_to_meet_me_over_there? interrogative
 Maybe_that_would_work. declarative
 I'll_catch_you_later_then. declarative
 Have_a_wonderful_morning. imperative
-Could_you_tell_me_if_you_have_ever_taken_a_class_from_Dr. interrogative
-Miller? interrogative
+Could_you_tell_me_if_you_have_ever_taken_a_class_from_Dr._Miller? interrogative
 Are_you_going_to_be_taking_a_class_from_him? interrogative
 Yes,_but_I_have_never_taken_his_class_before. declarative
 He_is_very_interesting_and_challenging. declarative
@@ -14409,8 +14360,7 @@ Yes,_I_had_a_teacher_like_that_before. declarative
 Did_you_know_that_he_has_20_years_teaching_experience? interrogative
 No,_I_didn't,_but_that_could_be_a_good_thing. declarative
 Well,_take_a_look_at_everything_and_figure_out_what_is_best_for_you. imperative
-Do_you_know_anything_about_Dr. interrogative
-Miller's_classes? interrogative
+Do_you_know_anything_about_Dr._Miller's_classes? interrogative
 Are_you_in_his_class? interrogative
 I'm_thinking_of_taking_his_class_next_semester. declarative
 He_really_knew_his_stuff,_but_he_graded_hard. declarative
@@ -14426,7 +14376,7 @@ Did_you_know_that_he_is_a_fairly_new_teacher_and_very_current_in_his_field? inte
 I_don't_care_about_any_of_that. declarative
 We_all_are_looking_for_different_things_in_an_instructor. declarative
 I_hope_I've_helped_you. declarative
-Would_you_talk_to_me_about_taking_one_of_Dr. interrogative
+Would_you_talk_to_me_about_taking_one_of_doctor? interrogative
 Have_you_ever_been_in_one_of_his_classes? interrogative
 I'm_thinking_about_taking_his_class_next_semester. declarative
 He_was_a_very_easy_teacher. declarative
@@ -14852,7 +14802,7 @@ Don't_worry,_this_will_be_the_last_class_I_miss. declarative
 Make_sure_to_remind_me_right_before_you_are_absent. imperative
 I'll_remember. declarative
 Enjoy_your_day_off_and_don't_forget_to_study! imperative
-Hello,_how_are_you_doing? interrogative
+How_are_you_doing? interrogative
 Pretty_good,_and_you? declarative
 So_how_long_have_you_been_going_to_PCC? interrogative
 I've_been_going_here_for_a_couple_years_now. declarative
@@ -14947,7 +14897,7 @@ What_if_we_can't_get_to_school? interrogative
 You_can_only_miss_one_class_without_penalty. declarative
 If_we_have_a_major_problem,_will_you_let_us_know? interrogative
 I_will_be_letting_you_know_during_the_year_if_you_have_a_major_problem. declarative
-Hello,_I_need_to_register_for_a_class. declarative
+I_need_to_register_for_a_class. declarative
 What_class_are_you_trying_to_take? interrogative
 I_want_to_take_a_Psychology_class. declarative
 Well,_there_are_only_two_classes_open. declarative
@@ -15248,7 +15198,6 @@ Mike,_I_had_a_good_time_too,_but_I_am_getting_ready_to_move_back_to_the_east_coa
 Well,_we_could_just_go_out_as_friends. declarative
 Right_now,_I_think_I_need_to_really_focus_on_matters_at_home,_but_thanks_for_a_nice_evening. declarative
 Hi_Kara,_this_is_Mike declarative
-Hello_Mike. imperative
 How_are_things_going_for_you? interrogative
 Great,_how_are_you? interrogative
 Everything_is_just_fine. declarative
@@ -15257,7 +15206,7 @@ Mike,_I_enjoyed_your_company,_but_I_am_getting_ready_to_graduate_soon. declarati
 I_really_need_to_focus_on_my_studies. declarative
 Maybe_I_could_help_you_with_what_you_need_to_get_done. declarative
 It_would_be_better_for_me_to_just_deal_with_getting_my_work_done,_but_thank_you_for_a_lovely_dinner. declarative
-Hello,_this_is_Mike,_Kara. declarative
+This_is_Mike,_Kara. declarative
 Mike! imperative
 Good_to_hear_from_you. imperative
 Everything_is_fine,_and_how_are_you? declarative
@@ -16449,7 +16398,7 @@ What_are_you_majoring_in? interrogative
 I_am_studying_international_communications. declarative
 You_should_easily_be_able_to_find_a_job_with_that_major. declarative
 I_am_counting_on_being_able_to_get_a_good_job. declarative
-Hello,_it's_been_a_long_time_since_I_have_seen_you. declarative
+It's_been_a_long_time_since_I_have_seen_you. declarative
 It_is_true_that_I_have_not_seen_you_in_a_while. declarative
 Exactly_how_long_do_you_think_that_it_has_been? interrogative
 I_believe_that_it_has_been_two_years_since_we_last_saw_each_other. declarative
@@ -18645,11 +18594,10 @@ Sure,_let's_go_there. declarative
 Fine_then,_I'll_meet_you_around_twelve. declarative
 I'll_see_you_there. declarative
 Look_forward_to_it. imperative
-Good_morning,_this_is_Ray_speaking. declarative
+This_is_Ray_speaking. declarative
 Is_Lee_in? interrogative
 Hi,_Ray. imperative
 This_is_Lee. declarative
-Good_morning,_Lee. declarative
 How_is_it_going_with_you_today? interrogative
 Things_are_wonderful. declarative
 Could_we_meet_for_lunch_tomorrow_to_discuss_the_new_project? interrogative
@@ -18883,7 +18831,7 @@ Mr._Wallace,_we_were_very_pleased_with_your_interview_and_would_like_to_offer_yo
 I_am_very_happy_to_be_able_to_join_your_organization. declarative
 We_are_interested_in_having_you_begin_as_soon_as_possible,_perhaps_in_two_weeks? interrogative
 Yes,_that_would_be_perfect! declarative
-Good_morning,_may_I_speak_with_Mr._Wallace,_please? interrogative
+May_I_speak_with_Mr._Wallace,_please? interrogative
 You_are_speaking_to_him,_may_I_help_you? interrogative
 Mr._Wallace,_this_is_the_Xenon_Company_calling_to_speak_with_you. declarative
 Yes,_good_to_hear_from_you! declarative
@@ -19088,8 +19036,7 @@ Should_we_hire_a_band_or_bring_in_a_DJ? interrogative
 Maybe_we_could_do_both! declarative
 Everything_sounds_great_then! declarative
 I'll_meet_you_back_here_on_Friday_to_discuss_the_details. declarative
-Good_morning,_I_am_here_for_my_interview. declarative
-Hello,_nice_to_meet_you. declarative
+I_am_here_for_my_interview. declarative
 I'm_Mr._Gotcha. declarative
 Have_any_trouble_finding_the_place? interrogative
 So_why_don't_you_tell_me_why_you_are_interested_in_changing_positions? interrogative
@@ -19112,7 +19059,7 @@ I_don't_like_to_sit_around_and_so_like_to_always_find_things_to_do_to_keep_mysel
 That_is_good_to_hear! declarative
 Good_afternoon. declarative
 Thank_you_for_the_opportunity_to_interview_for_this_position. imperative
-Hello,_have_a_seat. imperative
+Have_a_seat. imperative
 I'm_Bill_Gotcha. declarative
 I_am_assuming_you_found_your_way_here_with_no_trouble? interrogative
 Actually,_I_am_very_familiar_with_the_area_so_there_was_absolutely_no_problem. declarative
@@ -23384,11 +23331,11 @@ Is_there_a_game_tonight? interrogative
 Yes,_it_starts_at_7_p.m. declarative
 Can_we_get_tickets? interrogative
 Yes,_but_only_the_cheap_tickets. declarative
-They're_only_$5_each. imperative
-That's_a_good_price. imperative
+They're_only_$5_each. declarative
+That's_a_good_price. declarative
 Yes,_it's_cheaper_than_a_hot_dog_or_a_beer. declarative
 Where_are_the_seats? interrogative
-They're_behind_the_outfield. imperative
+They're_behind_the_outfield. declarative
 Maybe_we_can_catch_a_home_run_ball. declarative
 Exactly_what? interrogative
 All_I_get_is_a_black_screen. declarative
@@ -23422,7 +23369,6 @@ Have_you_tried_earplugs? interrogative
 They_don't_work,_either. declarative
 Well,_be_glad_you're_not_a_pilot. imperative
 Does_your_girlfriend_ever_make_you_angry? interrogative
-Sometimes. imperative
 What_does_she_do? interrogative
 Just_yesterday,_I_told_her_I_wouldn't_trade_her_for_all_the_money_in_the_world. declarative
 That_was_a_nice_thing_to_say. declarative
@@ -23530,7 +23476,6 @@ It_went_by_pretty_fast. declarative
 But_work_goes_on_forever! declarative
 We_have_to_work_for_30_years! declarative
 What_is_your_major? interrogative
-English. imperative
 What_are_you_going_to_do_with_an_English_major? interrogative
 I'm_going_to_be_a_teacher. declarative
 High_school_or_middle_school? interrogative
@@ -23615,7 +23560,7 @@ Who_makes_up_all_these_jokes? interrogative
 But_there_must_be_a_hundred_new_ones_every_day. declarative
 Yes,_just_in_English_alone. declarative
 I_wonder_if_every_language_has_jokes. declarative
-People_everywhere_like_good_jokes. imperative
+People_everywhere_like_good_jokes. declarative
 What_do_you_think_people_joke_about_the_most? interrogative
 I_think_most_jokes_are_about_women. declarative
 I_think_most_jokes_are_about_men! declarative
@@ -23726,7 +23671,7 @@ Then_you_can_start_losing_weight,_if_there_isn't_another_sale. declarative
 Do_you_listen_to_the_radio? interrogative
 I_listen_day_and_night. declarative
 What_do_you_listen_to? interrogative
-Mostly_talk_radio. imperative
+Mostly_talk_radio. declarative 
 People_talk_about_current_events. declarative
 What_do_they_say? interrogative
 They_say_they_want_change. declarative
@@ -23744,7 +23689,7 @@ That's_only_a_penny_a_minute! declarative
 It's_a_great_price. declarative
 But_you_have_to_dial_a_lot_of_numbers. declarative
 First_you_dial_seven_numbers,_then_ten_numbers,_then_ten_more_numbers. declarative
-Yikes. imperative
+Yikes. declarative
 I_think_I'll_keep_my_long_distance_service. declarative
 I'm_upset_with_my_mom. declarative
 I_warned_her_about_her_new_boyfriend. declarative
@@ -23861,7 +23806,6 @@ Of_course_you_can. declarative
 I_don't_have_enough_will_power. declarative
 Of_course_you_do. declarative
 I_wish_I_had_never_started. declarative
-So_does_every_smoker. imperative
 I've_tried_to_quit_so_many_times. declarative
 So_has_everyone_else. declarative
 Nothing_seems_to_work. declarative
@@ -24003,7 +23947,7 @@ Why_doesn't_it_close? interrogative
 They_said_they'll_fix_it_before_next_season. declarative
 Let's_go_for_a_ride. imperative
 Where_are_we_going? interrogative
-Into_the_mountains. imperative
+Into_the_mountains. declarative
 I_want_to_show_you_my_new_car. declarative
 You_bought_a_new_car? interrogative
 I_bought_a_Cadillac. declarative
@@ -24081,7 +24025,7 @@ How_many_rich_people_do_you_know? interrogative
 None. imperative
 Look_at_all_these_kittens! imperative
 How_many_are_there? interrogative
-Eight. imperative
+Eight. declarative
 They're_all_so_cute. declarative
 Yes,_but_I_can't_keep_them. declarative
 What_are_you_going_to_do_with_them? interrogative
@@ -24201,3 +24145,38 @@ What_Bob_said_was_wrong. declarative
 Clarify_for_me_if_I_have_a_car. interrogative
 Show_me_the_concept. imperative
 Define_for_me_the_formula. interrogative
+Name_the_first_private_citizen_to_fly_in_space. interrogative
+Name_the_designer_of_the_shoe_that_spawned_millions_of_plastic_imitations,_known_as_"jellies". interrogative
+Jack_threw_a_salt_shaker_down_the_window. declarative
+Tom_picked_it_up_from_the_ground. declarative
+The_sky_is_blue. declarative
+Mary_is_happy_about_the_party. declarative
+Mary_is_difficult_to_understand. declarative
+I_don't_have_to_take_care_of_whom? interrogative
+Tom_and_Mike_are_friends. declarative
+Janet_didn't_attend_the_meeting. declarative
+Janet_attended_the_meeting. declarative
+Chris_eats_shoes. declarative
+John_runs_very_quickly. declarative
+Market_data_is_from_the_mainframe. declarative
+User_should_contact_the_client_to_increase_the_mailbox_size_in_order_to_receive_email_notifications_from_Morgan_Stanley. declarative
+Mary_looks_so_beautiful. declarative
+Say_I_am_the_very_model_of_a_modern_major_general. imperative
+What_does_Full_Access_allow? interrogative
+I_ran_away_to_escape_the_killer. declarative
+54.4_percent_of_population_have_college_degree. declarative
+Jane_spent_her_birthday_with_John_until_the_end. declarative
+Don't_shut_the_door. imperative
+Greet_the_user. imperative
+You_know_what_I'd_like_to_do_to_you? interrogative
+But_didn't_you_leave_early? interrogative
+Ow!_My_back_hurts. declarative
+Houdini's_step_father_is_Harry. declarative
+I_am_interested_in_what. interrogative
+You_and_John_eat_dinner. declarative
+Access_level_is_determined_by_Social_Security_Number_(SSN)_or_Passport_number. declarative
+French_society_itself_underwent_an_epic_transformation_as_feudal,_aristocratic,_and_religious_privileges_evaporated_under_a_sustained_assault_from_various_left-wing_political_groups,_the_masses_on_the_streets,_and_peasants_in_the_countryside. declarative
+Possible_symptoms_of_a_distorted_casing_are_vibration_and_noise,_short_mechanical_seal_life,_short_bearing_life,_cracks_in_casing,_or_damages_in_flange_connection. declarative
+Drive_shaft_is_a_component_of_the_centrifugal_pump. declarative
+Verify_that_the_dog's_bone_is_big. imperative
+Verify_that_the_cat's_head_is_small. imperative

@@ -114,16 +114,21 @@ public class FeatureExtractor {
         }
         addFeats(builder, "question_over_head", isStartPrefixMatch);
 
-        String inputWithTag = "<sentence> " + input.toLowerCase() + " </sentence>";
+        // Verify - imperative
+        addFeats(builder, "has_verify_keyword", "verify".equals(tree.get(1).form.toLowerCase()));
+
+        String inputWithTag = " <sentence> " + input.toLowerCase() + " </sentence> ";
         inputWithTag = inputWithTag.replaceAll(" ", "_");
         //Bigram
         for (String str : biGram.keySet()) {
-            addFeats(builder, "biGram_" + str, inputWithTag.contains(str));
+            // Make sure is the whole word match instead of partial word+"_"+partial word.
+            addFeats(builder, "biGram_" + str, inputWithTag.contains("_" + str + "_"));
         }
 
         //Trigram
         for (String str : triGram.keySet()) {
-            addFeats(builder, "triGram_" + str, inputWithTag.contains(str));
+            // Make sure is the whole word match instead of partial word+"_"+partial word.
+            addFeats(builder, "triGram_" + str, inputWithTag.contains("_" + str + "_"));
         }
         return builder.toString().trim();
     }
