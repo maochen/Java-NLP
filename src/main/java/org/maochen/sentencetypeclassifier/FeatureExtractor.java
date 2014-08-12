@@ -53,7 +53,64 @@ public class FeatureExtractor {
         input = input.trim();
         input = input.replaceAll("_", " ");
 
+        // Add punct if not there.
+        if (!input.matches(".*\\p{Punct}$")) {
+            input += ".";
+        }
+
         DEPTree tree = parser.process(input);
+
+        String inputWithTag = input.toLowerCase();
+        // Remove Punct at the end
+        inputWithTag = inputWithTag.replaceAll("\\p{Punct}*$", "");
+        inputWithTag = " <sentence> " + inputWithTag + " </sentence> ";
+        inputWithTag = inputWithTag.replaceAll(" ", "_");
+        // Bigram
+        for (String str : biGram.keySet()) {
+            // Make sure is the whole word match instead of partial word+"_"+partial word.
+            addFeats(builder, "biGram_" + str, inputWithTag.contains("_" + str + "_"));
+        }
+
+        // Trigram
+        for (String str : triGram.keySet()) {
+            // Make sure is the whole word match instead of partial word+"_"+partial word.
+            addFeats(builder, "triGram_" + str, inputWithTag.contains("_" + str + "_"));
+        }
+
+        Set<String> whPrefixPos = Sets.newHashSet(CTLibEn.POS_WRB, CTLibEn.POS_WDT, CTLibEn.POS_WP, CTLibEn.POS_WPS);
+        // 1st word is WH
+        String firstPOS = tree.get(1).pos;
+        addFeats(builder, "first_word_pos", whPrefixPos.contains(firstPOS));
+
+        // last word is WH
+        String lastPOS = tree.get(tree.size() - 1).pos;
+        addFeats(builder, "last_word_pos", whPrefixPos.contains(lastPOS));
+
+        // is 1st word rootVerb.
+        addFeats(builder, "first_word_root_verb", firstPOS.startsWith(CTLibEn.POS_VB));
+
+        // Have aux in the sentence.
+        int auxCount = Collections2.filter(tree, new Predicate<DEPNode>() {
+            @Override
+            public boolean apply(DEPNode depNode) {
+                return DEPLibEn.DEP_AUX.equals(depNode.getLabel());
+            }
+        }).size();
+        addFeats(builder, "has_aux", auxCount > 0);
+
+        // Start with question word.
+        Set<String> bagOfQuestionPrefix = Sets.newHashSet("tell me", "let me know", "clarify for me");
+        boolean isStartPrefixMatch = false;
+        for (String prefix : bagOfQuestionPrefix) {
+            if (input.toLowerCase().startsWith(prefix)) {
+                isStartPrefixMatch = true;
+                break;
+            }
+        }
+        addFeats(builder, "question_over_head", isStartPrefixMatch);
+
+        // Verify - imperative
+        addFeats(builder, "has_verify_keyword", "verify".equals(tree.get(1).form.toLowerCase()));
 
         // puncts.
         char punct = input.charAt(input.length() - 1);
@@ -81,55 +138,9 @@ public class FeatureExtractor {
                 break;
         }
 
-
         // keyword whether
         addFeats(builder, "whether", input.toLowerCase().contains("whether"));
 
-        // 1st word POS
-        Set<String> whPrefixPos = Sets.newHashSet(CTLibEn.POS_WRB, CTLibEn.POS_WDT, CTLibEn.POS_WP, CTLibEn.POS_WPS);
-        String pos = tree.get(1).pos;
-        addFeats(builder, "first_word_pos", whPrefixPos.contains(pos));
-
-        // is 1st word rootVerb.
-        addFeats(builder, "first_word_root_verb", pos.startsWith(CTLibEn.POS_VB));
-
-
-        // Have aux in the sentence.
-        int auxCount = Collections2.filter(tree, new Predicate<DEPNode>() {
-            @Override
-            public boolean apply(DEPNode depNode) {
-                return DEPLibEn.DEP_AUX.equals(depNode.getLabel());
-            }
-        }).size();
-        addFeats(builder, "aux_count", auxCount > 0);
-
-        // Start with question word.
-        Set<String> bagOfQuestionPrefix = Sets.newHashSet("tell me", "let me know", "clarify for me");
-        boolean isStartPrefixMatch = false;
-        for (String prefix : bagOfQuestionPrefix) {
-            if (input.toLowerCase().startsWith(prefix)) {
-                isStartPrefixMatch = true;
-                break;
-            }
-        }
-        addFeats(builder, "question_over_head", isStartPrefixMatch);
-
-        // Verify - imperative
-        addFeats(builder, "has_verify_keyword", "verify".equals(tree.get(1).form.toLowerCase()));
-
-        String inputWithTag = " <sentence> " + input.toLowerCase() + " </sentence> ";
-        inputWithTag = inputWithTag.replaceAll(" ", "_");
-        //Bigram
-        for (String str : biGram.keySet()) {
-            // Make sure is the whole word match instead of partial word+"_"+partial word.
-            addFeats(builder, "biGram_" + str, inputWithTag.contains("_" + str + "_"));
-        }
-
-        //Trigram
-        for (String str : triGram.keySet()) {
-            // Make sure is the whole word match instead of partial word+"_"+partial word.
-            addFeats(builder, "triGram_" + str, inputWithTag.contains("_" + str + "_"));
-        }
         return builder.toString().trim();
     }
 

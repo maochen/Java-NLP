@@ -24141,6 +24141,7 @@ Did_you_give_him_a_nose? interrogative
 We_gave_him_a_big_carrot_for_a_nose. declarative
 Let_me_help_you_make_one_this_year. imperative
 Clarify_for_me_the_concept. interrogative
+What_Tom_said_was_not_true. declarative
 What_Bob_said_was_wrong. declarative
 Clarify_for_me_if_I_have_a_car. interrogative
 Show_me_the_concept. imperative
@@ -24180,3 +24181,4 @@ Possible_symptoms_of_a_distorted_casing_are_vibration_and_noise,_short_mechanica
 Drive_shaft_is_a_component_of_the_centrifugal_pump. declarative
 Verify_that_the_dog's_bone_is_big. imperative
 Verify_that_the_cat's_head_is_small. imperative
+What_Bob_said_is_not_ture. declarative
