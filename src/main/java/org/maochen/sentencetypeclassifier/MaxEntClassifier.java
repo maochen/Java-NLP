@@ -9,44 +9,20 @@ import opennlp.model.RealValueFileEventStream;
 
 import java.io.*;
 import java.util.HashSet;
+import java.util.Scanner;
 import java.util.Set;
 
 public class MaxEntClassifier {
-    // Annotated Training Data Delimiter
-    private static final String DELIMITER = " ";
+
+    public static final String DELIMITER = " ";
     private static final boolean USE_SMOOTHING = true;
     private static final int ITERATIONS = 100;
     private static final int CUTOFF = 0;
-    private FeatureExtractor featureExtractor;
-    private String outputDirPath;
+    private String filepathPrefix;
     private GISModel model;
     private boolean isRealFeature = false;
 
-    private void extractFeatureVector(Set<String> trainingData) {
-        // Set isRealFeatureFlag
-        this.isRealFeature = featureExtractor.getIsRealFeature();
-
-        File featureVectorFile = new File(outputDirPath + "/featureVector.txt");
-        if (!featureVectorFile.exists()) {
-            try {
-                featureVectorFile.createNewFile();
-
-                FileWriter fw = new FileWriter(featureVectorFile.getAbsoluteFile());
-                BufferedWriter bw = new BufferedWriter(fw);
-
-                Set<String> featureVector = featureExtractor.getFeats(trainingData);
-                for (String s : featureVector) {
-                    bw.write(s + System.getProperty("line.separator"));
-                }
-
-                bw.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public void train(String trainFilePath) throws IOException {
+    public void train(String trainFilePath, TrainingFeatureExtractor trainingFeatureExtractor) throws IOException {
         // Preparing training data
         Set<String> trainingData = new HashSet<>();
         try (BufferedReader br = new BufferedReader(new FileReader(trainFilePath))) {
@@ -58,13 +34,14 @@ public class MaxEntClassifier {
         }
         // -----------
 
-        extractFeatureVector(trainingData);
+        this.isRealFeature = trainingFeatureExtractor.isRealFeature;
+        trainingFeatureExtractor.extractFeature(trainingData);
 
         EventStream es;
         if (isRealFeature) {
-            es = new RealBasicEventStream(new PlainTextByLineDataStream(new FileReader(outputDirPath + "/featureVector.txt")));
+            es = new RealBasicEventStream(new PlainTextByLineDataStream(new FileReader(filepathPrefix + "featureVector.txt")));
         } else {
-            es = new BasicEventStream(new PlainTextByLineDataStream(new FileReader(outputDirPath + "/featureVector.txt")));
+            es = new BasicEventStream(new PlainTextByLineDataStream(new FileReader(filepathPrefix + "featureVector.txt")));
         }
 
         model = GIS.trainModel(es, ITERATIONS, CUTOFF, USE_SMOOTHING, true);
@@ -86,7 +63,7 @@ public class MaxEntClassifier {
 
     }
 
-    private double[] predictOCS(String sentence) {
+    private double[] predictOCS(String sentence, FeatureExtractor featureExtractor) {
         sentence = sentence.replaceAll("\\s+", "_");
         String vector = featureExtractor.getFeats(sentence + DELIMITER + "?");
         String[] contexts = vector.split(DELIMITER);
@@ -102,27 +79,26 @@ public class MaxEntClassifier {
         return ocs;
     }
 
-    public String predict(String sentence) {
-        return model.getBestOutcome(predictOCS(sentence));
+    public String predict(String sentence, FeatureExtractor featureExtractor) {
+        return model.getBestOutcome(predictOCS(sentence, featureExtractor));
     }
 
-    public String predictAllOutcome(String sentence) {
-        return model.getAllOutcomes(predictOCS(sentence));
+    public String predictAllOutcome(String sentence, FeatureExtractor featureExtractor) {
+        return model.getAllOutcomes(predictOCS(sentence, featureExtractor));
     }
 
-    public MaxEntClassifier(String outputDirPath) {
-        this.outputDirPath = outputDirPath;
-        featureExtractor = new FeatureExtractor(outputDirPath, DELIMITER);
+    public MaxEntClassifier(String filepathPrefix) {
+        this.filepathPrefix = filepathPrefix;
     }
 
-    // Annotate a whole file.
-    public static void annotate(String testFilePath, MaxEntClassifier maxEntClassifier) {
+    public static void annotate(String testFilePath, MaxEntClassifier maxEntClassifier, FeatureExtractor featureExtractor) {
+
         try (BufferedReader br = new BufferedReader(new FileReader(testFilePath))) {
             BufferedWriter bw = new BufferedWriter(new FileWriter(testFilePath + ".result"));
 
             String line = br.readLine();
             while (line != null) {
-                String result = maxEntClassifier.predict(line);
+                String result = maxEntClassifier.predict(line, featureExtractor);
                 bw.write(line.replaceAll("\\s", "_") + " " + result + System.getProperty("line.separator"));
 
                 line = br.readLine();
@@ -140,22 +116,30 @@ public class MaxEntClassifier {
         String modelPath = prefix + "model.dat";
 
         MaxEntClassifier maxEntClassifier = new MaxEntClassifier(prefix);
-        maxEntClassifier.train(trainFilePath);
+        TrainingFeatureExtractor trainingFeatureExtractor = new TrainingFeatureExtractor(prefix, MaxEntClassifier.DELIMITER);
+        maxEntClassifier.train(trainFilePath, trainingFeatureExtractor);
         maxEntClassifier.persist(modelPath);
 
-        maxEntClassifier.loadModel(modelPath);
-        annotate("/Users/Maochen/Desktop/test.txt", maxEntClassifier);
 
-        //        Scanner scanner = new Scanner(System.in);
-        //        String sentence = "";
-        //        System.out.println("Input Sentence:");
-        //        while (!sentence.equalsIgnoreCase("exit")) {
-        //            sentence = scanner.nextLine();
-        //            sentence = sentence.replaceAll("\\s", "_");
-        //            // String vector = maxEnt.featureExtractor.getFeats(sentence + DELIMITER + "?");
-        //            // System.out.println(vector);
-        //            String result = maxEnt.predictAllOutcome(sentence);
-        //            System.out.println(result + " ||| " + maxEnt.predict(sentence));
-        //        }
+        FeatureExtractor featureExtractor = trainingFeatureExtractor;
+        maxEntClassifier.loadModel(modelPath);
+        //        annotate("/Users/Maochen/Desktop/test.txt", maxEntClassifier, featureExtractor);
+
+        Scanner scanner = new Scanner(System.in);
+        String sentence = "";
+        System.out.println("Input Sentence:");
+        while (true) {
+            sentence = scanner.nextLine();
+            if (sentence.equalsIgnoreCase("exit")) {
+                break;
+            }
+            sentence = sentence.replaceAll("\\s", "_");
+            String vector = featureExtractor.getFeats(sentence + DELIMITER + "?");
+            System.out.println(vector);
+            String result = maxEntClassifier.predictAllOutcome(sentence, featureExtractor);
+            System.out.println(result + " ||| " + maxEntClassifier.predict(sentence, featureExtractor));
+        }
+        scanner.close();
+        System.exit(0);
     }
 }

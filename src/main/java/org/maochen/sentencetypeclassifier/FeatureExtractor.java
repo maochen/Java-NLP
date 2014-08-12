@@ -11,9 +11,13 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Created by Maochen on 8/5/14.
@@ -22,23 +26,22 @@ public class FeatureExtractor {
 
     private static final Logger LOG = LoggerFactory.getLogger(FeatureExtractor.class);
 
-    private final String filepathPrefix;
-    private String delimiter;
-    private ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(),
+    final String filepathPrefix;
+    String delimiter;
+    ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(),
             new ThreadFactoryBuilder().setNameFormat("MaxEnt-FeatureExtractor-%d").build());
 
-    private ClearNLPUtil parser;
+    ClearNLPUtil parser;
 
-    private boolean isRealFeature = false;
+    boolean isRealFeature = false;
 
     // chunk, count
-    private Map<String, Integer> biGram = new HashMap<>();
+    Map<String, Integer> biGramWordMap = new HashMap<>();
+    Map<String, Integer> triGramWordMap = new HashMap<>();
 
-    private Map<String, Integer> triGram = new HashMap<>();
-
-    public boolean getIsRealFeature() {
-        return isRealFeature;
-    }
+    // label, count
+    Map<String, Integer> biGramDepMap = new HashMap<>();
+    Map<String, Integer> triGramDepMap = new HashMap<>();
 
     private void addFeats(StringBuilder builder, String key, Object value) {
         //        builder.append(key).append("=").append(value).append(delimiter);
@@ -47,34 +50,57 @@ public class FeatureExtractor {
         }
     }
 
+    protected String getDEPString(DEPTree tree) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("_<DEP>_");
+        Queue<DEPNode> q = new LinkedList<>();
+        q.add(tree.getFirstRoot());
+
+        while (!q.isEmpty()) {
+            DEPNode currentNode = q.poll();
+            if (currentNode == null) {
+                continue;
+            }
+            builder.append(currentNode.getLabel()).append("_");
+            for (DEPNode child : currentNode.getDependentNodeList()) {
+                q.add(child);
+            }
+        }
+
+        builder.append("</DEP>_");
+        return builder.toString();
+    }
+
     // Bossssssss.... currently all binary features.
-    private String generateFeats(String input) {
+    private String generateFeats(String input, DEPTree tree) {
         StringBuilder builder = new StringBuilder();
         input = input.trim();
         input = input.replaceAll("_", " ");
 
-        // Add punct if not there.
-        if (!input.matches(".*\\p{Punct}$")) {
-            input += ".";
-        }
-
-        DEPTree tree = parser.process(input);
-
         String inputWithTag = input.toLowerCase();
-        // Remove Punct at the end
+        // Remove Punct at the end for NGram
         inputWithTag = inputWithTag.replaceAll("\\p{Punct}*$", "");
         inputWithTag = " <sentence> " + inputWithTag + " </sentence> ";
         inputWithTag = inputWithTag.replaceAll(" ", "_");
         // Bigram
-        for (String str : biGram.keySet()) {
+        for (String str : biGramWordMap.keySet()) {
             // Make sure is the whole word match instead of partial word+"_"+partial word.
-            addFeats(builder, "biGram_" + str, inputWithTag.contains("_" + str + "_"));
+            addFeats(builder, "biGramWord_" + str, inputWithTag.contains("_" + str + "_"));
         }
 
         // Trigram
-        for (String str : triGram.keySet()) {
+        for (String str : triGramWordMap.keySet()) {
             // Make sure is the whole word match instead of partial word+"_"+partial word.
-            addFeats(builder, "triGram_" + str, inputWithTag.contains("_" + str + "_"));
+            addFeats(builder, "triGramWord_" + str, inputWithTag.contains("_" + str + "_"));
+        }
+
+        String depString = getDEPString(tree);
+        for (String str : biGramDepMap.keySet()) {
+            addFeats(builder, "biGramDEP_" + str, depString.contains("_" + str + "_"));
+        }
+
+        for (String str : triGramDepMap.keySet()) {
+            addFeats(builder, "triGramDEP_" + str, depString.contains("_" + str + "_"));
         }
 
         Set<String> whPrefixPos = Sets.newHashSet(CTLibEn.POS_WRB, CTLibEn.POS_WDT, CTLibEn.POS_WP, CTLibEn.POS_WPS);
@@ -83,11 +109,12 @@ public class FeatureExtractor {
         addFeats(builder, "first_word_pos", whPrefixPos.contains(firstPOS));
 
         // last word is WH
-        String lastPOS = tree.get(tree.size() - 1).pos;
+        int lastPOSIndex = input.matches(".*\\p{Punct}$") ? tree.size() - 2 : tree.size() - 1;
+        String lastPOS = tree.get(lastPOSIndex).pos;
         addFeats(builder, "last_word_pos", whPrefixPos.contains(lastPOS));
 
         // is 1st word rootVerb.
-        addFeats(builder, "first_word_root_verb", firstPOS.startsWith(CTLibEn.POS_VB));
+        addFeats(builder, "first_word_root_verb", firstPOS.startsWith(CTLibEn.POS_VB) && tree.get(1).isRoot());
 
         // Have aux in the sentence.
         int auxCount = Collections2.filter(tree, new Predicate<DEPNode>() {
@@ -99,7 +126,7 @@ public class FeatureExtractor {
         addFeats(builder, "has_aux", auxCount > 0);
 
         // Start with question word.
-        Set<String> bagOfQuestionPrefix = Sets.newHashSet("tell me", "let me know", "clarify for me");
+        Set<String> bagOfQuestionPrefix = Sets.newHashSet("tell me", "let me know", "clarify for me", "name");
         boolean isStartPrefixMatch = false;
         for (String prefix : bagOfQuestionPrefix) {
             if (input.toLowerCase().startsWith(prefix)) {
@@ -109,8 +136,9 @@ public class FeatureExtractor {
         }
         addFeats(builder, "question_over_head", isStartPrefixMatch);
 
-        // Verify - imperative
-        addFeats(builder, "has_verify_keyword", "verify".equals(tree.get(1).form.toLowerCase()));
+        // Verify, Ask - imperative
+        Set<String> imperativeKeywords = Sets.newHashSet("verify", "ask");
+        addFeats(builder, "has_imperative_keyword", imperativeKeywords.contains(tree.get(1).form.toLowerCase()));
 
         // puncts.
         char punct = input.charAt(input.length() - 1);
@@ -125,10 +153,30 @@ public class FeatureExtractor {
                 addFeats(builder, "punct_dot", false);
                 addFeats(builder, "punct_question", false);
                 addFeats(builder, "punct_exclaim", true);
+                addFeats(builder, "punct_exclaim", true);
+                addFeats(builder, "punct_exclaim", true);
+                addFeats(builder, "punct_exclaim", true);
+                addFeats(builder, "punct_exclaim", true);
+                addFeats(builder, "punct_exclaim", true);
+                addFeats(builder, "punct_exclaim", true);
+                addFeats(builder, "punct_exclaim", true);
+                addFeats(builder, "punct_exclaim", true);
+                addFeats(builder, "punct_exclaim", true);
                 break;
             case '?':
+                // Just give more weights for ?
                 addFeats(builder, "punct_dot", false);
                 addFeats(builder, "punct_question", true);
+                addFeats(builder, "punct_question", true);
+                addFeats(builder, "punct_question", true);
+                addFeats(builder, "punct_question", true);
+                addFeats(builder, "punct_question", true);
+                addFeats(builder, "punct_question", true);
+                addFeats(builder, "punct_question", true);
+                addFeats(builder, "punct_question", true);
+                addFeats(builder, "punct_question", true);
+                addFeats(builder, "punct_question", true);
+
                 addFeats(builder, "punct_exclaim", false);
                 break;
             default:
@@ -144,100 +192,37 @@ public class FeatureExtractor {
         return builder.toString().trim();
     }
 
-    public String getFeats(String sentence) {
-        String[] tokens = sentence.split(delimiter);
+    public String getFeats(String entry) {
+        DEPTree tree = parser.process(entry.split(delimiter)[0].replaceAll("_", " "));
+        return getFeats(entry, tree);
+    }
+
+    public String getFeats(String entry, DEPTree tree) {
+        String[] tokens = entry.split(delimiter);
         if (tokens.length != 2) return "";
 
         StringBuilder builder = new StringBuilder();
         // Sentence
         builder.append(tokens[0]).append(delimiter);
-        builder.append(generateFeats(tokens[0])).append(delimiter);
+        builder.append(generateFeats(tokens[0], tree)).append(delimiter);
         // Label
         builder.append(tokens[1]);
 
         return builder.toString().trim();
     }
 
-    public Set<String> getFeats(Set<String> trainEntries) {
-        LOG.info("Extracting Features ...");
-
-        final Set<String> vectorSet = Sets.newSetFromMap(new ConcurrentHashMap<String, Boolean>());
-
-        LOG.info("Generating NGram Model ...");
-
-        //Generate Bigram, Trigram
-        for (String str : trainEntries) {
-            // Grab the sentence.
-            str = str.split(delimiter)[0];
-            // Start End tag.
-            str = "<sentence>_" + str.toLowerCase() + "_</sentence>";
-            String[] tokens = str.split("_");
-            for (int i = 0; i < tokens.length; i++) {
-                if (i + 1 < tokens.length) {
-                    String chunk = (tokens[i] + "_" + tokens[i + 1]);
-                    int count = biGram.containsKey(chunk) ? biGram.get(chunk) : 0;
-                    biGram.put(chunk, ++count);
-                }
-                if (i + 2 < tokens.length) {
-                    String chunk = tokens[i] + "_" + tokens[i + 1] + "_" + tokens[i + 2];
-                    int count = triGram.containsKey(chunk) ? triGram.get(chunk) : 0;
-                    triGram.put(chunk, ++count);
-                }
-            }
-        }
-
-        // Delete these uncommon chunk
-        biGram.values().removeAll(Sets.newHashSet(1));
-        triGram.values().removeAll(Sets.newHashSet(1));
-        // -----------
-
-        // Persist for prediction use.
-        persistNGram();
-        LOG.info("NGram Model completed ...");
-
-        List<Future<String>> futureList = new ArrayList<>();
-
-        for (final String entry : trainEntries) {
-            Callable<String> entryCallable = new Callable<String>() {
-                @Override
-                public String call() throws Exception {
-                    String featVector = getFeats(entry);
-                    vectorSet.add(featVector);
-                    return featVector;
-                }
-            };
-
-            Future<String> future = executorService.submit(entryCallable);
-            futureList.add(future);
-        }
-
-        for (Future<String> future : futureList) {
-            try {
-                future.get();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        LOG.info("Extracting features completed.");
-        return vectorSet;
-    }
-
-    private void persistNGram() {
-        String biGramFile = filepathPrefix + "/bigram";
-        String triGramFile = filepathPrefix + "/trigram";
-
+    private Map<String, Integer> deserialize(String filePath) {
         try {
-            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(biGramFile));
-            oos.writeObject(biGram);
-            oos.close();
-
-            ObjectOutputStream oosTrigram = new ObjectOutputStream(new FileOutputStream(triGramFile));
-            oosTrigram.writeObject(triGram);
-            oosTrigram.close();
-        } catch (IOException e) {
+            File serializedFile = new File(filePath);
+            if (serializedFile.exists() && !serializedFile.isDirectory()) {
+                ObjectInputStream ois = new ObjectInputStream(new FileInputStream(serializedFile));
+                return (Map) ois.readObject();
+            }
+        } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
+
+        return new HashMap<>();
     }
 
     public FeatureExtractor(String filepathPrefix, String delimiter) {
@@ -245,21 +230,11 @@ public class FeatureExtractor {
         this.delimiter = delimiter;
         this.filepathPrefix = filepathPrefix;
 
-        try {
-            File bigramFile = new File(filepathPrefix + "/bigram");
-            if (bigramFile.exists() && !bigramFile.isDirectory()) {
-                ObjectInputStream ois = new ObjectInputStream(new FileInputStream(bigramFile));
-                biGram = (Map) ois.readObject();
-            }
-
-            File trigramFile = new File(filepathPrefix + "/trigram");
-            if (trigramFile.exists() && !trigramFile.isDirectory()) {
-                ObjectInputStream ois = new ObjectInputStream(new FileInputStream(trigramFile));
-                triGram = (Map) ois.readObject();
-            }
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+        biGramWordMap = deserialize(filepathPrefix + "/bigram_word");
+        triGramWordMap = deserialize(filepathPrefix + "/trigram_word");
+        biGramDepMap = deserialize(filepathPrefix + "/bigram_dep");
+        triGramDepMap = deserialize(filepathPrefix + "/trigram_dep");
     }
+
 
 }
