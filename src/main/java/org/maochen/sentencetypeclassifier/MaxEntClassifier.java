@@ -6,6 +6,8 @@ import opennlp.maxent.io.SuffixSensitiveGISModelReader;
 import opennlp.maxent.io.SuffixSensitiveGISModelWriter;
 import opennlp.model.EventStream;
 import opennlp.model.RealValueFileEventStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.HashSet;
@@ -13,6 +15,8 @@ import java.util.Scanner;
 import java.util.Set;
 
 public class MaxEntClassifier {
+
+    private static final Logger LOG = LoggerFactory.getLogger(MaxEntClassifier.class);
 
     public static final String DELIMITER = " ";
     private static final boolean USE_SMOOTHING = true;
@@ -55,11 +59,11 @@ public class MaxEntClassifier {
 
     public void loadModel(String modelPath) throws IOException {
         long start = System.currentTimeMillis();
-        System.out.println("Loading MaxEnt model ... ");
+        LOG.info("Loading MaxEnt model ... ");
         model = (GISModel) new SuffixSensitiveGISModelReader(new File(modelPath)).getModel();
         long end = System.currentTimeMillis();
         long duration = (end - start) / 1000;
-        System.out.println("completed ... " + duration + " secs.");
+        LOG.info("completed ... " + duration + " secs.");
 
     }
 
@@ -112,7 +116,7 @@ public class MaxEntClassifier {
 
     public static void main(String[] args) throws IOException {
         String prefix = "/Users/Maochen/workspace/Test/fixture/";
-        String trainFilePath = prefix + "annotatedTrainingData.txt";
+        String trainFilePath = MaxEntClassifier.class.getResource("/annotatedTrainingData.txt").getPath();
         String modelPath = prefix + "model.dat";
 
         MaxEntClassifier maxEntClassifier = new MaxEntClassifier(prefix);
@@ -123,13 +127,11 @@ public class MaxEntClassifier {
 
         FeatureExtractor featureExtractor = trainingFeatureExtractor;
         maxEntClassifier.loadModel(modelPath);
-        //        annotate("/Users/Maochen/Desktop/test.txt", maxEntClassifier, featureExtractor);
 
         Scanner scanner = new Scanner(System.in);
-        String sentence = "";
         System.out.println("Input Sentence:");
         while (true) {
-            sentence = scanner.nextLine();
+            String sentence = scanner.nextLine();
             if (sentence.equalsIgnoreCase("exit")) {
                 break;
             }

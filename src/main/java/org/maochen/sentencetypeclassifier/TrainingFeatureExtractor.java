@@ -2,14 +2,13 @@ package org.maochen.sentencetypeclassifier;
 
 import com.clearnlp.dependency.DEPTree;
 import com.google.common.collect.Sets;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 /**
  * Created by Maochen on 8/12/14.
@@ -18,6 +17,8 @@ public class TrainingFeatureExtractor extends FeatureExtractor {
     private static final Logger LOG = LoggerFactory.getLogger(TrainingFeatureExtractor.class);
 
     private Map<String, DEPTree> depTreeCache = new HashMap<>();
+    private ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(),
+            new ThreadFactoryBuilder().setNameFormat("MaxEnt-FeatureExtractor-%d").build());
 
     public TrainingFeatureExtractor(String filepathPrefix, String delimiter) {
         super(filepathPrefix, delimiter);
@@ -124,7 +125,7 @@ public class TrainingFeatureExtractor extends FeatureExtractor {
                 }
             };
 
-            Future<String> future = super.executorService.submit(entryCallable);
+            Future<String> future = executorService.submit(entryCallable);
             futureList.add(future);
         }
 
