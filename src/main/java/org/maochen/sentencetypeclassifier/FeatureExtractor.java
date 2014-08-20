@@ -75,6 +75,7 @@ public class FeatureExtractor {
         sentence = sentence.trim();
         sentence = sentence.replaceAll("_", " ");
         int sentenceLength = sentence.split("\\s").length;
+        int weight = sentenceLength > 10 ? sentenceLength : 10;
 
         String inputWithTag = sentence.toLowerCase();
         // Remove Punct at the end for NGram
@@ -113,7 +114,7 @@ public class FeatureExtractor {
         addFeats(builder, "last_word_pos", whPrefixPos.contains(lastPOS), 1);
 
         // is 1st word rootVerb.
-        addFeats(builder, "first_word_root_verb", firstPOS.startsWith(CTLibEn.POS_VB) && tree.get(1).isRoot(), 1);
+        addFeats(builder, "first_word_root_verb", firstPOS.startsWith(CTLibEn.POS_VB) && tree.get(1).isRoot(), weight);
 
         // Have aux in the sentence.
         int auxCount = Collections2.filter(tree, new Predicate<DEPNode>() {
@@ -136,12 +137,12 @@ public class FeatureExtractor {
         addFeats(builder, "question_over_head", isStartPrefixMatch, 1);
 
         // Verify, Ask, Say - imperative
-        Set<String> imperativeKeywords = Sets.newHashSet("verify", "ask", "say", "solve");
-        addFeats(builder, "has_imperative_keyword", imperativeKeywords.contains(tree.get(1).lemma), 3);
+        Set<String> imperativeKeywords = Sets.newHashSet("verify", "ask", "say", "solve", "run", "execute");
+        boolean isImperativeStart = imperativeKeywords.contains(tree.get(1).lemma) && tree.get(1).isRoot();
+        addFeats(builder, "has_imperative_keyword", isImperativeStart, weight);
 
         // puncts.
         char punct = sentence.charAt(sentence.length() - 1);
-        int weight = sentenceLength > 10 ? sentenceLength : 10;
         switch (punct) {
             case ';':
             case '.':

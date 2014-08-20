@@ -43,9 +43,9 @@ public class MaxEntClassifier {
 
         EventStream es;
         if (isRealFeature) {
-            es = new RealBasicEventStream(new PlainTextByLineDataStream(new FileReader(filepathPrefix + "featureVector.txt")));
+            es = new RealBasicEventStream(new PlainTextByLineDataStream(new FileReader(filepathPrefix + "/featureVector.txt")));
         } else {
-            es = new BasicEventStream(new PlainTextByLineDataStream(new FileReader(filepathPrefix + "featureVector.txt")));
+            es = new BasicEventStream(new PlainTextByLineDataStream(new FileReader(filepathPrefix + "/featureVector.txt")));
         }
 
         model = GIS.trainModel(es, ITERATIONS, CUTOFF, USE_SMOOTHING, true);
@@ -115,9 +115,9 @@ public class MaxEntClassifier {
     }
 
     public static void main(String[] args) throws IOException {
-        String prefix = "/Users/Maochen/workspace/Test/fixture/";
+        String prefix = "/Users/Maochen/Desktop/temp";
         String trainFilePath = MaxEntClassifier.class.getResource("/annotatedTrainingData.txt").getPath();
-        String modelPath = prefix + "model.dat";
+        String modelPath = prefix + "/model.dat";
 
         MaxEntClassifier maxEntClassifier = new MaxEntClassifier(prefix);
         TrainingFeatureExtractor trainingFeatureExtractor = new TrainingFeatureExtractor(prefix, MaxEntClassifier.DELIMITER);

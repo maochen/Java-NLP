@@ -25,7 +25,7 @@ public class TrainingFeatureExtractor extends FeatureExtractor {
     }
 
     public void extractFeature(Set<String> trainingData) {
-        File featureVectorFile = new File(filepathPrefix + "featureVector.txt");
+        File featureVectorFile = new File(filepathPrefix + "/featureVector.txt");
         if (!featureVectorFile.exists()) {
             try {
                 featureVectorFile.createNewFile();

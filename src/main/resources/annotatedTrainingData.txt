@@ -688,7 +688,7 @@ Hi,_I’d_like_to_mail_a_package. declarative
 Alright,_how_big_is_it? interrogative
 It’s_about_one_cubic_foot,_and_it_weighs_ten_pounds. declarative
 Alright,_let’s_check_those_measurements. declarative
-Yep,_you_were_about_right. declarative
+You_were_about_right. declarative
 Now,_do_you_have_enough_stamps? interrogative
 Yeah,_I_put_three. declarative
 It’s_going_across_the_country. declarative
@@ -841,6 +841,8 @@ Good,_I_just_got_my_Halloween_costume. declarative
 What_are_you_going_as? interrogative
 Spiderman. declarative
 Yup. declarative
+Yep. declarative
+Yep declarative
 Do_you_have_a_costume? interrogative
 No,_not_yet. declarative
 Well,_do_you_have_any_ideas_of_what_you_want_to_go_as? interrogative
