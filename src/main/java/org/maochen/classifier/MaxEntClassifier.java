@@ -14,7 +14,7 @@ import opennlp.model.RealValueFileEventStream;
 import java.io.*;
 import java.util.*;
 
-public class MaxEntClassifier implements IClassifier {
+public class MaxEntClassifier {
 
     private boolean USE_SMOOTHING = true;
     private static final int ITERATIONS = 100;
@@ -26,8 +26,7 @@ public class MaxEntClassifier implements IClassifier {
 
     String pathPrefix = MaxEntClassifier.class.getResource(".").getPath();
 
-    @Override
-    public IClassifier train(List<String[]> trainingData) {
+    public MaxEntClassifier train(List<String[]> trainingData) {
         String filePath = pathPrefix + "/featureVector.txt";
         File file = new File(filePath);
 
@@ -57,7 +56,7 @@ public class MaxEntClassifier implements IClassifier {
         return this;
     }
 
-    private IClassifier train(String featureVectorFile) {
+    private MaxEntClassifier train(String featureVectorFile) {
         try {
             EventStream es = new RealBasicEventStream(new PlainTextByLineDataStream(new FileReader(featureVectorFile)));
             model = GIS.trainModel(es, ITERATIONS, CUTOFF, USE_SMOOTHING, true);
@@ -67,7 +66,6 @@ public class MaxEntClassifier implements IClassifier {
         return this;
     }
 
-    @Override
     public Map<String, Double> predict(String[] featureVector) {
         String[] contexts = featureVector;
         float[] values = RealValueFileEventStream.parseContexts(contexts);
@@ -84,7 +82,6 @@ public class MaxEntClassifier implements IClassifier {
         return resultMap;
     }
 
-    @Override
     public String getResult() {
         if (resultMap == null) throw new RuntimeException("Predicting First");
 
@@ -101,7 +98,6 @@ public class MaxEntClassifier implements IClassifier {
         return maxTag;
     }
 
-    @Override
     public void setParameter(Map<String, String> paraMap) {
 
     }

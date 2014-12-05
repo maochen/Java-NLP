@@ -1,5 +1,6 @@
 package org.maochen.classifier.naivebayes;
 
+import org.maochen.classifier.IClassifier;
 import org.maochen.datastructure.Element;
 import org.maochen.datastructure.LabelIndexer;
 import org.maochen.utils.ElementUtils;
@@ -13,18 +14,19 @@ import java.util.Map;
 /**
  * Created by Maochen on 12/3/14.
  */
-public class NaiveBayesClassifier {
+public class NaiveBayesClassifier implements IClassifier {
 
     private TrainingEngine trainingEngine;
 
     private int labelSize = -1;
     private int featureLength = -1;
 
-    public LabelIndexer labelIndexer = new LabelIndexer();
+    private LabelIndexer labelIndexer = new LabelIndexer();
 
     /**
      * @param paraMap
      */
+    @Override
     public void setParameter(Map<String, String> paraMap) {
         if (paraMap.containsKey("label_size")) {
             labelSize = Integer.parseInt(paraMap.get("label_size"));
@@ -36,7 +38,8 @@ public class NaiveBayesClassifier {
     }
 
     // Integer is label's Index from labelIndexer
-    public Map<Integer, Double> predict(Element predict) {
+    @Override
+    public Map<String, Double> predict(Element predict) {
         Map<Integer, Double> probs = new HashMap<>();
 
         for (String label : labelIndexer.getAllLabels()) {
@@ -45,6 +48,8 @@ public class NaiveBayesClassifier {
             probs.put(index, 0.5);
         }
 
+        double maxProb = 0;
+        int maxProbLabel = -1;
         for (int i = 0; i < predict.featureVector.length; i++) {
             double fi = predict.featureVector[i];
 
@@ -53,13 +58,20 @@ public class NaiveBayesClassifier {
 
                 double newProb = probs.get(labelIndex) * VectorUtils.gaussianDensityDistribution(trainingEngine.meanVectors[labelIndex][i], trainingEngine.varianceVectors[labelIndex][i], fi);
                 probs.put(labelIndex, newProb);
+                if (newProb > maxProb) {
+                    maxProb = newProb;
+                    maxProbLabel = labelIndex;
+                }
             }
         }
 
-        return probs;
+        predict.label = labelIndexer.getLabel(maxProbLabel);
+
+        return ElementUtils.convertMap(probs, labelIndexer);
     }
 
-    public void train(List<Element> trainingData) {
+    @Override
+    public IClassifier train(List<Element> trainingData) {
         if (labelSize <= 0 || featureLength <= 0) {
             throw new RuntimeException("Label size and feature length are required.");
         }
@@ -68,10 +80,11 @@ public class NaiveBayesClassifier {
         trainingEngine.init(trainingData, labelIndexer);
         trainingEngine.calculateMean();
         trainingEngine.calculateVariance();
+        return this;
     }
 
     public static void main(String[] args) {
-        NaiveBayesClassifier nbc = new NaiveBayesClassifier();
+        IClassifier nbc = new NaiveBayesClassifier();
         Map<String, String> paraMap = new HashMap<>();
         paraMap.put("label_size", "2");
         paraMap.put("feature_len", "3");
@@ -90,7 +103,9 @@ public class NaiveBayesClassifier {
         Element predict = new Element(new double[]{6, 130, 8});
 
         nbc.train(trainingData);
-        ElementUtils.print(nbc.predict(predict), nbc.labelIndexer);
+        Map<String, Double> probs = nbc.predict(predict);
+        System.out.println("Result: " + predict);
+        System.out.println(probs);
     }
 
 

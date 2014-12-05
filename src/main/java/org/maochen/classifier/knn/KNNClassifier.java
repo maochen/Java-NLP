@@ -1,5 +1,6 @@
 package org.maochen.classifier.knn;
 
+import org.maochen.classifier.IClassifier;
 import org.maochen.datastructure.Element;
 
 import java.util.ArrayList;
@@ -12,7 +13,7 @@ import java.util.Map;
  *
  * @author Maochen
  */
-public class KNNClassifier {
+public class KNNClassifier implements IClassifier{
 
     private List<Element> trainingData;
 
@@ -27,6 +28,7 @@ public class KNNClassifier {
      *
      * @param paraMap Parameters Map.
      */
+    @Override
     public void setParameter(Map<String, String> paraMap) {
         if (paraMap.containsKey("k")) {
             this.k = Integer.parseInt(paraMap.get("k"));
@@ -45,12 +47,14 @@ public class KNNClassifier {
     /**
      * train() method for knn is just used for loading trainingdata!!
      */
-    public void train(List<Element> trainingData) {
+    @Override
+    public IClassifier train(List<Element> trainingData) {
         this.trainingData = new ArrayList<>();
 
         for (Element t : trainingData) {
             this.trainingData.add(t);
         }
+        return this;
     }
 
     /**
@@ -58,6 +62,7 @@ public class KNNClassifier {
      *
      * @return return by Id which is ordered by input sequential.
      */
+    @Override
     public Map<String, Double> predict(Element predict) {
         engine.initialize(predict, trainingData, k);
         if (mode == 1) {
@@ -93,7 +98,7 @@ public class KNNClassifier {
 
         Element predict = new Element(new double[]{74, 55, 22});
 
-        KNNClassifier knn = new KNNClassifier();
+        IClassifier knn = new KNNClassifier();
         knn.train(trainList);
         Map<String, String> paraMap = new HashMap<String, String>();
         paraMap.put("k", String.valueOf(k));
