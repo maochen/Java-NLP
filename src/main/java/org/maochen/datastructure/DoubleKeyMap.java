@@ -62,7 +62,7 @@ public class DoubleKeyMap<K1, K2, V> implements Serializable{
 
     public V get(K1 key1, K2 key2) {
         if (key1 == null || key2 == null) {
-            throw new RuntimeException("[DoubleKeyMap.get] Please fill all keys.");
+            throw new RuntimeException("[DoubleKeyMap.key] Please fill all keys.");
         }
         return data.get(key1).get(key2);
     }

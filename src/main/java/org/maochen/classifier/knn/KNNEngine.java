@@ -1,5 +1,7 @@
 package org.maochen.classifier.knn;
 
+import org.maochen.datastructure.Element;
+
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -8,14 +10,14 @@ import java.util.Map;
 
 /**
  * Should not exposed.
- * 
+ *
  * @author MaochenG
  */
 public final class KNNEngine {
 
-    protected class DistanceComparator implements Comparator<KNNDTO<String>> {
-        public int compare(KNNDTO<String> turple1, KNNDTO<String> turple2) {
-            double diff = turple1.getDistance() - turple2.getDistance();
+    protected class DistanceComparator implements Comparator<Element> {
+        public int compare(Element e1, Element e2) {
+            double diff = e1.distance - e2.distance;
 
             if (Math.abs(diff) < Double.MIN_VALUE)
                 return 0;
@@ -26,82 +28,77 @@ public final class KNNEngine {
 
     }
 
-    private KNNDTO<String> predict;
-    private List<KNNDTO<String>> trainRecordList;
+    private Element predict;
+    private List<Element> trainingData;
     private int k;
 
-    public void initialize(KNNDTO<String> predict, List<KNNDTO<String>> trainRecordList, int k) {
+    public void initialize(Element predict, List<Element> trainingData, int k) {
         this.predict = predict;
-        this.trainRecordList = trainRecordList;
+        this.trainingData = trainingData;
         this.k = k;
     }
 
     public void EuclideanDistance() {
-        for (KNNDTO<String> record : trainRecordList) {
-            if (predict.getVector().length != record.getVector().length) {
+        for (Element element : trainingData) {
+            if (predict.featureVector.length != element.featureVector.length) {
                 throw new RuntimeException("2 Vectors must has same dimension.");
             }
 
             double result = 0.0;
-            for (int i = 0; i < predict.getVector().length; i++) {
-                result += Math.pow(predict.getVector()[i] - record.getVector()[i], 2);
+            for (int i = 0; i < predict.featureVector.length; i++) {
+                result += Math.pow(predict.featureVector[i] - element.featureVector[i], 2);
             }
 
             result = Math.sqrt(result);
-            record.setDistance(result);
-
+            element.distance = result;
         }
 
     }
 
     public void ChebyshevDistance() {
-        for (KNNDTO<String> record : trainRecordList) {
-            if (predict.getVector().length != record.getVector().length) {
+        for (Element element : trainingData) {
+            if (predict.featureVector.length != element.featureVector.length) {
                 throw new RuntimeException("2 Vectors must has same dimension.");
             }
 
             double result = 0.0;
-            for (int i = 0; i < predict.getVector().length; i++) {
-                double diff = Math.abs(predict.getVector()[i] - record.getVector()[i]);
+            for (int i = 0; i < predict.featureVector.length; i++) {
+                double diff = Math.abs(predict.featureVector[i] - element.featureVector[i]);
                 if (diff > result) result = diff;
             }
 
             result = Math.sqrt(result);
-            record.setDistance(result);
+            element.distance = result;
         }
     }
 
     public void ManhattanDistance() {
-        for (KNNDTO<String> record : trainRecordList) {
-            if (predict.getVector().length != record.getVector().length) {
+        for (Element element : trainingData) {
+            if (predict.featureVector.length != element.featureVector.length) {
                 throw new RuntimeException("2 Vectors must has same dimension.");
             }
 
             double result = 0.0;
-            for (int i = 0; i < predict.getVector().length; i++) {
-                double diff = Math.abs(predict.getVector()[i] - record.getVector()[i]);
+            for (int i = 0; i < predict.featureVector.length; i++) {
+                double diff = Math.abs(predict.featureVector[i] - element.featureVector[i]);
                 result += diff;
             }
 
             result = Math.sqrt(result);
-            record.setDistance(result);
+            element.distance = result;
         }
     }
 
     public String getResult() {
         Map<String, Integer> resultMap = new HashMap<String, Integer>();
-        Collections.sort(trainRecordList, new DistanceComparator());
+        Collections.sort(trainingData, new DistanceComparator());
 
         for (int i = 0; i < k; i++) {
-            KNNDTO<String> entry = trainRecordList.get(i);
-            String label = entry.getLabel();
-            if (!resultMap.containsKey(label)) {
-                resultMap.put(label, 1);
-            }
-            else {
-                int count = resultMap.get(label) + 1;
-                resultMap.put(label, count);
-            }
+            Element element = trainingData.get(i);
+            int count = resultMap.containsKey(element.label) ? resultMap.get(element.label) : 0;
+            count++;
+            resultMap.put(element.label, count);
+
         }
 
         String maxVote = "";
@@ -113,8 +110,7 @@ public final class KNNEngine {
 
             if (currentCount == maxCount) {
                 maxCountEntryNumber++;
-            }
-            else if (currentCount > maxCount) {
+            } else if (currentCount > maxCount) {
                 maxCount = currentCount;
                 maxVote = label;
                 maxCountEntryNumber = 1;
@@ -122,8 +118,10 @@ public final class KNNEngine {
 
         }
 
-        if (maxCountEntryNumber != 1) System.out.println("Equal Max Vote, just grab the first max!");
-        predict.setLabel(maxVote);
+        if (maxCountEntryNumber != 1) {
+            System.out.println("Equal Max Vote, take the first max!");
+        }
+        predict.label = maxVote;
         return maxVote;
 
     }

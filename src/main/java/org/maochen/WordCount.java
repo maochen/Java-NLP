@@ -8,9 +8,8 @@ import java.util.Queue;
 
 /**
  * Unigram word freq count
- * 
+ *
  * @author maochen
- * 
  */
 public class WordCount {
     static class WordDatum implements Comparable<WordDatum> {
@@ -43,11 +42,8 @@ public class WordCount {
 
         @Override
         public int compareTo(WordDatum o) {
-            if (this.count > o.count)
-                return -1;
-            else if (this.count < o.count)
-                return 1;
-            else return 0;
+            // Reverse
+            return Double.compare(o.count, this.count);
         }
     }
 
