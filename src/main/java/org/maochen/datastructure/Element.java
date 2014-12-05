@@ -1,5 +1,7 @@
 package org.maochen.datastructure;
 
+import java.util.Arrays;
+
 /**
  * Created by Maochen on 12/3/14.
  */
@@ -20,5 +22,10 @@ public class Element {
         this.id = id;
         this.featureVector = featureVector;
         this.label = label;
+    }
+
+    @Override
+    public String toString() {
+        return "id:" + id + " " + Arrays.toString(featureVector) + " -> " + label;
     }
 }

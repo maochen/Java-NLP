@@ -1,19 +1,18 @@
 package org.maochen.classifier.knn;
 
 import org.maochen.datastructure.Element;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Should not exposed.
  *
- * @author MaochenG
+ * @author Maochen
  */
-public final class KNNEngine {
+final class KNNEngine {
+    private static final Logger LOG = LoggerFactory.getLogger(KNNEngine.class);
 
     protected class DistanceComparator implements Comparator<Element> {
         public int compare(Element e1, Element e2) {
@@ -39,26 +38,27 @@ public final class KNNEngine {
     }
 
     public void EuclideanDistance() {
-        for (Element element : trainingData) {
-            if (predict.featureVector.length != element.featureVector.length) {
-                throw new RuntimeException("2 Vectors must has same dimension.");
+        for (Element t : trainingData) {
+            if (predict.featureVector.length != t.featureVector.length) {
+                LOG.error("2 Vectors must has same dimension.");
+                return;
             }
 
             double result = 0.0;
             for (int i = 0; i < predict.featureVector.length; i++) {
-                result += Math.pow(predict.featureVector[i] - element.featureVector[i], 2);
+                result += Math.pow(predict.featureVector[i] - t.featureVector[i], 2);
             }
 
             result = Math.sqrt(result);
-            element.distance = result;
+            t.distance = result;
         }
-
     }
 
     public void ChebyshevDistance() {
         for (Element element : trainingData) {
             if (predict.featureVector.length != element.featureVector.length) {
-                throw new RuntimeException("2 Vectors must has same dimension.");
+                LOG.error("2 Vectors must has same dimension.");
+                return;
             }
 
             double result = 0.0;
@@ -75,7 +75,8 @@ public final class KNNEngine {
     public void ManhattanDistance() {
         for (Element element : trainingData) {
             if (predict.featureVector.length != element.featureVector.length) {
-                throw new RuntimeException("2 Vectors must has same dimension.");
+                LOG.error("2 Vectors must has same dimension.");
+                return;
             }
 
             double result = 0.0;
@@ -119,10 +120,9 @@ public final class KNNEngine {
         }
 
         if (maxCountEntryNumber != 1) {
-            System.out.println("Equal Max Vote, take the first max!");
+            LOG.info("Equal Max Vote, take the first max!");
         }
         predict.label = maxVote;
         return maxVote;
-
     }
 }

@@ -9,7 +9,7 @@ import java.util.*;
 /**
  * Created by Maochen on 12/3/14.
  */
-public class TrainingEngine {
+final class TrainingEngine {
 
     LabelIndexer labelIndexer;
 

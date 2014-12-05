@@ -14,6 +14,7 @@ import java.util.Map;
  * Created by Maochen on 12/3/14.
  */
 public class NaiveBayesClassifier {
+
     private TrainingEngine trainingEngine;
 
     private int labelSize = -1;
