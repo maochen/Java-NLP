@@ -49,7 +49,8 @@ public class LangLib {
     public static final String NE_DATE = "DATE";
     public static final String NE_TIME = "TIME";
     public static final String NE_PERSON = "PERSON";
-
+    public static final String NE_ORG = "ORGANIZATION";
+    public static final String NE_LOC = "LOCATION";
 
     /**
      * The dependency label for passive.
