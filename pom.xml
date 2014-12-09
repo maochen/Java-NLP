@@ -46,35 +46,29 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.3.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>edu.stanford.nlp</groupId>
+            <artifactId>stanford-corenlp</artifactId>
+            <version>3.4.1</version>
+        </dependency>
+        <!-- models for stanford parser -->
+        <dependency>
+            <groupId>edu.stanford.nlp</groupId>
+            <artifactId>stanford-corenlp</artifactId>
+            <version>3.4.1</version>
+            <classifier>models</classifier>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.opennlp</groupId>
             <artifactId>opennlp-maxent</artifactId>
             <version>3.0.3</version>
         </dependency>
 
-        <dependency>
-            <groupId>com.clearnlp</groupId>
-            <artifactId>clearnlp-dictionary</artifactId>
-            <version>1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.clearnlp</groupId>
-            <artifactId>clearnlp-general-en-pos</artifactId>
-            <version>1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.clearnlp</groupId>
-            <artifactId>clearnlp-general-en-dep</artifactId>
-            <version>1.2</version>
-        </dependency>
-        <dependency>
-            <groupId>com.clearnlp</groupId>
-            <artifactId>clearnlp-general-en-srl</artifactId>
-            <version>1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.clearnlp</groupId>
-            <artifactId>clearnlp</artifactId>
-            <version>2.0.2</version>
-        </dependency>
     </dependencies>
 </project>

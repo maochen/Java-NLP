@@ -1,7 +1,7 @@
 package org.maochen.classifier.knn;
 
 import org.maochen.classifier.IClassifier;
-import org.maochen.datastructure.Element;
+import org.maochen.datastructure.Tuple;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,7 +15,7 @@ import java.util.Map;
  */
 public class KNNClassifier implements IClassifier{
 
-    private List<Element> trainingData;
+    private List<Tuple> trainingData;
 
     private int k;
     private int mode;
@@ -48,10 +48,10 @@ public class KNNClassifier implements IClassifier{
      * train() method for knn is just used for loading trainingdata!!
      */
     @Override
-    public IClassifier train(List<Element> trainingData) {
+    public IClassifier train(List<Tuple> trainingData) {
         this.trainingData = new ArrayList<>();
 
-        for (Element t : trainingData) {
+        for (Tuple t : trainingData) {
             this.trainingData.add(t);
         }
         return this;
@@ -63,7 +63,7 @@ public class KNNClassifier implements IClassifier{
      * @return return by Id which is ordered by input sequential.
      */
     @Override
-    public Map<String, Double> predict(Element predict) {
+    public Map<String, Double> predict(Tuple predict) {
         engine.initialize(predict, trainingData, k);
         if (mode == 1) {
             engine.ChebyshevDistance();
@@ -78,7 +78,7 @@ public class KNNClassifier implements IClassifier{
 
         Map<String, Double> outputMap = new HashMap<String, Double>();
 
-        for (Element dtos : trainingData) {
+        for (Tuple dtos : trainingData) {
             outputMap.put(String.valueOf(dtos.id), dtos.distance);
         }
         return outputMap;
@@ -87,16 +87,16 @@ public class KNNClassifier implements IClassifier{
     public static void main(String[] args) {
         int k = 3;
 
-        Element vectorA = new Element(1, new double[]{9, 32, 65.1}, "A");
-        Element vectorB = new Element(2, new double[]{12, 65, 86.1}, "C");
-        Element vectorC = new Element(3, new double[]{19, 54, 45.1}, "C");
+        Tuple vectorA = new Tuple(1, new double[]{9, 32, 65.1}, "A");
+        Tuple vectorB = new Tuple(2, new double[]{12, 65, 86.1}, "C");
+        Tuple vectorC = new Tuple(3, new double[]{19, 54, 45.1}, "C");
 
-        List<Element> trainList = new ArrayList<>();
+        List<Tuple> trainList = new ArrayList<>();
         trainList.add(vectorA);
         trainList.add(vectorB);
         trainList.add(vectorC);
 
-        Element predict = new Element(new double[]{74, 55, 22});
+        Tuple predict = new Tuple(new double[]{74, 55, 22});
 
         IClassifier knn = new KNNClassifier();
         knn.train(trainList);

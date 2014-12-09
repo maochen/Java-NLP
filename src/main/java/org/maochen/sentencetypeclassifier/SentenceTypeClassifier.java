@@ -14,9 +14,9 @@ import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
 
-public class MaxEntClassifier {
+public class SentenceTypeClassifier {
 
-    private static final Logger LOG = LoggerFactory.getLogger(MaxEntClassifier.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SentenceTypeClassifier.class);
 
     public static final String DELIMITER = " ";
     private static final boolean USE_SMOOTHING = true;
@@ -91,18 +91,18 @@ public class MaxEntClassifier {
         return model.getAllOutcomes(predictOCS(sentence, featureExtractor));
     }
 
-    public MaxEntClassifier(String filepathPrefix) {
+    public SentenceTypeClassifier(String filepathPrefix) {
         this.filepathPrefix = filepathPrefix;
     }
 
-    public static void annotate(String testFilePath, MaxEntClassifier maxEntClassifier, FeatureExtractor featureExtractor) {
+    public static void annotate(String testFilePath, SentenceTypeClassifier sentenceTypeClassifier, FeatureExtractor featureExtractor) {
 
         try (BufferedReader br = new BufferedReader(new FileReader(testFilePath))) {
             BufferedWriter bw = new BufferedWriter(new FileWriter(testFilePath + ".result"));
 
             String line = br.readLine();
             while (line != null) {
-                String result = maxEntClassifier.predict(line, featureExtractor);
+                String result = sentenceTypeClassifier.predict(line, featureExtractor);
                 bw.write(line.replaceAll("\\s", "_") + " " + result + System.getProperty("line.separator"));
 
                 line = br.readLine();
@@ -116,17 +116,17 @@ public class MaxEntClassifier {
 
     public static void main(String[] args) throws IOException {
         String prefix = "/Users/Maochen/Desktop/temp";
-        String trainFilePath = MaxEntClassifier.class.getResource("/annotatedTrainingData.txt").getPath();
+        String trainFilePath = SentenceTypeClassifier.class.getResource("/annotatedTrainingData.txt").getPath();
         String modelPath = prefix + "/model.dat";
 
-        MaxEntClassifier maxEntClassifier = new MaxEntClassifier(prefix);
-        TrainingFeatureExtractor trainingFeatureExtractor = new TrainingFeatureExtractor(prefix, MaxEntClassifier.DELIMITER);
-        maxEntClassifier.train(trainFilePath, trainingFeatureExtractor);
-        maxEntClassifier.persist(modelPath);
+        SentenceTypeClassifier sentenceTypeClassifier = new SentenceTypeClassifier(prefix);
+        TrainingFeatureExtractor trainingFeatureExtractor = new TrainingFeatureExtractor(prefix, SentenceTypeClassifier.DELIMITER);
+        sentenceTypeClassifier.train(trainFilePath, trainingFeatureExtractor);
+        sentenceTypeClassifier.persist(modelPath);
 
 
         FeatureExtractor featureExtractor = trainingFeatureExtractor;
-        maxEntClassifier.loadModel(modelPath);
+        sentenceTypeClassifier.loadModel(modelPath);
 
         Scanner scanner = new Scanner(System.in);
         System.out.println("Input Sentence:");
@@ -138,8 +138,8 @@ public class MaxEntClassifier {
             sentence = sentence.replaceAll("\\s", "_");
             String vector = featureExtractor.getFeats(sentence + DELIMITER + "?");
             System.out.println(vector);
-            String result = maxEntClassifier.predictAllOutcome(sentence, featureExtractor);
-            System.out.println(result + " ||| " + maxEntClassifier.predict(sentence, featureExtractor));
+            String result = sentenceTypeClassifier.predictAllOutcome(sentence, featureExtractor);
+            System.out.println(result + " ||| " + sentenceTypeClassifier.predict(sentence, featureExtractor));
         }
         scanner.close();
         System.exit(0);

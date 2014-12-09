@@ -1,6 +1,6 @@
 package org.maochen.classifier.naivebayes;
 
-import org.maochen.datastructure.Element;
+import org.maochen.datastructure.Tuple;
 import org.maochen.datastructure.LabelIndexer;
 import org.maochen.utils.VectorUtils;
 
@@ -13,7 +13,7 @@ final class TrainingEngine {
 
     LabelIndexer labelIndexer;
 
-    List<Element> trainingData;
+    List<Tuple> trainingData;
 
     // row=labelSize,col=featureLength
     double[][] meanVectors;
@@ -24,7 +24,7 @@ final class TrainingEngine {
 
     // Step 1
     public void calculateMean() {
-        for (Element t : trainingData) {
+        for (Tuple t : trainingData) {
             int index = labelIndexer.getIndex(t.label);
             count[index]++;
             double[] newMeanVector = VectorUtils.addition(meanVectors[index], t.featureVector);
@@ -40,7 +40,7 @@ final class TrainingEngine {
 
     // Step 2
     public void calculateVariance() {
-        for (Element t : trainingData) {
+        for (Tuple t : trainingData) {
             int index = labelIndexer.getIndex(t.label);
             double[] diff = VectorUtils.minus(t.featureVector, meanVectors[index]);
             diff = VectorUtils.multiply(diff, diff);
@@ -57,13 +57,13 @@ final class TrainingEngine {
         }
     }
 
-    public void init(List<Element> trainingData, LabelIndexer labelIndexer) {
+    public void init(List<Tuple> trainingData, LabelIndexer labelIndexer) {
         this.labelIndexer = labelIndexer;
         this.trainingData = trainingData;
 
-        for (Element element : this.trainingData) {
-            if (!labelIndexer.hasLabel(element.label)) {
-                labelIndexer.put(element.label);
+        for (Tuple tuple : this.trainingData) {
+            if (!labelIndexer.hasLabel(tuple.label)) {
+                labelIndexer.put(tuple.label);
             }
         }
     }

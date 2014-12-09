@@ -1,6 +1,6 @@
 package org.maochen.classifier.knn;
 
-import org.maochen.datastructure.Element;
+import org.maochen.datastructure.Tuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,8 +14,8 @@ import java.util.*;
 final class KNNEngine {
     private static final Logger LOG = LoggerFactory.getLogger(KNNEngine.class);
 
-    protected class DistanceComparator implements Comparator<Element> {
-        public int compare(Element e1, Element e2) {
+    protected class DistanceComparator implements Comparator<Tuple> {
+        public int compare(Tuple e1, Tuple e2) {
             double diff = e1.distance - e2.distance;
 
             if (Math.abs(diff) < Double.MIN_VALUE)
@@ -27,18 +27,18 @@ final class KNNEngine {
 
     }
 
-    private Element predict;
-    private List<Element> trainingData;
+    private Tuple predict;
+    private List<Tuple> trainingData;
     private int k;
 
-    public void initialize(Element predict, List<Element> trainingData, int k) {
+    public void initialize(Tuple predict, List<Tuple> trainingData, int k) {
         this.predict = predict;
         this.trainingData = trainingData;
         this.k = k;
     }
 
     public void EuclideanDistance() {
-        for (Element t : trainingData) {
+        for (Tuple t : trainingData) {
             if (predict.featureVector.length != t.featureVector.length) {
                 LOG.error("2 Vectors must has same dimension.");
                 return;
@@ -55,38 +55,38 @@ final class KNNEngine {
     }
 
     public void ChebyshevDistance() {
-        for (Element element : trainingData) {
-            if (predict.featureVector.length != element.featureVector.length) {
+        for (Tuple tuple : trainingData) {
+            if (predict.featureVector.length != tuple.featureVector.length) {
                 LOG.error("2 Vectors must has same dimension.");
                 return;
             }
 
             double result = 0.0;
             for (int i = 0; i < predict.featureVector.length; i++) {
-                double diff = Math.abs(predict.featureVector[i] - element.featureVector[i]);
+                double diff = Math.abs(predict.featureVector[i] - tuple.featureVector[i]);
                 if (diff > result) result = diff;
             }
 
             result = Math.sqrt(result);
-            element.distance = result;
+            tuple.distance = result;
         }
     }
 
     public void ManhattanDistance() {
-        for (Element element : trainingData) {
-            if (predict.featureVector.length != element.featureVector.length) {
+        for (Tuple tuple : trainingData) {
+            if (predict.featureVector.length != tuple.featureVector.length) {
                 LOG.error("2 Vectors must has same dimension.");
                 return;
             }
 
             double result = 0.0;
             for (int i = 0; i < predict.featureVector.length; i++) {
-                double diff = Math.abs(predict.featureVector[i] - element.featureVector[i]);
+                double diff = Math.abs(predict.featureVector[i] - tuple.featureVector[i]);
                 result += diff;
             }
 
             result = Math.sqrt(result);
-            element.distance = result;
+            tuple.distance = result;
         }
     }
 
@@ -95,10 +95,10 @@ final class KNNEngine {
         Collections.sort(trainingData, new DistanceComparator());
 
         for (int i = 0; i < k; i++) {
-            Element element = trainingData.get(i);
-            int count = resultMap.containsKey(element.label) ? resultMap.get(element.label) : 0;
+            Tuple tuple = trainingData.get(i);
+            int count = resultMap.containsKey(tuple.label) ? resultMap.get(tuple.label) : 0;
             count++;
-            resultMap.put(element.label, count);
+            resultMap.put(tuple.label, count);
 
         }
 

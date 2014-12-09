@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * Created by Maochen on 12/4/14.
  */
-public class ElementUtils {
+public class TupleUtils {
     //    public static Element inputConverter(int id, String[] entry, boolean isPredict) {
     //        int newLength = (isPredict) ? entry.length : entry.length - 1;
     //        double[] vector = new double[newLength];

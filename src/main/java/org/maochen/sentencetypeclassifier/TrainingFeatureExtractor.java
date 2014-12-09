@@ -1,8 +1,9 @@
 package org.maochen.sentencetypeclassifier;
 
-import com.clearnlp.dependency.DEPTree;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import org.apache.commons.lang3.StringUtils;
+import org.maochen.datastructure.DTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +17,7 @@ import java.util.concurrent.*;
 public class TrainingFeatureExtractor extends FeatureExtractor {
     private static final Logger LOG = LoggerFactory.getLogger(TrainingFeatureExtractor.class);
 
-    private Map<String, DEPTree> depTreeCache = new HashMap<>();
+    private Map<String, DTree> depTreeCache = new HashMap<>();
     private ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(),
             new ThreadFactoryBuilder().setNameFormat("MaxEnt-FeatureExtractor-%d").build());
 
@@ -48,7 +49,7 @@ public class TrainingFeatureExtractor extends FeatureExtractor {
     }
 
     private void addToMap(Map<String, Integer> ngramMap, String... tokens) {
-        String chunk = "";
+        String chunk = StringUtils.EMPTY;
         for (String token : tokens) {
             chunk = chunk + "_" + token;
         }
@@ -58,7 +59,7 @@ public class TrainingFeatureExtractor extends FeatureExtractor {
     }
 
     // BFS
-    private void generateDEPNGram(DEPTree tree) {
+    private void generateDEPNGram(DTree tree) {
         String depString = super.getDEPString(tree);
         String[] depStringTokens = depString.split("_");
 
@@ -97,7 +98,7 @@ public class TrainingFeatureExtractor extends FeatureExtractor {
         for (String str : trainEntries) {
             // Grab the sentence.
             str = str.split(super.delimiter)[0];
-            DEPTree tree = parser.process(str.replaceAll("_", " "));
+            DTree tree = parser.parse(str.replaceAll("_", StringUtils.SPACE));
             depTreeCache.put(str, tree);
             generateDEPNGram(tree);
             generateWordNGram(str);

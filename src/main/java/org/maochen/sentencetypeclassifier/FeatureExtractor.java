@@ -1,12 +1,14 @@
 package org.maochen.sentencetypeclassifier;
 
-import com.clearnlp.constituent.CTLibEn;
-import com.clearnlp.dependency.DEPLibEn;
-import com.clearnlp.dependency.DEPNode;
-import com.clearnlp.dependency.DEPTree;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Sets;
+import org.apache.commons.lang3.StringUtils;
+import org.maochen.datastructure.DNode;
+import org.maochen.datastructure.DTree;
+import org.maochen.datastructure.LangLib;
+import org.maochen.parser.IParser;
+import org.maochen.parser.StanfordParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +27,7 @@ public class FeatureExtractor {
 
     final String filepathPrefix;
 
-    ClearNLPUtil parser;
+    IParser parser;
 
     String delimiter;
 
@@ -48,19 +50,19 @@ public class FeatureExtractor {
         }
     }
 
-    protected String getDEPString(DEPTree tree) {
+    protected String getDEPString(DTree tree) {
         StringBuilder builder = new StringBuilder();
         builder.append("_<DEP>_");
-        Queue<DEPNode> q = new LinkedList<>();
-        q.add(tree.getFirstRoot());
+        Queue<DNode> q = new LinkedList<>();
+        q.add(tree.getRoots().get(0));
 
         while (!q.isEmpty()) {
-            DEPNode currentNode = q.poll();
+            DNode currentNode = q.poll();
             if (currentNode == null) {
                 continue;
             }
-            builder.append(currentNode.getLabel()).append("_");
-            for (DEPNode child : currentNode.getDependentNodeList()) {
+            builder.append(currentNode.getDepLabel()).append("_");
+            for (DNode child : currentNode.getChildren()) {
                 q.add(child);
             }
         }
@@ -70,10 +72,10 @@ public class FeatureExtractor {
     }
 
     // Bossssssss.... currently all binary features.
-    private String generateFeats(String sentence, DEPTree tree) {
+    private String generateFeats(String sentence, DTree tree) {
         StringBuilder builder = new StringBuilder();
         sentence = sentence.trim();
-        sentence = sentence.replaceAll("_", " ");
+        sentence = sentence.replaceAll("_", StringUtils.SPACE);
         int sentenceLength = sentence.split("\\s").length;
         int weight = sentenceLength > 10 ? sentenceLength : 10;
 
@@ -103,24 +105,24 @@ public class FeatureExtractor {
             addFeats(builder, "triGramDEP_" + str, depString.contains("_" + str + "_"), 1);
         }
 
-        Set<String> whPrefixPos = Sets.newHashSet(CTLibEn.POS_WRB, CTLibEn.POS_WDT, CTLibEn.POS_WP, CTLibEn.POS_WPS);
+        Set<String> whPrefixPos = Sets.newHashSet(LangLib.POS_WRB, LangLib.POS_WDT, LangLib.POS_WP, LangLib.POS_WPS);
         // 1st word is WH
-        String firstPOS = tree.get(1).pos;
+        String firstPOS = tree.get(1).getPos();
         addFeats(builder, "first_word_pos", whPrefixPos.contains(firstPOS), 1);
 
         // last word is WH
         int lastPOSIndex = sentence.matches(".*\\p{Punct}$") ? tree.size() - 2 : tree.size() - 1;
-        String lastPOS = tree.get(lastPOSIndex).pos;
+        String lastPOS = tree.get(lastPOSIndex).getPos();
         addFeats(builder, "last_word_pos", whPrefixPos.contains(lastPOS), 1);
 
         // is 1st word rootVerb.
-        addFeats(builder, "first_word_root_verb", firstPOS.startsWith(CTLibEn.POS_VB) && tree.get(1).isRoot(), weight);
+        addFeats(builder, "first_word_root_verb", firstPOS.startsWith(LangLib.POS_VB) && tree.get(1).isRoot(), weight);
 
         // Have aux in the sentence.
-        int auxCount = Collections2.filter(tree, new Predicate<DEPNode>() {
+        int auxCount = Collections2.filter(tree, new Predicate<DNode>() {
             @Override
-            public boolean apply(DEPNode depNode) {
-                return DEPLibEn.DEP_AUX.equals(depNode.getLabel());
+            public boolean apply(DNode depNode) {
+                return LangLib.DEP_AUX.equals(depNode.getDepLabel());
             }
         }).size();
         addFeats(builder, "has_aux", auxCount > 0, 1);
@@ -138,7 +140,7 @@ public class FeatureExtractor {
 
         // Verify, Ask, Say - imperative
         Set<String> imperativeKeywords = Sets.newHashSet("verify", "ask", "say", "solve", "run", "execute");
-        boolean isImperativeStart = imperativeKeywords.contains(tree.get(1).lemma) && tree.get(1).isRoot();
+        boolean isImperativeStart = imperativeKeywords.contains(tree.get(1).getLemma()) && tree.get(1).isRoot();
         addFeats(builder, "has_imperative_keyword", isImperativeStart, weight);
 
         // puncts.
@@ -175,11 +177,11 @@ public class FeatureExtractor {
     }
 
     public String getFeats(String entry) {
-        DEPTree tree = parser.process(entry.split(delimiter)[0].replaceAll("_", " "));
+        DTree tree = parser.parse(entry.split(delimiter)[0].replaceAll("_", StringUtils.SPACE));
         return getFeats(entry, tree);
     }
 
-    public String getFeats(String entry, DEPTree tree) {
+    public String getFeats(String entry, DTree tree) {
         String[] tokens = entry.split(delimiter);
         if (tokens.length != 2) return "";
 
@@ -210,7 +212,7 @@ public class FeatureExtractor {
     public FeatureExtractor(String filepathPrefix, String delimiter) {
         this.delimiter = delimiter;
 
-        parser = new ClearNLPUtil();
+        parser = new StanfordParser();
         this.filepathPrefix = filepathPrefix;
 
         biGramWordMap = deserialize(filepathPrefix + "/bigram_word");
