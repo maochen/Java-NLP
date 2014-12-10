@@ -183,6 +183,11 @@ public class StanfordTreeBuilder {
         if (node.getLemma().equals("together") && node.getParent() != null && node.getParent().getLemma().equals("hold") && !node.getDepLabel().equals(LangLib.DEP_PRT)) {
             node.setDepLabel(LangLib.DEP_PRT);
         }
+
+        // Ex: What bad weather.
+        if (node.getPOS().equals(LangLib.POS_WDT) && node.getDepLabel().equals(LangLib.DEP_ATTR)) {
+            node.setDepLabel(LangLib.DEP_DET);
+        }
     }
 
     private static void convertCopHead(DTree tree) {
@@ -270,7 +275,6 @@ public class StanfordTreeBuilder {
             }
         }
 
-
         for (int i = 1; i < depTree.size(); i++) {
             DNode node = depTree.get(i);
             if (node.getDepLabel() == null) {
@@ -310,7 +314,8 @@ public class StanfordTreeBuilder {
             patchTree(node);
             dirtyPatch(node);
         }
-
+        // Dont put it before dirty patch.
+        // Ex: Is the car slow? -> slow, VBZ should be correct to JJ first and then convert tree.
         convertCopHead(depTree);
         return depTree;
     }
