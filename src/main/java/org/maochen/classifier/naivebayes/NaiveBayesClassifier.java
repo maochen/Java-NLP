@@ -104,6 +104,13 @@ public class NaiveBayesClassifier implements IClassifier {
 
         nbc.train(trainingData);
         Map<String, Double> probs = nbc.predict(predict);
+
+        // double expectedMaleProb = probs.get("male");
+        // double expectedFemaleProb = probs.get("female");
+        // assert expectedMaleProb == 6.197071843878083E-9;
+        // assert expectedFemaleProb == 5.377909183630024E-4;
+
+
         System.out.println("Result: " + predict);
         System.out.println(probs);
     }

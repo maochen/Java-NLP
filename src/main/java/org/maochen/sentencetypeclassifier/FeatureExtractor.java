@@ -107,12 +107,12 @@ public class FeatureExtractor {
 
         Set<String> whPrefixPos = Sets.newHashSet(LangLib.POS_WRB, LangLib.POS_WDT, LangLib.POS_WP, LangLib.POS_WPS);
         // 1st word is WH
-        String firstPOS = tree.get(1).getPos();
+        String firstPOS = tree.get(1).getPOS();
         addFeats(builder, "first_word_pos", whPrefixPos.contains(firstPOS), 1);
 
         // last word is WH
         int lastPOSIndex = sentence.matches(".*\\p{Punct}$") ? tree.size() - 2 : tree.size() - 1;
-        String lastPOS = tree.get(lastPOSIndex).getPos();
+        String lastPOS = tree.get(lastPOSIndex).getPOS();
         addFeats(builder, "last_word_pos", whPrefixPos.contains(lastPOS), 1);
 
         // is 1st word rootVerb.

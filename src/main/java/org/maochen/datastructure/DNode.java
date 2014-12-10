@@ -66,11 +66,11 @@ public class DNode {
         this.lemma = lemma;
     }
 
-    public String getPos() {
+    public String getPOS() {
         return pos;
     }
 
-    public void setPos(String pos) {
+    public void setPOS(String pos) {
         this.pos = pos;
     }
 
@@ -130,12 +130,14 @@ public class DNode {
     public void setNamedEntity(String namedEntity) {
         this.namedEntity = namedEntity;
     }
-    
+
     public boolean isRoot() {
         return this.depLabel.equals(LangLib.DEP_ROOT);
     }
 
-    public String toCoNLLString() {
+    // This is CoNLL format.
+    @Override
+    public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append(id).append("\t");
         builder.append(name).append("\t");

@@ -111,36 +111,36 @@ public class StanfordTreeBuilder {
         // PS2: "be simulated", actually the whole tree should start with node instead of "be", cannot fix the dep.
 
         // Dont assign verb that['s] to possessive
-        if (node.getName().equalsIgnoreCase("'s") && !node.getPos().startsWith(LangLib.POS_VB)) {
-            node.setPos(LangLib.POS_POS);
+        if (node.getName().equalsIgnoreCase("'s") && !node.getPOS().startsWith(LangLib.POS_VB)) {
+            node.setPOS(LangLib.POS_POS);
         }
 
         // Inconsistency in VBG and JJ
         // Ex: What is the reason for missing internal account? --> missing can be either JJ or VBG.
-        else if (LangLib.POS_JJ.equals(node.getPos()) && node.getName().endsWith("ing")) {
-            node.setPos(LangLib.POS_VBG);
+        else if (LangLib.POS_JJ.equals(node.getPOS()) && node.getName().endsWith("ing")) {
+            node.setPOS(LangLib.POS_VBG);
         }
 
         // Mislabeled VBG as NN.
-        else if (node.getPos().startsWith(LangLib.POS_NN) && node.getName().endsWith("ing") && node.getDepLabel().equals(LangLib.DEP_ROOT)) {
-            node.setPos(LangLib.POS_VBG);
+        else if (node.getPOS().startsWith(LangLib.POS_NN) && node.getName().endsWith("ing") && node.getDepLabel().equals(LangLib.DEP_ROOT)) {
+            node.setPOS(LangLib.POS_VBG);
         }
 
         // If root has aux and itself is a Noun, correct it as verb.
-        else if (node.getPos().startsWith(LangLib.POS_NN) && node.getDepLabel().equals(LangLib.DEP_ROOT) && !node.getChildrenByDepLabels(LangLib.DEP_AUX).isEmpty()) {
-            node.setPos(LangLib.POS_VB);
+        else if (node.getPOS().startsWith(LangLib.POS_NN) && node.getDepLabel().equals(LangLib.DEP_ROOT) && !node.getChildrenByDepLabels(LangLib.DEP_AUX).isEmpty()) {
+            node.setPOS(LangLib.POS_VB);
         }
 
         // Fix root spread as verb
-        else if (node.getName().toLowerCase().equals("spread") && node.getPos().startsWith(LangLib.POS_NN) && node.getDepLabel().equals(LangLib.DEP_ROOT)) {
-            node.setPos(LangLib.POS_VBD);
+        else if (node.getName().toLowerCase().equals("spread") && node.getPOS().startsWith(LangLib.POS_NN) && node.getDepLabel().equals(LangLib.DEP_ROOT)) {
+            node.setPOS(LangLib.POS_VBD);
         }
 
         DNode fixedNode = words.get(node.getName().toLowerCase());
         if (fixedNode != null) {
             if (node.getName().toLowerCase().equals("to")) {
                 if (node.getDepLabel().equals(LangLib.DEP_PREP)) {
-                    node.setPos(LangLib.POS_IN);
+                    node.setPOS(LangLib.POS_IN);
                 } else {
                     // Dont patch
                 }
@@ -148,7 +148,7 @@ public class StanfordTreeBuilder {
 
             // French fix.
             else if ("french".equalsIgnoreCase(node.getName()) && node.getDepLabel().startsWith(LangLib.DEP_NSUBJ)) {
-                node.setPos(LangLib.POS_NNP);
+                node.setPOS(LangLib.POS_NNP);
             }
 
             // General Case
@@ -157,8 +157,8 @@ public class StanfordTreeBuilder {
                     node.setLemma(fixedNode.getLemma());
                 }
 
-                if (fixedNode.getPos() != null && !node.getPos().equals(fixedNode.getPos())) {
-                    node.setPos(fixedNode.getPos());
+                if (fixedNode.getPOS() != null && !node.getPOS().equals(fixedNode.getPOS())) {
+                    node.setPOS(fixedNode.getPOS());
                 }
 
                 if (fixedNode.getDepLabel() != null && !node.getDepLabel().equals(fixedNode.getDepLabel())) {
@@ -169,14 +169,14 @@ public class StanfordTreeBuilder {
 
         // ---------- Fix the Label ------------
         // Fix the preposition label
-        if (LangLib.POS_IN.equals(node.getPos()) && !LangLib.DEP_MARK.equals(node.getDepLabel())) {
+        if (LangLib.POS_IN.equals(node.getPOS()) && !LangLib.DEP_MARK.equals(node.getDepLabel())) {
             node.setDepLabel(LangLib.DEP_PREP);
         }
 
         // For aux verb tagged as Noun.
         if (node.getId() == 1 && auxVerbFix.containsKey(node.getName().toLowerCase())) {
             node.setDepLabel(LangLib.DEP_AUX);
-            node.setPos(auxVerbFix.get(node.getName().toLowerCase()));
+            node.setPOS(auxVerbFix.get(node.getName().toLowerCase()));
         }
 
         // hold together -> "together" should be PRT
@@ -189,8 +189,7 @@ public class StanfordTreeBuilder {
         DNode originalRoot = tree.getRoots().get(0); // JJ mostly.
         List<DNode> cops = originalRoot.getChildrenByDepLabels(LangLib.DEP_COP);
 
-        if (!originalRoot.getPos().startsWith(LangLib.POS_VB) && !cops.isEmpty() && cops.get(0) != originalRoot) {
-            DNode headOfRoot = tree.get(0);
+        if (!originalRoot.getPOS().startsWith(LangLib.POS_VB) && !cops.isEmpty() && cops.get(0) != originalRoot) {
             DNode cop = cops.get(0);
 
             cop.setDepLabel(LangLib.DEP_ROOT);
@@ -200,11 +199,11 @@ public class StanfordTreeBuilder {
                 originalRoot.setDepLabel(LangLib.DEP_DEP);
             }
 
-            cop.setParent(headOfRoot);
+            cop.setParent(tree.getPaddingNode());
             originalRoot.setParent(cop);
 
-            headOfRoot.removeChild(originalRoot.getId());
-            headOfRoot.addChild(cop);
+            tree.getPaddingNode().removeChild(originalRoot.getId());
+            tree.getPaddingNode().addChild(cop);
 
 
             // Add original deps to cop
@@ -261,7 +260,7 @@ public class StanfordTreeBuilder {
                 DNode child = depTree.get(targetIndex);
                 DNode parent = depTree.get(sourceIndex);
                 // ClearNLP has different possessive handling.
-                if (child.getPos().equals(LangLib.POS_POS) && !childDEPLabel.equals(LangLib.DEP_POSSESSIVE)) {
+                if (child.getPOS().equals(LangLib.POS_POS) && !childDEPLabel.equals(LangLib.DEP_POSSESSIVE)) {
                     childDEPLabel = LangLib.DEP_POSSESSIVE;
                     parent.setDepLabel(LangLib.DEP_POSS);
                 }

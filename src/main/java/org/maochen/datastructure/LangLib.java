@@ -1,9 +1,11 @@
 package org.maochen.datastructure;
 
 /**
- * This is derived from Penn POS
- * <p/>
+ * POS Tag is derived from Penn POS
  * http://www.ling.upenn.edu/courses/Fall_2003/ling001/penn_treebank_pos.html
+ * <p/>
+ * Dependency Labels is from Stanford Typed Dependencies.
+ * http://nlp.stanford.edu/software/dependencies_manual.pdf
  * <p/>
  * Created by Maochen on 12/8/14.
  */
@@ -52,235 +54,64 @@ public class LangLib {
     public static final String NE_ORG = "ORGANIZATION";
     public static final String NE_LOC = "LOCATION";
 
-    /**
-     * The dependency label for passive.
-     */
-    public static final String DEP_PASS = "pass";
-    /**
-     * The dependency label for subjects.
-     */
-    public static final String DEP_SUBJ = "subj";
-
-    /**
-     * The dependency label for adjectival complements.
-     */
-    public static final String DEP_ACOMP = "acomp";
-    /**
-     * The dependency label for adverbial clause modifiers.
-     */
-    public static final String DEP_ADVCL = "advcl";
-    /**
-     * The dependency label for adverbial modifiers.
-     */
-    public static final String DEP_ADVMOD = "advmod";
-    /**
-     * The dependency label for agents.
-     */
-    public static final String DEP_AGENT = "agent";
-    /**
-     * The dependency label for adjectival modifiers.
-     */
-    public static final String DEP_AMOD = "amod";
-    /**
-     * The dependency label for appositional modifiers.
-     */
-    public static final String DEP_APPOS = "appos";
-    /**
-     * The dependency label for attributes.
-     */
-    public static final String DEP_ATTR = "attr";
-    /**
-     * The dependency label for auxiliary verbs.
-     */
-    public static final String DEP_AUX = "aux";
-    /**
-     * The dependency label for passive auxiliary verbs.
-     */
-    public static final String DEP_AUXPASS = DEP_AUX + DEP_PASS;
-    /**
-     * The dependency label for coordinating conjunctions.
-     */
-    public static final String DEP_CC = "cc";
-    /**
-     * The dependency label for clausal complements.
-     */
-    public static final String DEP_CCOMP = "ccomp";
-    /**
-     * The dependency label for complementizers.
-     */
-    public static final String DEP_COMPLM = "complm";
-    /**
-     * The dependency label for conjuncts.
-     */
-    public static final String DEP_CONJ = "conj";
-
-    // Copula
-    public static final String DEP_COP = "cop";
-    /**
-     * The dependency label for clausal subjects.
-     */
-    public static final String DEP_CSUBJ = "c" + DEP_SUBJ;
-    /**
-     * The dependency label for clausal passive subjects.
-     */
-    public static final String DEP_CSUBJPASS = DEP_CSUBJ + DEP_PASS;
-    /**
-     * The dependency label for unknown dependencies.
-     */
-    public static final String DEP_DEP = "dep";
-    /**
-     * The dependency label for determiners.
-     */
-    public static final String DEP_DET = "det";
-    /**
-     * The dependency label for direct objects.
-     */
-    public static final String DEP_DOBJ = "dobj";
-    /**
-     * The dependency label for expletives.
-     */
-    public static final String DEP_EXPL = "expl";
-    /**
-     * The dependency label for modifiers in hyphenation.
-     */
-    public static final String DEP_HMOD = "hmod";
-    /**
-     * The dependency label for hyphenation.
-     */
-    public static final String DEP_HYPH = "hyph";
-    /**
-     * The dependency label for indirect objects.
-     */
-    public static final String DEP_IOBJ = "iobj";
-    /**
-     * The dependency label for interjections.
-     */
-    public static final String DEP_INTJ = "intj";
-    /**
-     * The dependency label for markers.
-     */
-    public static final String DEP_MARK = "mark";
-    /**
-     * The dependency label for meta modifiers.
-     */
-    public static final String DEP_META = "meta";
-    /**
-     * The dependency label for negation modifiers.
-     */
-    public static final String DEP_NEG = "neg";
-    /**
-     * The dependency label for non-finite modifiers.
-     */
-    public static final String DEP_NFMOD = "nfmod";
-    /**
-     * The dependency label for infinitival modifiers.
-     */
-    public static final String DEP_INFMOD = "infmod";
-    /**
-     * The dependency label for noun phrase modifiers.
-     */
-    public static final String DEP_NMOD = "nmod";
-    /**
-     * The dependency label for noun compound modifiers.
-     */
-    public static final String DEP_NN = "nn";
-    /**
-     * The dependency label for noun phrase as adverbial modifiers.
-     */
-    public static final String DEP_NPADVMOD = "npadvmod";
-    /**
-     * The dependency label for nominal subjects.
-     */
-    public static final String DEP_NSUBJ = "n" + DEP_SUBJ;
-    /**
-     * The dependency label for nominal passive subjects.
-     */
-    public static final String DEP_NSUBJPASS = DEP_NSUBJ + DEP_PASS;
-    /**
-     * The dependency label for numeric modifiers.
-     */
-    public static final String DEP_NUM = "num";
-    /**
-     * The dependency label for elements of compound numbers.
-     */
-    public static final String DEP_NUMBER = "number";
-    /**
-     * The dependency label for object predicates.
-     */
-    public static final String DEP_OPRD = "oprd";
-    /**
-     * The dependency label for parataxis.
-     */
-    public static final String DEP_PARATAXIS = "parataxis";
-    /**
-     * The dependency label for participial modifiers.
-     */
-    public static final String DEP_PARTMOD = "partmod";
-    /**
-     * The dependency label for modifiers of prepositions.
-     */
-    public static final String DEP_PMOD = "pmod";
-    /**
-     * The dependency label for prepositional complements.
-     */
-    public static final String DEP_PCOMP = "pcomp";
-    /**
-     * The dependency label for objects of prepositions.
-     */
-    public static final String DEP_POBJ = "pobj";
-    /**
-     * The dependency label for possession modifiers.
-     */
-    public static final String DEP_POSS = "poss";
-    /**
-     * The dependency label for possessive modifiers.
-     */
-    public static final String DEP_POSSESSIVE = "possessive";
-    /**
-     * The dependency label for pre-conjuncts.
-     */
-    public static final String DEP_PRECONJ = "preconj";
-    /**
-     * The dependency label for pre-determiners.
-     */
-    public static final String DEP_PREDET = "predet";
-    /**
-     * The dependency label for prepositional modifiers.
-     */
-    public static final String DEP_PREP = "prep";
-    /**
-     * The dependency label for particles.
-     */
-    public static final String DEP_PRT = "prt";
-    /**
-     * The dependency label for punctuation.
-     */
-    public static final String DEP_PUNCT = "punct";
-    /**
-     * The dependency label for modifiers of quantifiers.
-     */
-    public static final String DEP_QMOD = "qmod";
-    /**
-     * The dependency label for quantifier phrase modifiers.
-     */
-    public static final String DEP_QUANTMOD = "quantmod";
-    /**
-     * The dependency label for relative clause modifiers.
-     */
-    public static final String DEP_RCMOD = "rcmod";
-    /**
-     * The dependency label for roots.
-     */
-    public static final String DEP_ROOT = "root";
+    public static final String DEP_PASS = "pass"; // passive dependency label
+    public static final String DEP_SUBJ = "subj"; // subjects dependency label
+    public static final String DEP_ACOMP = "acomp"; // adjectival complements dependency label
+    public static final String DEP_ADVCL = "advcl"; // adverbial clause modifiers
+    public static final String DEP_ADVMOD = "advmod"; // adverbial modifiers
+    public static final String DEP_AGENT = "agent"; // agents
+    public static final String DEP_AMOD = "amod"; // adjectival modifiers
+    public static final String DEP_APPOS = "appos"; // appositional modifiers
+    public static final String DEP_ATTR = "attr"; // attributes
+    public static final String DEP_AUX = "aux"; // auxiliary verbs
+    public static final String DEP_AUXPASS = DEP_AUX + DEP_PASS; // passive auxiliary verbs.
+    public static final String DEP_CC = "cc"; // coordinating conjunctions
+    public static final String DEP_CCOMP = "ccomp"; // clausal complements
+    public static final String DEP_COMPLM = "complm"; // complementizers
+    public static final String DEP_CONJ = "conj"; // conjuncts
+    public static final String DEP_COP = "cop"; // copula verb
+    public static final String DEP_CSUBJ = "c" + DEP_SUBJ; // clausal subjects
+    public static final String DEP_CSUBJPASS = DEP_CSUBJ + DEP_PASS; // clausal passive subjects
+    public static final String DEP_DEP = "dep"; // UNKNOWN dependencies
+    public static final String DEP_DET = "det"; // determiners
+    public static final String DEP_DOBJ = "dobj"; // direct objects
+    public static final String DEP_EXPL = "expl"; // expletives
+    public static final String DEP_HMOD = "hmod"; // modifiers in hyphenation
+    public static final String DEP_HYPH = "hyph"; // hyphenation
+    public static final String DEP_IOBJ = "iobj"; // indirect objects
+    public static final String DEP_INTJ = "intj"; // interjections
+    public static final String DEP_MARK = "mark"; // markers
+    public static final String DEP_META = "meta"; // meta modifiers
+    public static final String DEP_NEG = "neg"; // negation modifiers
+    public static final String DEP_NFMOD = "nfmod"; // non-finite modifiers
+    public static final String DEP_INFMOD = "infmod"; // infinitival modifiers
+    public static final String DEP_NMOD = "nmod"; // noun phrase modifiers
+    public static final String DEP_NN = "nn"; // noun compound modifiers
+    public static final String DEP_NPADVMOD = "npadvmod"; // adverbial modifiers
+    public static final String DEP_NSUBJ = "n" + DEP_SUBJ; // nominal subjects
+    public static final String DEP_NSUBJPASS = DEP_NSUBJ + DEP_PASS; // nominal passive subjects
+    public static final String DEP_NUM = "num"; // numeric modifiers
+    public static final String DEP_NUMBER = "number"; // elements of compound numbers
+    public static final String DEP_OPRD = "oprd"; // object predicates
+    public static final String DEP_PARATAXIS = "parataxis"; // parataxis
+    public static final String DEP_PARTMOD = "partmod"; // participial modifiers
+    public static final String DEP_PMOD = "pmod"; // modifiers of prepositions
+    public static final String DEP_PCOMP = "pcomp"; // prepositional complements
+    public static final String DEP_POBJ = "pobj"; // objects of prepositions
+    public static final String DEP_POSS = "poss"; // possession modifiers
+    public static final String DEP_POSSESSIVE = "possessive"; // possessive modifiers
+    public static final String DEP_PRECONJ = "preconj"; // pre-conjuncts
+    public static final String DEP_PREDET = "predet"; // pre-determiners
+    public static final String DEP_PREP = "prep"; // prepositional modifiers
+    public static final String DEP_PRT = "prt"; // particles
+    public static final String DEP_PUNCT = "punct"; // punctuation
+    public static final String DEP_QMOD = "qmod"; // modifiers of quantifiers
+    public static final String DEP_QUANTMOD = "quantmod"; // quantifier phrase modifiers
+    public static final String DEP_RCMOD = "rcmod"; // relative clause modifiers
+    public static final String DEP_ROOT = "root"; // roots
     // Only from Stanford
     public static final String DEP_VMOD = "vmod";
-    /**
-     * The dependency label for open clausal modifiers.
-     */
-    public static final String DEP_XCOMP = "xcomp";
-    /**
-     * The dependency label for open clausal subjects.
-     */
-    public static final String DEP_XSUBJ = "x" + DEP_SUBJ;
+    public static final String DEP_XCOMP = "xcomp"; // open clausal modifiers
+    public static final String DEP_XSUBJ = "x" + DEP_SUBJ; // open clausal subjects
 
 }

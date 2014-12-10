@@ -1,9 +1,7 @@
-package org.maochen.classifier;
+package org.maochen.classifier.maxent;
 
 import opennlp.maxent.GIS;
 import opennlp.maxent.GISModel;
-import opennlp.maxent.PlainTextByLineDataStream;
-import opennlp.maxent.RealBasicEventStream;
 import opennlp.maxent.io.GISModelWriter;
 import opennlp.maxent.io.SuffixSensitiveGISModelReader;
 import opennlp.maxent.io.SuffixSensitiveGISModelWriter;
@@ -11,7 +9,8 @@ import opennlp.model.AbstractModel;
 import opennlp.model.EventStream;
 import opennlp.model.RealValueFileEventStream;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 public class MaxEntClassifier {
@@ -26,39 +25,10 @@ public class MaxEntClassifier {
 
     String pathPrefix = MaxEntClassifier.class.getResource(".").getPath();
 
-    public MaxEntClassifier train(List<String[]> trainingData) {
-        String filePath = pathPrefix + "/featureVector.txt";
-        File file = new File(filePath);
-
+    private MaxEntClassifier train(List<String[]> trainingData) {
         try {
-            file.createNewFile();
-
-            FileWriter writer = new FileWriter(file);
-            for (String[] entry : trainingData) {
-                StringBuilder builder = new StringBuilder();
-                for (String s : entry) {
-                    builder.append(s).append(" ");
-                }
-                writer.write(builder.toString().trim() + "\n");
-            }
-
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        train(filePath);
-
-        if (!file.delete()) {
-            throw new RuntimeException("Unable to delete temp featureVector file.");
-        }
-
-        return this;
-    }
-
-    private MaxEntClassifier train(String featureVectorFile) {
-        try {
-            EventStream es = new RealBasicEventStream(new PlainTextByLineDataStream(new FileReader(featureVectorFile)));
+            EventStream es = new StringEventStream(trainingData);
+            //            EventStream es = new TupleEventStream(trainingData);
             model = GIS.trainModel(es, ITERATIONS, CUTOFF, USE_SMOOTHING, true);
         } catch (IOException e) {
             e.printStackTrace();
@@ -67,9 +37,16 @@ public class MaxEntClassifier {
     }
 
     public Map<String, Double> predict(String[] featureVector) {
-        String[] contexts = featureVector;
-        float[] values = RealValueFileEventStream.parseContexts(contexts);
-        double[] ocs = model.eval(contexts, values);
+
+        // TODO: here we dont need to worry about feature labels but we need to change the above train!
+        //        String[] contexts = new String[featureVector.length];
+        //
+        //        for (int i = 0; i < featureVector.length; i++) {
+        //            contexts[i] = String.valueOf(i);
+        //        }
+
+        float[] values = RealValueFileEventStream.parseContexts(featureVector);
+        double[] ocs = model.eval(featureVector, values);
         String outcomes = model.getAllOutcomes(ocs);
 
         resultMap = new HashMap<>();
@@ -124,7 +101,7 @@ public class MaxEntClassifier {
     }
 
     public static void main(String[] args) throws IOException {
-        List<String[]> traindata = new ArrayList<String[]>();
+        List<String[]> traindata = new ArrayList<>();
         traindata.add(new String[]{"away", "pdiff=0.6875", "ptwins=0.5", "lose"});
         traindata.add(new String[]{"away", "pdiff=1.0625", "ptwins=0.5", "win"});
         traindata.add(new String[]{"home", "pdiff=0.8125", "ptwins=0.5", "lose"});
@@ -246,6 +223,28 @@ public class MaxEntClassifier {
         predictData.add(new String[]{"home", "pdiff=0.9375", "ptwins=0.3333"});
         predictData.add(new String[]{"home", "pdiff=0.6875", "ptwins=0.5"});
 
+        /*
+        * [home, pdiff=0.6875, ptwins=0.5]
+        * {lose=0.328, tie=0.2409, win=0.4311}
+        * [home, pdiff=1.0625, ptwins=0.5]
+        * {lose=0.3415, tie=0.2284, win=0.4301}
+        * [away, pdiff=0.8125, ptwins=0.5]
+        * {lose=0.5586, tie=0.2552, win=0.1862}
+        * [away, pdiff=0.6875, ptwins=0.6]
+        * {lose=0.5574, tie=0.2562, win=0.1863}
+        * [home, pdiff=0.9375, ptwins=0.5]
+        * {lose=0.337, tie=0.2325, win=0.4305}
+        * [home, pdiff=0.6875, ptwins=0.3333]
+        * {lose=0.322, tie=0.2466, win=0.4314}
+        * [away, pdiff=1.0625, ptwins=0.6666]
+        * {lose=0.5782, tie=0.238, win=0.1838}
+        * [home, pdiff=0.8125, ptwins=0.6666]
+        * {lose=0.3385, tie=0.2311, win=0.4304}
+        * [home, pdiff=0.9375, ptwins=0.3333]
+        * {lose=0.331, tie=0.2381, win=0.4309}
+        * [home, pdiff=0.6875, ptwins=0.5]
+        * {lose=0.328, tie=0.2409, win=0.4311}
+            */
         for (String[] feature : predictData) {
             System.out.println(Arrays.toString(feature));
             System.out.println(maxent.predict(feature));

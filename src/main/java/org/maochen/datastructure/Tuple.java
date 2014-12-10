@@ -9,12 +9,21 @@ public class Tuple {
     public int id;
     public String label;
     public double[] featureVector;
+    public int[] featureVectorIndex;
     public double distance;
 
+
+    private void getFeatureVectorIndex() {
+        featureVectorIndex = new int[featureVector.length];
+        for (int i = 0; i < featureVector.length; i++) {
+            featureVectorIndex[i] = i;
+        }
+    }
 
     // This is for predict
     public Tuple(double[] featureVector) {
         this.featureVector = featureVector;
+        getFeatureVectorIndex();
     }
 
     // This is for training data
@@ -22,6 +31,7 @@ public class Tuple {
         this.id = id;
         this.featureVector = featureVector;
         this.label = label;
+        getFeatureVectorIndex();
     }
 
     @Override

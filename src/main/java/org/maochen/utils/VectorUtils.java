@@ -66,4 +66,21 @@ public class VectorUtils {
         return result;
     }
 
+    public static float[] doubleToFloat(double[] vector) {
+        float[] result = new float[vector.length];
+        for (int i = 0; i < vector.length; i++) {
+            result[i] = (float) vector[i];
+        }
+        return result;
+    }
+
+    public static String[] intToString(int[] vectorIndex) {
+        String[] result = new String[vectorIndex.length];
+        for (int i = 0; i < vectorIndex.length; i++) {
+            result[i] = String.valueOf(vectorIndex[i]);
+        }
+
+        return result;
+    }
+
 }
