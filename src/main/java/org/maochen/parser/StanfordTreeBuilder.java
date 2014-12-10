@@ -1,6 +1,5 @@
 package org.maochen.parser;
 
-import com.google.common.collect.ImmutableSet;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.trees.Tree;
@@ -12,19 +11,67 @@ import org.maochen.datastructure.LangLib;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
- * Created by Maochen on 12/8/14.
+ * For the Stanford parse tree.
+ * Created by Maochen on 10/28/14.
  */
 public class StanfordTreeBuilder {
-
     private static final Logger LOG = LoggerFactory.getLogger(StanfordTreeBuilder.class);
 
-    private static final Set<String> preps = ImmutableSet.of("to", "in", "on");
-    private static final Set<String> modalVerbs = ImmutableSet.of("can", "could", "coulda", "shall", "should", "shoulda", "will", "would", "may", "might", "must", "musta");
-    private static final Set<String> adjectives = ImmutableSet.of("blue", "red", "slow");
-    private static final Set<String> nouns = ImmutableSet.of("insect", "username");
+    private static final Map<String, DNode> words = new HashMap<String, DNode>() {{
+        DNode locate = new DNode(0, "located", "locate", LangLib.POS_VBD, StringUtils.EMPTY);
+        put(locate.getName(), locate);
+        DNode working = new DNode(0, "working", "work", LangLib.POS_VBG, StringUtils.EMPTY);
+        put(working.getName(), working);
+        DNode to = new DNode(1, "to", "to", LangLib.POS_IN, StringUtils.EMPTY);
+        put(to.getName(), to);
+        DNode in = new DNode(2, "in", "in", LangLib.POS_IN, StringUtils.EMPTY);
+        put(in.getName(), in);
+        DNode on = new DNode(2, "on", "on", LangLib.POS_IN, StringUtils.EMPTY);
+        put(on.getName(), on);
+        DNode blue = new DNode(2, "blue", "blue", LangLib.POS_JJ, StringUtils.EMPTY);
+        put(blue.getName(), blue);
+        DNode red = new DNode(2, "red", "red", LangLib.POS_JJ, StringUtils.EMPTY);
+        put(red.getName(), red);
+        DNode slow = new DNode(2, "slow", "slow", LangLib.POS_JJ, StringUtils.EMPTY);
+        put(slow.getName(), slow);
+        DNode french = new DNode(3, "french", "french", LangLib.POS_NNP, LangLib.DEP_NSUBJ);
+        put(french.getName(), french);
+        DNode insect = new DNode(4, "insect", "insect", LangLib.POS_NN, StringUtils.EMPTY);
+        put(insect.getName(), insect);
+        DNode username = new DNode(5, "username", "username", LangLib.POS_NN, StringUtils.EMPTY);
+        put(username.getName(), username);
+        DNode can = new DNode(6, "can", "can", LangLib.POS_MD, LangLib.DEP_AUX);
+        put(can.getName(), can);
+        DNode could = new DNode(6, "could", "can", LangLib.POS_MD, LangLib.DEP_AUX);
+        put(could.getName(), could);
+        DNode coulda = new DNode(6, "coulda", "can", LangLib.POS_MD, LangLib.DEP_AUX);
+        put(coulda.getName(), coulda);
+        DNode shall = new DNode(6, "shall", "shall", LangLib.POS_MD, LangLib.DEP_AUX);
+        put(shall.getName(), shall);
+        DNode should = new DNode(6, "should", "shall", LangLib.POS_MD, LangLib.DEP_AUX);
+        put(should.getName(), should);
+        DNode shoulda = new DNode(6, "shoulda", "shall", LangLib.POS_MD, LangLib.DEP_AUX);
+        put(shoulda.getName(), shoulda);
+        DNode will = new DNode(6, "will", "will", LangLib.POS_MD, LangLib.DEP_AUX);
+        put(will.getName(), will);
+        DNode would = new DNode(6, "would", "will", LangLib.POS_MD, LangLib.DEP_AUX);
+        put(would.getName(), would);
+        DNode may = new DNode(6, "may", "may", LangLib.POS_MD, LangLib.DEP_AUX);
+        put(may.getName(), may);
+        DNode might = new DNode(6, "might", "may", LangLib.POS_MD, LangLib.DEP_AUX);
+        put(might.getName(), might);
+        DNode must = new DNode(6, "must", "must", LangLib.POS_MD, LangLib.DEP_AUX);
+        put(must.getName(), must);
+        DNode musta = new DNode(6, "musta", "must", LangLib.POS_MD, LangLib.DEP_AUX);
+        put(musta.getName(), musta);
+    }};
+
 
     private static final Map<String, String> auxVerbFix = new HashMap<String, String>() {
         {
@@ -33,11 +80,6 @@ public class StanfordTreeBuilder {
             put("do", LangLib.POS_VBP);
         }
     };
-
-    // if pos is IN, and dep label is the following
-    private static final Set<String> excludingPrepDepLabels = ImmutableSet.of("mark");
-
-    private static final String NAMEDENTITY = "name_entity";
 
     private static void setRel(DNode parent, DNode child) {
         child.setParent(parent);
@@ -52,60 +94,82 @@ public class StanfordTreeBuilder {
             node.setName(")");
         }
 
-        if (preps.contains(node.getName().toLowerCase())) {
-            if (node.getName().toLowerCase().equals("to") && node.getDepLabel().equals("prep")) {
-                node.setPos(LangLib.POS_IN);
-            } else if (!node.getName().toLowerCase().equals("to")) {
-                node.setPos(LangLib.POS_IN);
-            }
-        }
-
         // Take the 'dep' as 'attr'. Cuz ClearNLP says it is attr. funny right?
         if (node.getDepLabel().equals(LangLib.DEP_DEP)) {
             node.setDepLabel(LangLib.DEP_ATTR);
         }
 
         // ClearNLP does not have vmod.
-        if (node.getDepLabel().equals("vmod")) {
+        if (node.getDepLabel().equals(LangLib.DEP_VMOD)) {
             node.setDepLabel(LangLib.DEP_PARTMOD);
         }
     }
 
-    // TODO: Most things here are stanford parsing issue. Try to get rid of these once we can train our own stanford models.
+    // Most things here are stanford parsing issue.
     private static void dirtyPatch(DNode node) {
-        // ---------- Fix the POS ---------------
-        // Don't fix the root to a verb if it is not. Ex: "a car." -> car is root.
+        // PS1: Don't fix the root to a verb if it is not. Ex: "a car." -> car is root.
+        // PS2: "be simulated", actually the whole tree should start with node instead of "be", cannot fix the dep.
 
         // Dont assign verb that['s] to possessive
         if (node.getName().equalsIgnoreCase("'s") && !node.getPos().startsWith(LangLib.POS_VB)) {
             node.setPos(LangLib.POS_POS);
         }
 
-        // TODO: we should put this into the interrogativeAttributeMatcherDelegate to match JJ and VBG instead of correct POS here.
         // Inconsistency in VBG and JJ
         // Ex: What is the reason for missing internal account? --> missing can be either JJ or VBG.
         else if (LangLib.POS_JJ.equals(node.getPos()) && node.getName().endsWith("ing")) {
             node.setPos(LangLib.POS_VBG);
         }
 
-        // adjective fix.
-        else if (adjectives.contains(node.getName().toLowerCase())) {
-            node.setPos(LangLib.POS_JJ);
+        // Mislabeled VBG as NN.
+        else if (node.getPos().startsWith(LangLib.POS_NN) && node.getName().endsWith("ing") && node.getDepLabel().equals(LangLib.DEP_ROOT)) {
+            node.setPos(LangLib.POS_VBG);
         }
 
-        // noun fix.
-        else if (nouns.contains(node.getName().toLowerCase())) {
-            node.setPos(LangLib.POS_NN);
+        // If root has aux and itself is a Noun, correct it as verb.
+        else if (node.getPos().startsWith(LangLib.POS_NN) && node.getDepLabel().equals(LangLib.DEP_ROOT) && !node.getChildrenByDepLabels(LangLib.DEP_AUX).isEmpty()) {
+            node.setPos(LangLib.POS_VB);
         }
 
-        // French fix.
-        else if ("french".equalsIgnoreCase(node.getName()) && node.getDepLabel().startsWith(LangLib.DEP_NSUBJ)) {
-            node.setPos(LangLib.POS_NNP);
+        // Fix root spread as verb
+        else if (node.getName().toLowerCase().equals("spread") && node.getPos().startsWith(LangLib.POS_NN) && node.getDepLabel().equals(LangLib.DEP_ROOT)) {
+            node.setPos(LangLib.POS_VBD);
+        }
+
+        DNode fixedNode = words.get(node.getName().toLowerCase());
+        if (fixedNode != null) {
+            if (node.getName().toLowerCase().equals("to")) {
+                if (node.getDepLabel().equals(LangLib.DEP_PREP)) {
+                    node.setPos(LangLib.POS_IN);
+                } else {
+                    // Dont patch
+                }
+            }
+
+            // French fix.
+            else if ("french".equalsIgnoreCase(node.getName()) && node.getDepLabel().startsWith(LangLib.DEP_NSUBJ)) {
+                node.setPos(LangLib.POS_NNP);
+            }
+
+            // General Case
+            else {
+                if (fixedNode.getLemma() != null && !node.getLemma().equals(fixedNode.getLemma())) {
+                    node.setLemma(fixedNode.getLemma());
+                }
+
+                if (fixedNode.getPos() != null && !node.getPos().equals(fixedNode.getPos())) {
+                    node.setPos(fixedNode.getPos());
+                }
+
+                if (fixedNode.getDepLabel() != null && !node.getDepLabel().equals(fixedNode.getDepLabel())) {
+                    node.setDepLabel(fixedNode.getDepLabel());
+                }
+            }
         }
 
         // ---------- Fix the Label ------------
         // Fix the preposition label
-        if (LangLib.POS_IN.equals(node.getPos()) && !excludingPrepDepLabels.contains(node.getDepLabel())) {
+        if (LangLib.POS_IN.equals(node.getPos()) && !LangLib.DEP_MARK.equals(node.getDepLabel())) {
             node.setDepLabel(LangLib.DEP_PREP);
         }
 
@@ -115,34 +179,33 @@ public class StanfordTreeBuilder {
             node.setPos(auxVerbFix.get(node.getName().toLowerCase()));
         }
 
-        // Modal fix.
-        if (modalVerbs.contains(node.getName().toLowerCase())) {
-            node.setPos(LangLib.POS_MD);
-            node.setDepLabel(LangLib.DEP_AUX);
-        }
-
         // hold together -> "together" should be PRT
-        if (node.getName().equalsIgnoreCase("together") && node.getParent() != null && node.getParent().getLemma().equals("hold") && !node.getDepLabel().equals(LangLib.DEP_PRT)) {
+        if (node.getLemma().equals("together") && node.getParent() != null && node.getParent().getLemma().equals("hold") && !node.getDepLabel().equals(LangLib.DEP_PRT)) {
             node.setDepLabel(LangLib.DEP_PRT);
         }
     }
 
     private static void convertCopHead(DTree tree) {
         DNode originalRoot = tree.getRoots().get(0); // JJ mostly.
-        List<DNode> cops = originalRoot.getChildrenByDepLabels("cop");
+        List<DNode> cops = originalRoot.getChildrenByDepLabels(LangLib.DEP_COP);
 
         if (!originalRoot.getPos().startsWith(LangLib.POS_VB) && !cops.isEmpty() && cops.get(0) != originalRoot) {
             DNode headOfRoot = tree.get(0);
             DNode cop = cops.get(0);
 
-            cop.setDepLabel("root");
-            originalRoot.setDepLabel("dep");
+            cop.setDepLabel(LangLib.DEP_ROOT);
+
+            // Label might be corrected by dirty patch.
+            if (originalRoot.getDepLabel().equals(LangLib.DEP_ROOT)) {
+                originalRoot.setDepLabel(LangLib.DEP_DEP);
+            }
 
             cop.setParent(headOfRoot);
             originalRoot.setParent(cop);
 
             headOfRoot.removeChild(originalRoot.getId());
             headOfRoot.addChild(cop);
+
 
             // Add original deps to cop
             for (DNode child : originalRoot.getChildren()) {
@@ -161,14 +224,10 @@ public class StanfordTreeBuilder {
     public static DTree generate(List<CoreLabel> tokens, Tree tree, Collection<TypedDependency> dependencies) {
         tree.setSpans();
         DTree depTree = new DTree();
+
         for (int i = 0; i < tokens.size(); i++) {
             CoreLabel token = tokens.get(i);
-            DNode node = new DNode();
-            node.setId(i + 1);
-            node.setName(token.originalText());
-            node.setLemma(token.lemma());
-            node.setPos(token.tag());
-
+            DNode node = new DNode(i + 1, token.originalText(), token.lemma(), token.tag(), StringUtils.EMPTY);
             // Set NamedEntity
             String namedEntity = getNamedEntity(token);
             if (!namedEntity.isEmpty()) {
@@ -180,7 +239,7 @@ public class StanfordTreeBuilder {
                         LOG.warn("Time NamedEntity but doesn't has proper parsed time. " + token.originalText());
                     }
                 }
-                node.addFeature(NAMEDENTITY, namedEntity);
+                node.setNamedEntity(namedEntity);
             }
 
             depTree.add(node);
@@ -215,7 +274,7 @@ public class StanfordTreeBuilder {
 
         for (int i = 1; i < depTree.size(); i++) {
             DNode node = depTree.get(i);
-            if (node.getDepLabel().isEmpty()) {
+            if (node.getDepLabel() == null) {
                 if (node.getName().matches("\\p{Punct}+")) {
                     node.setDepLabel(LangLib.DEP_PUNCT);
                     setRel(depTree.get(rootVerbIndex), node);
@@ -224,20 +283,20 @@ public class StanfordTreeBuilder {
                 }
             }
 
-            String namedEntity = node.getFeature(NAMEDENTITY);
-            if (namedEntity != null) {
+            String namedEntity = node.getNamedEntity();
+            if (!namedEntity.isEmpty()) {
                 // 5pm. -> (. -> Time)
                 if (node.getId() == depTree.size() - 1 && node.getDepLabel().equals(LangLib.DEP_PUNCT)) {
                     node.setLemma(node.getName());
-                    node.removeFeature(NAMEDENTITY);
+                    node.setNamedEntity(StringUtils.EMPTY);
                     continue;
                 }
 
                 int startNodeId = node.getId();
                 for (; startNodeId >= 1; startNodeId--) {
-                    DNode prev = depTree.get(startNodeId - 1);
-                    DNode current = depTree.get(startNodeId);
-                    if (!getNamedEntity(current).equals(getNamedEntity(prev))) {
+                    String prevNE = depTree.get(startNodeId - 1).getNamedEntity().split("_")[0];
+                    String currentNE = depTree.get(startNodeId).getNamedEntity().split("_")[0];
+                    if (!prevNE.equals(currentNE)) {
                         break;
                     }
                 }
@@ -246,7 +305,7 @@ public class StanfordTreeBuilder {
                 formatted += startNodeId == node.getId() ? "_start_" : "_cont_";
                 formatted += "${" + startNodeId + "}";
 
-                node.addFeature(NAMEDENTITY, formatted);
+                node.setNamedEntity(formatted);
             }
 
             patchTree(node);
@@ -255,17 +314,6 @@ public class StanfordTreeBuilder {
 
         convertCopHead(depTree);
         return depTree;
-    }
-
-
-    private static String getNamedEntity(DNode node) {
-        boolean noNamedEntity = node == null;
-        noNamedEntity |= node.getFeature(NAMEDENTITY) == null;
-        noNamedEntity |= node.getPos().startsWith(LangLib.POS_VB);
-        // 5pm is JJ and Time
-        // noNamedEntity |= node.pos.startsWith(CTLibEn.POS_JJ);
-
-        return noNamedEntity ? StringUtils.EMPTY : node.getFeature(NAMEDENTITY).split("_")[0];
     }
 
     public static boolean isValidNamedEntity(final String token, final String currentNE) {
@@ -297,7 +345,7 @@ public class StanfordTreeBuilder {
             return StringUtils.EMPTY;
         }
 
-        String type = token.ner().toUpperCase();
+        String type = token.ner();
         // Stanford doesn't need the next token patch rules there, just pass in empty.
         if (isValidNamedEntity(token.word(), type)) {
             return StringUtils.EMPTY;
@@ -308,9 +356,7 @@ public class StanfordTreeBuilder {
             return StringUtils.EMPTY;
         }
 
-
         return type;
     }
-
 
 }

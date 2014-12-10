@@ -16,6 +16,8 @@ public class DNode {
     private String pos;
     private String depLabel;
 
+    private String namedEntity;
+
     private DNode parent;
     // Key - id
     private Map<Integer, DNode> children = new HashMap<>();
@@ -27,7 +29,17 @@ public class DNode {
         lemma = StringUtils.EMPTY;
         pos = StringUtils.EMPTY;
         depLabel = StringUtils.EMPTY;
+        namedEntity = StringUtils.EMPTY;
         parent = null;
+    }
+
+    public DNode(int id, String name, String lemma, String pos, String depLabel) {
+        this();
+        this.id = id;
+        this.name = name;
+        this.lemma = lemma;
+        this.pos = pos;
+        this.depLabel = depLabel;
     }
 
     public int getId() {
@@ -111,6 +123,14 @@ public class DNode {
         }));
     }
 
+    public String getNamedEntity() {
+        return namedEntity;
+    }
+
+    public void setNamedEntity(String namedEntity) {
+        this.namedEntity = namedEntity;
+    }
+    
     public boolean isRoot() {
         return this.depLabel.equals(LangLib.DEP_ROOT);
     }
