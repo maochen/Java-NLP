@@ -9,6 +9,9 @@ import java.util.Map;
 import java.util.Set;
 
 @SuppressWarnings("serial")
+/**
+ * Row, Column, Value
+ */
 public class DoubleKeyMap<K1, K2, V> implements Serializable{
 
     private Map<K1, Map<K2, V>> data;
@@ -44,12 +47,12 @@ public class DoubleKeyMap<K1, K2, V> implements Serializable{
         return false;
     }
 
-    public Map<K2, V> getByKey1(K1 key1) {
+    public Map<K2, V> row(K1 key1) {
         if (!data.containsKey(key1)) return null;
         return data.get(key1);
     }
 
-    public Map<K1, V> getByKey2(K2 key2) {
+    public Map<K1, V> column(K2 key2) {
         if (!k2Cache.containsKey(key2)) return null;
 
         Map<K1, V> result = new HashMap<K1, V>();
@@ -134,7 +137,7 @@ public class DoubleKeyMap<K1, K2, V> implements Serializable{
         return result;
     }
 
-    public Set<K1> key1Set() {
+    public Set<K1> rowKeySet() {
         return data.keySet();
     }
 

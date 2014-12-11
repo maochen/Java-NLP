@@ -47,12 +47,19 @@ public class LangLib {
     public static final String POS_WPS = "WP$"; //Possessive wh-pronoun
     public static final String POS_WRB = "WRB"; //Wh-adverb
 
-    // Named entity tags.
-    public static final String NE_DATE = "DATE";
+    /**
+     * Named Entity Tags.
+     * This is based on MUC-7.
+     * http://www-nlpir.nist.gov/related_projects/muc/proceedings/ne_task.html
+     */
     public static final String NE_TIME = "TIME";
-    public static final String NE_PERSON = "PERSON";
-    public static final String NE_ORG = "ORGANIZATION";
     public static final String NE_LOC = "LOCATION";
+    public static final String NE_ORG = "ORGANIZATION";
+    public static final String NE_PERSON = "PERSON";
+    public static final String NE_MONEY = "MONEY";
+    public static final String NE_PERCENT = "PERCENT";
+    public static final String NE_DATE = "DATE";
+    public static final String NE_MISC = "MISC";
 
     public static final String DEP_PASS = "pass"; // passive dependency label
     public static final String DEP_SUBJ = "subj"; // subjects dependency label

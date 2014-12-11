@@ -1,19 +1,30 @@
 package org.maochen.wordcorrection;
 
+import org.apache.commons.lang3.StringUtils;
 import org.maochen.datastructure.DoubleKeyMap;
+import org.maochen.parser.StanfordParser;
 
 import java.io.*;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+/**
+ * This is for the single word correction. It doesn't count in the prev/following words to generate NGram.
+ */
 public class SingleWordCorrection {
     static class Model implements Serializable {
         private static final long serialVersionUID = 1L;
 
         // Correct Word Dictionary
-        public Map<String, Double> wordProbability;
+        public Map<String, Double> wordProbability = new HashMap<>();
+
+        // public transient Table<String, String, Double> derivedWordProbability = HashBasedTable.create();
+
         // Correct,Derived,Probability
-        public transient DoubleKeyMap<String, String, Double> derivedWordProbability;
+        // Row, Column, Value
+        // Dont use Guava Table. Predict takes ~18ms vs. DoubleKeyMap Predict 3ms.
+        public transient DoubleKeyMap<String, String, Double> derivedWordProbability = new DoubleKeyMap<>();
 
         public void normalizeWordProbability() {
             double totalCount = 0.0;
@@ -29,14 +40,14 @@ public class SingleWordCorrection {
         }
 
         public void normalizeDerivedWordProbability() {
-            for (String key1 : derivedWordProbability.key1Set()) {
+            for (String key1 : derivedWordProbability.rowKeySet()) {
                 double totalCount = 0.0;
-                Map<String, Double> k2map = derivedWordProbability.getByKey1(key1);
+                Map<String, Double> k2map = derivedWordProbability.row(key1);
                 for (String str : k2map.keySet()) {
                     totalCount += k2map.get(str);
                 }
 
-                for (String key2 : derivedWordProbability.getByKey1(key1).keySet()) {
+                for (String key2 : derivedWordProbability.row(key1).keySet()) {
                     derivedWordProbability.put(key1, key2, derivedWordProbability.get(key1, key2) / totalCount);
                 }
             }
@@ -59,11 +70,6 @@ public class SingleWordCorrection {
             this.wordProbability = reload.wordProbability;
             ois.close();
         }
-
-        public Model() {
-            wordProbability = new HashMap<String, Double>();
-            derivedWordProbability = new DoubleKeyMap<String, String, Double>();
-        }
     }
 
     private Model model = new Model();
@@ -75,8 +81,8 @@ public class SingleWordCorrection {
 
         Map<String, Double> result = new HashMap<String, Double>();
 
-        String prev = "";
-        String last = "";
+        String prev;
+        String last;
 
         for (int i = 0; i < word.length(); i++) {
             // Deletion
@@ -116,40 +122,39 @@ public class SingleWordCorrection {
     private Map<String, Double> errWordgenerating(String word) {
         Map<String, Double> oneDistance = distance1Generation(word);
 
-        // Two Steps - Slow A lot
-        // Set<String> twoDistance = new HashSet<String>();
-        // for (String str : oneDistance.keySet()) {
-        // twoDistance.addAll(distance1Generation(str).keySet());
-        // }
+        // Two Steps - One step seems makes more sense.
+        //        Set<String> twoDistance = new HashSet<String>();
+        //        for (String str : oneDistance.keySet()) {
+        //            twoDistance.addAll(distance1Generation(str).keySet());
+        //        }
         //
-        // for (String twoDistanceWord : twoDistance) {
-        // // 0.5 discounting needs to be discussed.
-        // if (!oneDistance.containsKey(twoDistanceWord)) {
-        // oneDistance.put(twoDistanceWord, 0.4);
-        // }
-        // }
+        //        for (String twoDistanceWord : twoDistance) {
+        //            // 0.5 discounting needs to be discussed.
+        //            if (!oneDistance.containsKey(twoDistanceWord)) {
+        //                oneDistance.put(twoDistanceWord, 0.4);
+        //            }
+        //        }
 
         return oneDistance;
     }
 
-    public void buildModel(String wordFileName) throws IOException {
+    // Parser here is just for tokenize.
+    public void buildModel(String wordFileName, StanfordParser parser) throws IOException {
         BufferedReader br = new BufferedReader(new FileReader(new File(wordFileName)));
 
         String str;
         while ((str = br.readLine()) != null) {
-            String[] token = new StringProcessor().tokenize(str);
-            for (String i : token) {
-                if (model.wordProbability.containsKey(i)) {
-                    double count = model.wordProbability.get(i) + 1;
-                    model.wordProbability.put(i, count);
-                } else {
-                    model.wordProbability.put(i, 1.0);
-                }
+            List<String> tokens = parser.tokenize(str);
+            for (String word : tokens) {
+                double count = model.wordProbability.containsKey(word) ? model.wordProbability.get(word) : 0;
+                count++;
+                model.wordProbability.put(word, count);
             }
         }
         br.close();
 
-        model.wordProbability.remove("");
+        // Remove Empty prob.
+        model.wordProbability.remove(StringUtils.EMPTY);
         model.normalizeWordProbability();
     }
 
@@ -159,12 +164,14 @@ public class SingleWordCorrection {
         Map<String, Double> possibleCorrectWordMap = errWordgenerating(wrongWord);
 
         for (String possibleCorrectWord : possibleCorrectWordMap.keySet()) {
+            // Only take these in the dict into consideration
             if (model.wordProbability.containsKey(possibleCorrectWord)) {
+                // From possible word generate all err words.
                 Map<String, Double> errWordMap = errWordgenerating(possibleCorrectWord);
 
-                for (String knownWord : model.wordProbability.keySet()) {
-                    errWordMap.remove(knownWord);
-                }
+                // Remove these non-err words.
+                // Dont use for-loop, far more slower.
+                errWordMap.keySet().removeAll(model.wordProbability.keySet());
 
                 for (String errWord : errWordMap.keySet()) {
                     model.derivedWordProbability.put(possibleCorrectWord, errWord, errWordMap.get(errWord));
@@ -180,12 +187,11 @@ public class SingleWordCorrection {
         model.normalizeDerivedWordProbability();
 
         double argmaxProb = 0.0;
-        String argmaxWord = "";
+        String argmaxWord = StringUtils.EMPTY;
         // P(w|c) Map - <correct,value>
-        Map<String, Double> pwc = model.derivedWordProbability.getByKey2(wrongWord);
+        Map<String, Double> pwc = model.derivedWordProbability.column(wrongWord);
         for (String correctWord : pwc.keySet()) {
-            System.out.println("[predict] Possible: " + correctWord + "=" + pwc.get(correctWord) + "\t|\twordProb: "
-                    + model.wordProbability.get(correctWord));
+            System.out.println("[predict] Possible: " + correctWord + "=" + pwc.get(correctWord) + "\t|\twordProb: " + model.wordProbability.get(correctWord));
             double localarg = pwc.get(correctWord) * model.wordProbability.get(correctWord);
             if (localarg >= argmaxProb) {
                 argmaxProb = localarg;
@@ -211,13 +217,20 @@ public class SingleWordCorrection {
     }
 
     public static void main(String[] args) throws IOException {
+        StanfordParser parser = new StanfordParser();
+
         String path = SingleWordCorrection.class.getClassLoader().getResource("big.txt").getFile();
         SingleWordCorrection swc = new SingleWordCorrection();
-        swc.buildModel(path);
-        swc.persistModel("model.dat");
+        swc.buildModel(path, parser);
+        // swc.persistModel("model.dat");
         // swc.restoreModel("model.dat");
         String word = "prob";
+        Long start = System.currentTimeMillis();
         String predict = swc.predict(word);
+        Long end = System.currentTimeMillis();
+
         System.out.println(word + "->" + predict);
+
+        System.out.println("\nPredict Time Elapse: " + (end - start) + "ms");
     }
 }

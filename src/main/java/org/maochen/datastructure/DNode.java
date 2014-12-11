@@ -11,7 +11,9 @@ import java.util.*;
  */
 public class DNode {
     private int id;
+    // 'm -> am, 're -> are ...
     private String name;
+    private String originalText;
     private String lemma;
     private String pos;
     private String depLabel;
@@ -26,6 +28,7 @@ public class DNode {
     public DNode() {
         id = 0;
         name = StringUtils.EMPTY;
+        originalText = StringUtils.EMPTY;
         lemma = StringUtils.EMPTY;
         pos = StringUtils.EMPTY;
         depLabel = StringUtils.EMPTY;
@@ -37,6 +40,7 @@ public class DNode {
         this();
         this.id = id;
         this.name = name;
+        this.originalText = name;
         this.lemma = lemma;
         this.pos = pos;
         this.depLabel = depLabel;
@@ -48,6 +52,14 @@ public class DNode {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getOriginalText() {
+        return originalText;
+    }
+
+    public void setOriginalText(String originalText) {
+        this.originalText = originalText;
     }
 
     public String getName() {
@@ -141,9 +153,15 @@ public class DNode {
         StringBuilder builder = new StringBuilder();
         builder.append(id).append("\t");
         builder.append(name).append("\t");
+        builder.append(originalText).append("\t");
         builder.append(lemma).append("\t");
         builder.append(pos).append("\t");
         builder.append(depLabel).append("\t");
+        if (!namedEntity.isEmpty()) {
+            builder.append(namedEntity).append("\t");
+        } else {
+            builder.append("_").append("\t");
+        }
         if (parent != null) {
             builder.append(parent.id).append("\t");
         } else {

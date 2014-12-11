@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.maochen.datastructure.DNode;
 import org.maochen.datastructure.DTree;
 import org.maochen.datastructure.LangLib;
+import org.maochen.utils.LangTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -235,10 +236,11 @@ public class StanfordTreeBuilder {
             // Set NamedEntity
             String namedEntity = getNamedEntity(token);
             if (!namedEntity.isEmpty()) {
+                // Resolve Time
                 if (namedEntity.equalsIgnoreCase(LangLib.NE_TIME)) {
                     String normalizedTime = token.get(CoreAnnotations.NormalizedNamedEntityTagAnnotation.class);
                     if (normalizedTime != null) {
-                        node.setLemma(normalizedTime);
+                        node.setName(normalizedTime);
                     } else {
                         LOG.warn("Time NamedEntity but doesn't has proper parsed time. " + token.originalText());
                     }
@@ -290,7 +292,8 @@ public class StanfordTreeBuilder {
             if (!namedEntity.isEmpty()) {
                 // 5pm. -> (. -> Time)
                 if (node.getId() == depTree.size() - 1 && node.getDepLabel().equals(LangLib.DEP_PUNCT)) {
-                    node.setLemma(node.getName());
+                    node.setLemma(node.getOriginalText());
+                    node.setName(node.getOriginalText());
                     node.setNamedEntity(StringUtils.EMPTY);
                     continue;
                 }
@@ -313,6 +316,7 @@ public class StanfordTreeBuilder {
 
             patchTree(node);
             dirtyPatch(node);
+            LangTools.generateName(node);
         }
         // Dont put it before dirty patch.
         // Ex: Is the car slow? -> slow, VBZ should be correct to JJ first and then convert tree.
@@ -326,14 +330,6 @@ public class StanfordTreeBuilder {
             if (currentNE.equalsIgnoreCase(LangLib.NE_DATE) || currentNE.equalsIgnoreCase(LangLib.NE_PERSON)) {
                 return true;
             }
-        }
-        // Blame for the openNLP NER, it tags $5000 to DATE!!
-        else if (token.startsWith("$") && currentNE.equalsIgnoreCase(LangLib.NE_DATE)) {
-            return true;
-        }
-        // Blame for the openNLP NER again, it tags ',' inside person [PERSON John, Mary]
-        else if (token.equals(",") && currentNE.equalsIgnoreCase(LangLib.NE_PERSON)) {
-            return true;
         }
 
         // Blame for stanford NER. Does Bill know John?  [ORG Does Bill]
