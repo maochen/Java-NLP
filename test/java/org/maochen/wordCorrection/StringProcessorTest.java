@@ -47,7 +47,7 @@ public class StringProcessorTest {
 
     @Test
     public void tokenizeTestAppS2() {
-        String str = "file('big.txt').read()";
+        String str = "file('the_adventures_of_sherlock_holmes.txt').read()";
         tokenizeEval(str, "file big txt read");
 
     }

@@ -116,7 +116,7 @@ public class SentenceTypeClassifier {
 
     public static void main(String[] args) throws IOException {
         String prefix = "/Users/Maochen/Desktop/temp";
-        String trainFilePath = SentenceTypeClassifier.class.getResource("/annotatedTrainingData.txt").getPath();
+        String trainFilePath = SentenceTypeClassifier.class.getResource("/sentence_type_corpus.txt").getPath();
         String modelPath = prefix + "/model.dat";
 
         SentenceTypeClassifier sentenceTypeClassifier = new SentenceTypeClassifier(prefix);

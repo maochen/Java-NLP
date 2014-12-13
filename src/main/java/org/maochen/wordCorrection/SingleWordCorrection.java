@@ -219,7 +219,7 @@ public class SingleWordCorrection {
     public static void main(String[] args) throws IOException {
         StanfordParser parser = new StanfordParser();
 
-        String path = SingleWordCorrection.class.getClassLoader().getResource("big.txt").getFile();
+        String path = SingleWordCorrection.class.getClassLoader().getResource("the_adventures_of_sherlock_holmes.txt").getFile();
         SingleWordCorrection swc = new SingleWordCorrection();
         swc.buildModel(path, parser);
         // swc.persistModel("model.dat");
