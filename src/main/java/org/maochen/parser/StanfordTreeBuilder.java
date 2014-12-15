@@ -1,5 +1,7 @@
 package org.maochen.parser;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.trees.Tree;
@@ -12,10 +14,7 @@ import org.maochen.utils.LangTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * For the Stanford parse tree.
@@ -321,7 +320,84 @@ public class StanfordTreeBuilder {
         // Dont put it before dirty patch.
         // Ex: Is the car slow? -> slow, VBZ should be correct to JJ first and then convert tree.
         convertCopHead(depTree);
+        swapPossessives(depTree);
         return depTree;
+    }
+
+    private static void swapPossessives(DTree depTree) {
+        DNode originalParent = null;
+        Iterator<DNode> originalParentIter = Collections2.filter(depTree, new Predicate<DNode>() {
+            @Override
+            public boolean apply(DNode depNode) {
+                if (depNode.getParent() == null) {
+                    return false;
+                }
+                boolean needAlter = depNode.getParent().isRoot();
+                needAlter &= depNode.getPOS().startsWith(LangLib.POS_NN);
+                return needAlter;
+            }
+        }).iterator();
+        if (originalParentIter.hasNext()) {
+            originalParent = originalParentIter.next();
+        }
+        if (originalParent == null) {
+            return;
+        }
+
+        DNode possessiveChild = null;
+        Iterator<DNode> possChildIter = Collections2.filter(originalParent.getChildren(), new Predicate<DNode>() {
+            @Override
+            public boolean apply(DNode depNode) {
+                return depNode.getLemma().equals("'s");
+            }
+        }).iterator();
+        if (possChildIter.hasNext()) {
+            possessiveChild = possChildIter.next();
+        }
+        if (possessiveChild == null) {
+            return;
+        }
+
+        DNode nounChild = null;
+        Iterator<DNode> nounChildIter = Collections2.filter(originalParent.getChildren(), new Predicate<DNode>() {
+            @Override
+            public boolean apply(DNode depNode) {
+                return depNode.getPOS().startsWith(LangLib.POS_NN);
+            }
+        }).iterator();
+        if (nounChildIter.hasNext()) {
+            nounChild = nounChildIter.next();
+        }
+        if (nounChild == null) {
+            return;
+        }
+
+        DNode det = null;
+        Iterator<DNode> detIter = originalParent.getChildrenByDepLabels(LangLib.DEP_DET).iterator();
+        if (detIter.hasNext()) {
+            det = detIter.next();
+        }
+
+        if (det != null) {
+            originalParent.removeChild(det.getId());
+            nounChild.addChild(det);
+            det.setParent(nounChild);
+        }
+
+        DNode originalGrandParent = originalParent.getParent();
+        originalParent.removeChild(nounChild.getId());
+        originalGrandParent.removeChild(originalParent.getId());
+
+        // Swap DEP Labels.
+        nounChild.setDepLabel(originalParent.getDepLabel());
+        // Must be poss, dont use child's deplabel, it might be attr which is not accurate
+        originalParent.setDepLabel(LangLib.DEP_POSS);
+
+        nounChild.setParent(originalGrandParent);
+        originalGrandParent.addChild(nounChild);
+
+        originalParent.setParent(nounChild);
+        nounChild.addChild(originalParent);
     }
 
     public static boolean isValidNamedEntity(final String token, final String currentNE) {
