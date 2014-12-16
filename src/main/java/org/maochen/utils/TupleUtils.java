@@ -30,11 +30,7 @@ public class TupleUtils {
     // Convert Index to actual string.
     public static Map<String, Double> convertMap(Map<Integer, Double> probs, LabelIndexer labelIndexer) {
         Map<String, Double> stringKeyProb = new HashMap<>();
-        for (Integer index : probs.keySet()) {
-            String label = labelIndexer.getLabel(index);
-            stringKeyProb.put(label, probs.get(index));
-        }
-
+        probs.entrySet().stream().forEach(e -> stringKeyProb.put(labelIndexer.getLabel(e.getKey()), e.getValue()));
         return stringKeyProb;
     }
 

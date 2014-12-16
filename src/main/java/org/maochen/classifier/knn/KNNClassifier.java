@@ -13,7 +13,7 @@ import java.util.Map;
  *
  * @author Maochen
  */
-public class KNNClassifier implements IClassifier{
+public class KNNClassifier implements IClassifier {
 
     private List<Tuple> trainingData;
 
@@ -127,4 +127,17 @@ public class KNNClassifier implements IClassifier{
         System.out.println(details);
     }
 
+    /**
+     Euclidean Distance:
+     Prediction data: id:0 [74.0, 55.0, 22.0] -> C
+     {1=81.31180726069246, 2=89.73745037608323, 3=59.66246726376642}
+
+     Chebyshev Distance:
+     Prediction data: id:0 [74.0, 55.0, 22.0] -> C
+     {1=8.06225774829855, 2=8.006247560499238, 3=7.416198487095663}
+
+     Manhattan Distance:
+     Prediction data: id:0 [74.0, 55.0, 22.0] -> C
+     {1=11.449890829173874, 2=11.666190466471907, 3=8.893818077743664}
+     */
 }

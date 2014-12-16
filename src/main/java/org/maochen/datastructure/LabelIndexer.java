@@ -1,7 +1,8 @@
 package org.maochen.datastructure;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+
 import java.util.Set;
 
 /**
@@ -9,15 +10,14 @@ import java.util.Set;
  */
 public class LabelIndexer {
     // They are pairs
-    private Map<String, Integer> labelIndexer = new HashMap<>();
-
+    private BiMap<String, Integer> labelIndexer = HashBiMap.create();
     int nextId = 0;
 
-    public int getIndex(String str) {
-        return labelIndexer.get(str);
+    public int getIndex(String label) {
+        return labelIndexer.get(label);
     }
 
-    public void put(String label) {
+    public void putByLabel(String label) {
         labelIndexer.put(label, nextId++);
     }
 
@@ -25,19 +25,11 @@ public class LabelIndexer {
         return labelIndexer.containsKey(label);
     }
 
-    public Set<String> getAllLabels() {
-        return labelIndexer.keySet();
+    public Set<Integer> getIndexSet() {
+        return labelIndexer.inverse().keySet();
     }
 
     public String getLabel(int index) {
-        String label = "";
-
-        for (String labelKey : labelIndexer.keySet()) {
-            if (labelIndexer.get(labelKey) == index) {
-                label = labelKey;
-                break;
-            }
-        }
-        return label;
+        return labelIndexer.inverse().get(index);
     }
 }

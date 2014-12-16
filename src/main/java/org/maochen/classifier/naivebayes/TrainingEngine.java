@@ -1,10 +1,11 @@
 package org.maochen.classifier.naivebayes;
 
-import org.maochen.datastructure.Tuple;
 import org.maochen.datastructure.LabelIndexer;
+import org.maochen.datastructure.Tuple;
 import org.maochen.utils.VectorUtils;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by Maochen on 12/3/14.
@@ -27,12 +28,12 @@ final class TrainingEngine {
         for (Tuple t : trainingData) {
             int index = labelIndexer.getIndex(t.label);
             count[index]++;
-            double[] newMeanVector = VectorUtils.addition(meanVectors[index], t.featureVector);
-            meanVectors[index] = newMeanVector;
+            meanVectors[index] = VectorUtils.operate(meanVectors[index], t.featureVector, (x, y) -> x + y);
         }
 
         for (int i = 0; i < meanVectors.length; i++) {
-            double[] meanVector = meanVectors[i];
+            // Get each label and normalize
+            double[] meanVector = meanVectors[i]; // feat(label)
             meanVector = VectorUtils.scale(meanVector, 1.0 / count[i]);
             meanVectors[i] = meanVector;
         }
@@ -42,10 +43,10 @@ final class TrainingEngine {
     public void calculateVariance() {
         for (Tuple t : trainingData) {
             int index = labelIndexer.getIndex(t.label);
-            double[] diff = VectorUtils.minus(t.featureVector, meanVectors[index]);
-            diff = VectorUtils.multiply(diff, diff);
+            double[] diff = VectorUtils.operate(t.featureVector, meanVectors[index], (x, y) -> x - y);
+            diff = Arrays.stream(diff).map(x -> x * x).toArray();
 
-            double[] varianceVector = VectorUtils.addition(varianceVectors[index], diff);
+            double[] varianceVector = VectorUtils.operate(varianceVectors[index], diff, (x, y) -> x + y);
             varianceVectors[index] = varianceVector;
         }
 
@@ -61,11 +62,9 @@ final class TrainingEngine {
         this.labelIndexer = labelIndexer;
         this.trainingData = trainingData;
 
-        for (Tuple tuple : this.trainingData) {
-            if (!labelIndexer.hasLabel(tuple.label)) {
-                labelIndexer.put(tuple.label);
-            }
-        }
+        this.trainingData.stream()
+                .filter(tuple -> !labelIndexer.hasLabel(tuple.label))
+                .forEach(tuple -> labelIndexer.putByLabel(tuple.label));
     }
 
     public TrainingEngine(int labelSize, int vectorLength) {

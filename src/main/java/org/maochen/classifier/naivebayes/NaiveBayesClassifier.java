@@ -1,15 +1,13 @@
 package org.maochen.classifier.naivebayes;
 
 import org.maochen.classifier.IClassifier;
-import org.maochen.datastructure.Tuple;
 import org.maochen.datastructure.LabelIndexer;
+import org.maochen.datastructure.Tuple;
 import org.maochen.utils.TupleUtils;
 import org.maochen.utils.VectorUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * Created by Maochen on 12/3/14.
@@ -42,26 +40,24 @@ public class NaiveBayesClassifier implements IClassifier {
     public Map<String, Double> predict(Tuple predict) {
         Map<Integer, Double> probs = new HashMap<>();
 
-        for (String label : labelIndexer.getAllLabels()) {
-            int index = labelIndexer.getIndex(label);
-            // P(male) -- P(C)
-            probs.put(index, 0.5);
-        }
+        // P(male) -- P(C)
+        labelIndexer.getIndexSet().stream().forEach(index -> probs.put(index, 0.5));
 
         double maxProb = 0;
         int maxProbLabel = -1;
-        for (int i = 0; i < predict.featureVector.length; i++) {
-            double fi = predict.featureVector[i];
+        for (Integer labelIndex : labelIndexer.getIndexSet()) {
+            double posteriorLabel = probs.get(labelIndex);
 
-            for (String label : labelIndexer.getAllLabels()) {
-                int labelIndex = labelIndexer.getIndex(label);
+            for (int i = 0; i < predict.featureVector.length; i++) {
+                double fi = predict.featureVector[i];
+                posteriorLabel = posteriorLabel * VectorUtils.gaussianDensityDistribution(trainingEngine.meanVectors[labelIndex][i], trainingEngine.varianceVectors[labelIndex][i], fi);
+            }
 
-                double newProb = probs.get(labelIndex) * VectorUtils.gaussianDensityDistribution(trainingEngine.meanVectors[labelIndex][i], trainingEngine.varianceVectors[labelIndex][i], fi);
-                probs.put(labelIndex, newProb);
-                if (newProb > maxProb) {
-                    maxProb = newProb;
-                    maxProbLabel = labelIndex;
-                }
+            probs.put(labelIndex, posteriorLabel);
+
+            if (posteriorLabel > maxProb) {
+                maxProb = posteriorLabel;
+                maxProbLabel = labelIndex;
             }
         }
 
@@ -105,14 +101,16 @@ public class NaiveBayesClassifier implements IClassifier {
         nbc.train(trainingData);
         Map<String, Double> probs = nbc.predict(predict);
 
-        // double expectedMaleProb = probs.get("male");
-        // double expectedFemaleProb = probs.get("female");
-        // assert expectedMaleProb == 6.197071843878083E-9;
-        // assert expectedFemaleProb == 5.377909183630024E-4;
 
+        // male: 6.197071843878083E-9;
+        // female: 5.377909183630024E-4;
+
+        List<Entry> result = new ArrayList<>(); // Just for ordered display.
+        Comparator<Entry<String, Double>> reverseCmp = Collections.reverseOrder(Comparator.comparing(Entry::getValue));
+        probs.entrySet().stream().sorted(reverseCmp).forEach(result::add);
 
         System.out.println("Result: " + predict);
-        System.out.println(probs);
+        result.forEach(e -> System.out.println(e.getKey() + "\t:\t" + e.getValue()));
     }
 
 

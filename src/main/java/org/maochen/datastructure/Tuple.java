@@ -1,6 +1,9 @@
 package org.maochen.datastructure;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.Arrays;
+import java.util.stream.IntStream;
 
 /**
  * Created by Maochen on 12/3/14.
@@ -14,10 +17,8 @@ public class Tuple {
 
 
     private void getFeatureVectorIndex() {
-        featureVectorIndex = new int[featureVector.length];
-        for (int i = 0; i < featureVector.length; i++) {
-            featureVectorIndex[i] = i;
-        }
+        // Generate a[index]=index
+        featureVectorIndex = IntStream.range(0, featureVector.length).parallel().toArray();
     }
 
     // This is for predict
@@ -36,6 +37,6 @@ public class Tuple {
 
     @Override
     public String toString() {
-        return "id:" + id + " " + Arrays.toString(featureVector) + " -> " + label;
+        return "id:" + id + StringUtils.SPACE + Arrays.toString(featureVector) + " -> " + label;
     }
 }

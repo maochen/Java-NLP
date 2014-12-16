@@ -1,6 +1,8 @@
 package org.maochen.classifier.knn;
 
+import org.apache.commons.lang3.StringUtils;
 import org.maochen.datastructure.Tuple;
+import org.maochen.utils.VectorUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,19 +15,6 @@ import java.util.*;
  */
 final class KNNEngine {
     private static final Logger LOG = LoggerFactory.getLogger(KNNEngine.class);
-
-    protected class DistanceComparator implements Comparator<Tuple> {
-        public int compare(Tuple e1, Tuple e2) {
-            double diff = e1.distance - e2.distance;
-
-            if (Math.abs(diff) < Double.MIN_VALUE)
-                return 0;
-            else if (diff > 0)
-                return 1;
-            else return -1;
-        }
-
-    }
 
     private Tuple predict;
     private List<Tuple> trainingData;
@@ -44,11 +33,8 @@ final class KNNEngine {
                 return;
             }
 
-            double result = 0.0;
-            for (int i = 0; i < predict.featureVector.length; i++) {
-                result += Math.pow(predict.featureVector[i] - t.featureVector[i], 2);
-            }
-
+            double result = Arrays.stream(VectorUtils.operate(predict.featureVector, t.featureVector, (x, y) -> Math.pow(x - y, 2)))
+                    .parallel().sum();
             result = Math.sqrt(result);
             t.distance = result;
         }
@@ -61,11 +47,8 @@ final class KNNEngine {
                 return;
             }
 
-            double result = 0.0;
-            for (int i = 0; i < predict.featureVector.length; i++) {
-                double diff = Math.abs(predict.featureVector[i] - tuple.featureVector[i]);
-                if (diff > result) result = diff;
-            }
+            double result = Arrays.stream(VectorUtils.operate(predict.featureVector, tuple.featureVector, (x, y) -> Math.abs(x - y)))
+                    .max().getAsDouble();
 
             result = Math.sqrt(result);
             tuple.distance = result;
@@ -79,12 +62,8 @@ final class KNNEngine {
                 return;
             }
 
-            double result = 0.0;
-            for (int i = 0; i < predict.featureVector.length; i++) {
-                double diff = Math.abs(predict.featureVector[i] - tuple.featureVector[i]);
-                result += diff;
-            }
-
+            double result = Arrays.stream(VectorUtils.operate(predict.featureVector, tuple.featureVector, (x, y) -> Math.abs(x - y)))
+                    .parallel().sum();
             result = Math.sqrt(result);
             tuple.distance = result;
         }
@@ -92,7 +71,15 @@ final class KNNEngine {
 
     public String getResult() {
         Map<String, Integer> resultMap = new HashMap<String, Integer>();
-        Collections.sort(trainingData, new DistanceComparator());
+        Collections.sort(trainingData, (tuple1, tuple2) -> {
+            double diff = tuple1.distance - tuple2.distance;
+            if (Math.abs(diff) < Double.MIN_VALUE) {
+                return 0;
+            } else {
+                return Double.compare(tuple1.distance, tuple2.distance);
+            }
+        });
+
 
         for (int i = 0; i < k; i++) {
             Tuple tuple = trainingData.get(i);
@@ -102,7 +89,7 @@ final class KNNEngine {
 
         }
 
-        String maxVote = "";
+        String maxVote = StringUtils.EMPTY;
         int maxCount = 0;
         int maxCountEntryNumber = 0; // equal vote
 

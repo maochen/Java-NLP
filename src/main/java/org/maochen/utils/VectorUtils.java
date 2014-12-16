@@ -1,51 +1,23 @@
 package org.maochen.utils;
 
+import com.google.common.primitives.Floats;
+
+import java.util.Arrays;
+import java.util.function.BinaryOperator;
+import java.util.stream.IntStream;
+
 /**
  * Created by Maochen on 12/3/14.
  */
 public class VectorUtils {
 
-    public static double[] addition(double[] a, double[] b) {
+    public static double[] operate(double[] a, double[] b, BinaryOperator<Double> op) {
         if (a.length != b.length) throw new IllegalArgumentException("not same length");
-
-        double[] result = new double[a.length];
-        for (int i = 0; i < a.length; i++) {
-            result[i] = a[i] + b[i];
-        }
-
-        return result;
+        return IntStream.range(0, a.length).parallel().mapToDouble(i -> op.apply(a[i], b[i])).toArray();
     }
 
-    public static double[] minus(double[] a, double[] b) {
-        if (a.length != b.length) throw new IllegalArgumentException("not same length");
-
-        double[] result = new double[a.length];
-        for (int i = 0; i < a.length; i++) {
-            result[i] = a[i] - b[i];
-        }
-
-        return result;
-    }
-
-    public static double[] multiply(double[] a, double[] b) {
-        if (a.length != b.length) throw new IllegalArgumentException("not same length");
-
-        double[] result = new double[a.length];
-        for (int i = 0; i < a.length; i++) {
-            result[i] = a[i] * b[i];
-        }
-
-        return result;
-    }
-
-    public static double[] scale(double[] a, double scale) {
-
-        double[] result = new double[a.length];
-        for (int i = 0; i < a.length; i++) {
-            result[i] = a[i] * scale;
-        }
-
-        return result;
+    public static double[] scale(final double[] a, double scale) {
+        return Arrays.stream(a).parallel().map(x -> x * scale).toArray();
     }
 
     public static double gaussianDensityDistribution(double mean, double variance, double x) {
@@ -56,31 +28,17 @@ public class VectorUtils {
         return val;
     }
 
-    public static double[] allXVector(double x, int length) {
-
-        double[] result = new double[length];
-        for (int i = 0; i < length; i++) {
-            result[i] = x;
-        }
-
-        return result;
+    public static double[] allXVector(double val, int length) {
+        return IntStream.range(0, length).parallel().mapToDouble(x -> val).toArray();
     }
 
     public static float[] doubleToFloat(double[] vector) {
-        float[] result = new float[vector.length];
-        for (int i = 0; i < vector.length; i++) {
-            result[i] = (float) vector[i];
-        }
-        return result;
+        Float[] f = Arrays.stream(vector).<Float>mapToObj(x -> (float) x).toArray(Float[]::new);
+        return Floats.toArray(Arrays.asList(f));
     }
 
     public static String[] intToString(int[] vectorIndex) {
-        String[] result = new String[vectorIndex.length];
-        for (int i = 0; i < vectorIndex.length; i++) {
-            result[i] = String.valueOf(vectorIndex[i]);
-        }
-
-        return result;
+        return Arrays.stream(vectorIndex).<String>mapToObj(String::valueOf).toArray(String[]::new);
     }
 
 }
