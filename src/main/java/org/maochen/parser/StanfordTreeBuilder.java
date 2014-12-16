@@ -266,6 +266,11 @@ public class StanfordTreeBuilder {
                 DNode child = depTree.get(targetIndex);
                 DNode parent = depTree.get(sourceIndex);
                 // ClearNLP has different possessive handling.
+                if (child == null) {
+                    LOG.error(parent.getName() + " doesn't have proper child.");
+                    continue;
+                }
+                // ClearNLP has different possessive handling.
                 if (child.getPOS().equals(LangLib.POS_POS) && !childDEPLabel.equals(LangLib.DEP_POSSESSIVE)) {
                     childDEPLabel = LangLib.DEP_POSSESSIVE;
                     parent.setDepLabel(LangLib.DEP_POSS);
