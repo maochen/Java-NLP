@@ -1,7 +1,5 @@
 package org.maochen.parser;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableSet;
 import edu.stanford.nlp.ie.NERClassifierCombiner;
 import edu.stanford.nlp.ling.CoreLabel;
@@ -16,7 +14,6 @@ import edu.stanford.nlp.trees.EnglishGrammaticalStructure;
 import edu.stanford.nlp.trees.SemanticHeadFinder;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.TypedDependency;
-import edu.stanford.nlp.util.Filter;
 import org.apache.commons.lang3.StringUtils;
 import org.maochen.datastructure.DTree;
 import org.slf4j.Logger;
@@ -25,6 +22,8 @@ import org.slf4j.LoggerFactory;
 import java.io.FileNotFoundException;
 import java.io.StringReader;
 import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * Created by Maochen on 12/8/14.
@@ -162,9 +161,9 @@ public class StanfordParser implements IParser {
     // What is Mary happy about? -- copula
     private static Collection<TypedDependency> getDependencies(Tree tree, boolean makeCopulaVerbHead) {
         SemanticHeadFinder headFinder = new SemanticHeadFinder(!makeCopulaVerbHead); // keep copula verbs as head
-        Filter<String> puncFilter = parser.treebankLanguagePack().punctuationWordRejectFilter();
+        Predicate<String> puncFilter = parser.treebankLanguagePack().punctuationWordRejectFilter();
         Collection<TypedDependency> result = new EnglishGrammaticalStructure(tree, puncFilter, headFinder).typedDependencies();
-        Filter<String> puncAllowFilter = parser.treebankLanguagePack().punctuationWordAcceptFilter();
+        Predicate<String> puncAllowFilter = parser.treebankLanguagePack().punctuationWordAcceptFilter();
         result.addAll(new EnglishGrammaticalStructure(tree, puncAllowFilter, headFinder).typedDependencies());
         return result;
     }
@@ -194,12 +193,7 @@ public class StanfordParser implements IParser {
     public List<String> tokenize(String sentence) {
         List<CoreLabel> tokens = stanfordTokenize(sentence);
         tagForm(tokens);
-        return new ArrayList<>(Collections2.transform(tokens, new Function<CoreLabel, String>() {
-            @Override
-            public String apply(CoreLabel coreLabel) {
-                return coreLabel.originalText();
-            }
-        }));
+        return tokens.stream().parallel().map(CoreLabel::originalText).collect(Collectors.toList());
     }
 
 

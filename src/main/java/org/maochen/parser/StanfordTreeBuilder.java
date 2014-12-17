@@ -1,7 +1,5 @@
 package org.maochen.parser;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.trees.Tree;
@@ -14,7 +12,11 @@ import org.maochen.utils.LangTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Predicate;
 
 /**
  * For the Stanford parse tree.
@@ -330,59 +332,33 @@ public class StanfordTreeBuilder {
     }
 
     private static void swapPossessives(DTree depTree) {
-        DNode originalParent = null;
-        Iterator<DNode> originalParentIter = Collections2.filter(depTree, new Predicate<DNode>() {
-            @Override
-            public boolean apply(DNode depNode) {
-                if (depNode.getParent() == null) {
-                    return false;
-                }
-                boolean needAlter = depNode.getParent().isRoot();
-                needAlter &= depNode.getPOS().startsWith(LangLib.POS_NN);
-                return needAlter;
+
+        Predicate<DNode> pred = (x) -> {
+            if (x.getParent() == null) {
+                return false;
             }
-        }).iterator();
-        if (originalParentIter.hasNext()) {
-            originalParent = originalParentIter.next();
-        }
+            boolean needAlter = x.getParent().isRoot();
+            needAlter &= x.getPOS().startsWith(LangLib.POS_NN);
+            return needAlter;
+        };
+
+        DNode originalParent = depTree.stream().parallel().filter(pred).findFirst().orElse(null);
         if (originalParent == null) {
             return;
         }
 
-        DNode possessiveChild = null;
-        Iterator<DNode> possChildIter = Collections2.filter(originalParent.getChildren(), new Predicate<DNode>() {
-            @Override
-            public boolean apply(DNode depNode) {
-                return depNode.getLemma().equals("'s");
-            }
-        }).iterator();
-        if (possChildIter.hasNext()) {
-            possessiveChild = possChildIter.next();
-        }
+
+        DNode possessiveChild = originalParent.getChildren().stream().parallel().filter(x -> x.getLemma().equals("'s")).findFirst().orElse(null);
         if (possessiveChild == null) {
             return;
         }
 
-        DNode nounChild = null;
-        Iterator<DNode> nounChildIter = Collections2.filter(originalParent.getChildren(), new Predicate<DNode>() {
-            @Override
-            public boolean apply(DNode depNode) {
-                return depNode.getPOS().startsWith(LangLib.POS_NN);
-            }
-        }).iterator();
-        if (nounChildIter.hasNext()) {
-            nounChild = nounChildIter.next();
-        }
+        DNode nounChild = originalParent.getChildren().stream().parallel().filter(x -> x.getPOS().startsWith(LangLib.POS_NN)).findFirst().orElse(null);
         if (nounChild == null) {
             return;
         }
 
-        DNode det = null;
-        Iterator<DNode> detIter = originalParent.getChildrenByDepLabels(LangLib.DEP_DET).iterator();
-        if (detIter.hasNext()) {
-            det = detIter.next();
-        }
-
+        DNode det = originalParent.getChildrenByDepLabels(LangLib.DEP_DET).stream().findFirst().orElse(null);
         if (det != null) {
             originalParent.removeChild(det.getId());
             nounChild.addChild(det);
@@ -405,7 +381,7 @@ public class StanfordTreeBuilder {
         nounChild.addChild(originalParent);
     }
 
-    public static boolean isValidNamedEntity(final String token, final String currentNE) {
+    public static boolean isInvalidNE(final String token, final String currentNE) {
         // Dirty Patch for Date.
         if (token.equalsIgnoreCase("and")) {
             if (currentNE.equalsIgnoreCase(LangLib.NE_DATE) || currentNE.equalsIgnoreCase(LangLib.NE_PERSON)) {
@@ -428,7 +404,7 @@ public class StanfordTreeBuilder {
 
         String type = token.ner();
         // Stanford doesn't need the next token patch rules there, just pass in empty.
-        if (isValidNamedEntity(token.word(), type)) {
+        if (isInvalidNE(token.word(), type)) {
             return StringUtils.EMPTY;
         }
 

@@ -1,10 +1,12 @@
 package org.maochen.datastructure;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Created by Maochen on 12/8/14.
@@ -103,7 +105,7 @@ public class DNode {
     }
 
     public List<DNode> getChildren() {
-        return new ArrayList<>(children.values());
+        return children.values().stream().collect(Collectors.toList());
     }
 
     public void addChild(DNode child) {
@@ -127,12 +129,7 @@ public class DNode {
     }
 
     public List<DNode> getChildrenByDepLabels(final String... labels) {
-        return new ArrayList<>(Collections2.filter(children.values(), new Predicate<DNode>() {
-            @Override
-            public boolean apply(DNode dNode) {
-                return Arrays.asList(labels).contains(dNode.getDepLabel());
-            }
-        }));
+        return children.values().stream().parallel().filter(x -> Arrays.asList(labels).contains(x.getDepLabel())).collect(Collectors.toList());
     }
 
     public String getNamedEntity() {

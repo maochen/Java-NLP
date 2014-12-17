@@ -1,7 +1,5 @@
 package org.maochen.utils;
 
-import com.google.common.primitives.Floats;
-
 import java.util.Arrays;
 import java.util.function.BinaryOperator;
 import java.util.stream.IntStream;
@@ -33,12 +31,13 @@ public class VectorUtils {
     }
 
     public static float[] doubleToFloat(double[] vector) {
-        Float[] f = Arrays.stream(vector).<Float>mapToObj(x -> (float) x).toArray(Float[]::new);
-        return Floats.toArray(Arrays.asList(f));
+        float[] result = new float[vector.length];
+        IntStream.range(0, vector.length).parallel().forEach(i -> result[i] = (float) vector[i]);
+        return result;
     }
 
     public static String[] intToString(int[] vectorIndex) {
-        return Arrays.stream(vectorIndex).<String>mapToObj(String::valueOf).toArray(String[]::new);
+        return Arrays.stream(vectorIndex).parallel().<String>mapToObj(String::valueOf).toArray(String[]::new);
     }
 
 }

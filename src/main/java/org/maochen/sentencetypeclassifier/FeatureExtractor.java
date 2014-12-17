@@ -1,7 +1,5 @@
 package org.maochen.sentencetypeclassifier;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.maochen.datastructure.DNode;
@@ -119,12 +117,7 @@ public class FeatureExtractor {
         addFeats(builder, "first_word_root_verb", firstPOS.startsWith(LangLib.POS_VB) && tree.get(1).isRoot(), weight);
 
         // Have aux in the sentence.
-        int auxCount = Collections2.filter(tree, new Predicate<DNode>() {
-            @Override
-            public boolean apply(DNode depNode) {
-                return LangLib.DEP_AUX.equals(depNode.getDepLabel());
-            }
-        }).size();
+        int auxCount = (int) tree.stream().parallel().filter(x -> LangLib.DEP_AUX.equals(x.getDepLabel())).distinct().count();
         addFeats(builder, "has_aux", auxCount > 0, 1);
 
         // Start with question word.

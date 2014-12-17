@@ -1,11 +1,10 @@
 package org.maochen.datastructure;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by Maochen on 12/8/14.
@@ -18,22 +17,14 @@ public class DTree extends ArrayList<DNode> {
 
     @Override
     public String toString() {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (DNode node : this) {
-            if (node != padding) {
-                stringBuilder.append(node.toString()).append(System.lineSeparator());
-            }
-        }
-        return stringBuilder.toString();
+        return this.stream()
+                .filter(x -> x != padding)
+                .map(x -> x.toString() + System.lineSeparator())
+                .reduce((x, y) -> x + y).get();
     }
 
     public List<DNode> getRoots() {
-        return new ArrayList<>(Collections2.filter(this, new Predicate<DNode>() {
-            @Override
-            public boolean apply(DNode dNode) {
-                return dNode.getDepLabel().equals(LangLib.DEP_ROOT);
-            }
-        }));
+        return this.stream().parallel().filter(x -> x.getDepLabel().equals(LangLib.DEP_ROOT)).distinct().collect(Collectors.toList());
     }
 
     public DNode getPaddingNode() {
