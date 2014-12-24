@@ -26,17 +26,19 @@ final class KNNEngine {
         this.k = k;
     }
 
+
+
     public void EuclideanDistance() {
-        for (Tuple t : trainingData) {
-            if (predict.featureVector.length != t.featureVector.length) {
+        for (Tuple tuple : trainingData) {
+            if (predict.featureVector.length != tuple.featureVector.length) {
                 LOG.error("2 Vectors must has same dimension.");
                 return;
             }
 
-            double result = Arrays.stream(VectorUtils.operate(predict.featureVector, t.featureVector, (x, y) -> Math.pow(x - y, 2)))
+            double result = Arrays.stream(VectorUtils.operate(predict.featureVector, tuple.featureVector, (x, y) -> Math.pow(x - y, 2)))
                     .parallel().sum();
             result = Math.sqrt(result);
-            t.distance = result;
+            tuple.distance = result;
         }
     }
 

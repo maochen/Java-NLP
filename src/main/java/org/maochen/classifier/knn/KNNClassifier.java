@@ -17,10 +17,10 @@ public class KNNClassifier implements IClassifier {
 
     private List<Tuple> trainingData;
 
-    private int k;
-    private int mode;
+    private int k = 1;
+    private int mode = 0;
 
-    private KNNEngine engine;
+    private KNNEngine engine = new KNNEngine();
 
     /**
      * k: k nearest neighbors.
@@ -39,9 +39,6 @@ public class KNNClassifier implements IClassifier {
     }
 
     public KNNClassifier() {
-        this.k = 1;
-        this.mode = 0;
-        engine = new KNNEngine();
     }
 
     /**
@@ -49,11 +46,7 @@ public class KNNClassifier implements IClassifier {
      */
     @Override
     public IClassifier train(List<Tuple> trainingData) {
-        this.trainingData = new ArrayList<>();
-
-        for (Tuple t : trainingData) {
-            this.trainingData.add(t);
-        }
+        this.trainingData = trainingData;
         return this;
     }
 
@@ -73,14 +66,12 @@ public class KNNClassifier implements IClassifier {
             engine.EuclideanDistance();
         }
 
-        String result = engine.getResult();
-        predict.label = result;
+        predict.label = engine.getResult();
 
         Map<String, Double> outputMap = new HashMap<String, Double>();
 
-        for (Tuple dtos : trainingData) {
-            outputMap.put(String.valueOf(dtos.id), dtos.distance);
-        }
+        trainingData.stream().parallel().forEach(x -> outputMap.put(String.valueOf(x.id), x.distance));
+
         return outputMap;
     }
 

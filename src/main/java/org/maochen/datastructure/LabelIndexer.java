@@ -11,7 +11,8 @@ import java.util.Set;
 public class LabelIndexer {
     // They are pairs
     private BiMap<String, Integer> labelIndexer = HashBiMap.create();
-    int nextId = 0;
+
+    private int nextId = 0;
 
     public int getIndex(String label) {
         return labelIndexer.get(label);
