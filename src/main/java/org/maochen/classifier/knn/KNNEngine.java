@@ -20,7 +20,7 @@ final class KNNEngine {
     private List<Tuple> trainingData;
     private int k;
 
-    public void initialize(Tuple predict, List<Tuple> trainingData, int k) {
+    public KNNEngine(Tuple predict, List<Tuple> trainingData, int k) {
         this.predict = predict;
         this.trainingData = trainingData;
         this.k = k;

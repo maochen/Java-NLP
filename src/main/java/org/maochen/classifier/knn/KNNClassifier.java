@@ -20,7 +20,8 @@ public class KNNClassifier implements IClassifier {
     private int k = 1;
     private int mode = 0;
 
-    private KNNEngine engine = new KNNEngine();
+    public KNNClassifier() {
+    }
 
     /**
      * k: k nearest neighbors.
@@ -36,9 +37,6 @@ public class KNNClassifier implements IClassifier {
         if (paraMap.containsKey("mode")) {
             this.mode = Integer.parseInt(paraMap.get("mode"));
         }
-    }
-
-    public KNNClassifier() {
     }
 
     /**
@@ -57,7 +55,8 @@ public class KNNClassifier implements IClassifier {
      */
     @Override
     public Map<String, Double> predict(Tuple predict) {
-        engine.initialize(predict, trainingData, k);
+        KNNEngine engine = new KNNEngine(predict, trainingData, k);
+
         if (mode == 1) {
             engine.ChebyshevDistance();
         } else if (mode == 2) {
