@@ -15,16 +15,21 @@ public class StringEventStream implements EventStream {
 
     private Iterator<String[]> dataIter;
 
+    // away pdiff=9.6875 ptwins=0.5 lose
     private Event createEvent(String obs) {
         int lastSpace = obs.lastIndexOf(StringUtils.SPACE);
-        if (lastSpace == -1)
-            return null;
-        else {
+        Event event = null;
+
+        if (lastSpace != -1) {
+            String label = obs.substring(lastSpace + 1);
             String[] contexts = obs.substring(0, lastSpace).split("\\s+");
+            // Split name and value
             float[] values = RealValueFileEventStream.parseContexts(contexts);
             // Label, feature name, feature value
-            return new Event(obs.substring(lastSpace + 1), contexts, values);
+            event = new Event(label, contexts, values);
         }
+
+        return event;
     }
 
     @Override
