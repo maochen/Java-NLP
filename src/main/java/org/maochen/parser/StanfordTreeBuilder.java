@@ -105,6 +105,11 @@ public class StanfordTreeBuilder {
         if (node.getDepLabel().equals(LangLib.DEP_VMOD)) {
             node.setDepLabel(LangLib.DEP_PARTMOD);
         }
+
+        // This is due to the inconsistency of stanford parser.
+        if (node.getDepLabel().equals(LangLib.DEP_NUMBER)) {
+            node.setDepLabel(LangLib.DEP_NUM);
+        }
     }
 
     // Most things here are stanford parsing issue.
