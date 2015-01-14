@@ -9,20 +9,19 @@ import edu.stanford.nlp.parser.lexparser.LexicalizedParser;
 import edu.stanford.nlp.process.Morphology;
 import edu.stanford.nlp.process.Tokenizer;
 import edu.stanford.nlp.process.TokenizerFactory;
-import edu.stanford.nlp.tagger.maxent.MaxentTagger;
 import edu.stanford.nlp.trees.EnglishGrammaticalStructure;
 import edu.stanford.nlp.trees.SemanticHeadFinder;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.TypedDependency;
 import org.apache.commons.lang3.StringUtils;
 import org.maochen.datastructure.DTree;
+import org.maochen.datastructure.LangLib;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.FileNotFoundException;
 import java.io.StringReader;
 import java.util.*;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -32,8 +31,7 @@ public class StanfordParser implements IParser {
 
     private static final Logger LOG = LoggerFactory.getLogger(StanfordParser.class);
 
-    private static LexicalizedParser parser = LexicalizedParser.loadModel();
-    private static MaxentTagger posTagger = new MaxentTagger(System.getProperty("pos.model", MaxentTagger.DEFAULT_JAR_PATH));
+    private static LexicalizedParser parser = null;
 
     private static NERClassifierCombiner ner = null;
 
@@ -85,17 +83,21 @@ public class StanfordParser implements IParser {
     }
 
     // 3. POS Tagger
-    private static void tagPOS(List<CoreLabel> tokens) {
-        List<TaggedWord> posWords = posTagger.tagSentence(tokens, false);
+    private static void tagPOS(List<CoreLabel> tokens, Tree tree) {
+        List<TaggedWord> posList = tree.getChild(0).taggedYield();
         for (int i = 0; i < tokens.size(); i++) {
             String word = tokens.get(i).word();
-            String pos = posWords.get(i).tag();
-            if (word.equals("(")) {
-                pos = "-LRB-";
-            } else if (word.equals(")")) {
-                pos = "-RRB-";
-            } else if (word.equals("-")) {
-                pos = "HYPH";
+            String pos = posList.get(i).tag();
+            switch (word) {
+                case "(":
+                    pos = "-LRB-";
+                    break;
+                case ")":
+                    pos = "-RRB-";
+                    break;
+                case "-":
+                    pos = "HYPH";
+                    break;
             }
             tokens.get(i).setTag(pos);
         }
@@ -138,7 +140,7 @@ public class StanfordParser implements IParser {
         // must be a verb and contain an underscore
         assert (word != null);
         assert (tag != null);
-        if (!tag.startsWith("VB") || !word.contains("_")) return null;
+        if (!tag.startsWith(LangLib.POS_VB) || !word.contains("_")) return null;
 
         // check whether the last part is a particle
         String[] verb = word.split("_");
@@ -161,28 +163,34 @@ public class StanfordParser implements IParser {
     // What is Mary happy about? -- copula
     private static Collection<TypedDependency> getDependencies(Tree tree, boolean makeCopulaVerbHead) {
         SemanticHeadFinder headFinder = new SemanticHeadFinder(!makeCopulaVerbHead); // keep copula verbs as head
-        Predicate<String> puncFilter = parser.treebankLanguagePack().punctuationWordRejectFilter();
-        Collection<TypedDependency> result = new EnglishGrammaticalStructure(tree, puncFilter, headFinder).typedDependencies();
-        Predicate<String> puncAllowFilter = parser.treebankLanguagePack().punctuationWordAcceptFilter();
-        result.addAll(new EnglishGrammaticalStructure(tree, puncAllowFilter, headFinder).typedDependencies());
-        return result;
+        // string -> true return all tokens including punctuations.
+        Collection<TypedDependency> typedDependencies = new EnglishGrammaticalStructure(tree, string -> true, headFinder).typedDependencies();
+        return typedDependencies;
     }
 
     public void loadModel(String modelFileLoc) {
         if (!modelFileLoc.isEmpty()) {
-            parser = LexicalizedParser.loadModel(modelFileLoc, StringUtils.EMPTY);
+            parser = LexicalizedParser.loadModel(modelFileLoc, new ArrayList<>());
         }
+    }
+
+    public LexicalizedParser getLexicalizedParser() {
+        return parser;
     }
 
     @Override
     public DTree parse(String sentence) {
+        if (parser == null) {
+            parser = LexicalizedParser.loadModel();
+        }
+
         List<CoreLabel> tokens = stanfordTokenize(sentence);
         // Parse right after get through tokenizer.
         Tree tree = parser.parse(tokens);
         Collection<TypedDependency> dependencies = getDependencies(tree, true);
 
         tagForm(tokens);
-        tagPOS(tokens);
+        tagPOS(tokens, tree);
         tagLemma(tokens);
         tagNamedEntity(tokens);
 
@@ -198,8 +206,9 @@ public class StanfordParser implements IParser {
 
 
     public static void main(String[] args) {
-        IParser parser = new StanfordParser();
+        StanfordParser parser = new StanfordParser();
 
+        parser.loadModel("/Users/Maochen/Desktop/englishPCFG.ser.gz");
         Scanner scan = new Scanner(System.in);
         String input = StringUtils.EMPTY;
         //        input = "What is blended learning?";
