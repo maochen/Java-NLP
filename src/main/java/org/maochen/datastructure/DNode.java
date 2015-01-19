@@ -27,6 +27,8 @@ public class DNode {
     private Map<Integer, DNode> children = new HashMap<>();
     private Map<String, String> feats = new HashMap<>();
 
+    private DTree tree = null;
+
     public DNode() {
         id = 0;
         name = StringUtils.EMPTY;
@@ -142,6 +144,14 @@ public class DNode {
 
     public boolean isRoot() {
         return this.depLabel.equals(LangLib.DEP_ROOT);
+    }
+
+    public DTree getTree() {
+        return tree;
+    }
+
+    public void setTree(DTree tree) {
+        this.tree = tree;
     }
 
     // This is CoNLL format.

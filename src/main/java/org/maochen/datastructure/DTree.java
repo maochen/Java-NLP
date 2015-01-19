@@ -23,6 +23,14 @@ public class DTree extends ArrayList<DNode> {
                 .reduce((x, y) -> x + y).get();
     }
 
+    @Override
+    public boolean add(DNode node) {
+        if (node != null) {
+            node.setTree(this);
+        }
+        return super.add(node);
+    }
+
     public List<DNode> getRoots() {
         return this.stream().parallel().filter(x -> x.getDepLabel().equals(LangLib.DEP_ROOT)).distinct().collect(Collectors.toList());
     }

@@ -31,18 +31,9 @@ public class StanfordParser implements IParser {
 
     private static final Logger LOG = LoggerFactory.getLogger(StanfordParser.class);
 
-    private static LexicalizedParser parser = null;
+    private LexicalizedParser parser = null;
 
-    private static NERClassifierCombiner ner = null;
-
-    // STUPID NER, Throw IOException in the constructor ... : (
-    static {
-        try {
-            ner = new NERClassifierCombiner("edu/stanford/nlp/models/ner/english.all.3class.distsim.crf.ser.gz");
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
+    private NERClassifierCombiner ner = null;
 
     // This is for Lemma Tagger
     private static final Set<String> particles = ImmutableSet.of(
@@ -53,7 +44,7 @@ public class StanfordParser implements IParser {
 
 
     // 1. Tokenize
-    private static List<CoreLabel> stanfordTokenize(String str) {
+    private List<CoreLabel> stanfordTokenize(String str) {
         TokenizerFactory<? extends HasWord> tf = parser.getOp().tlpParams.treebankLanguagePack().getTokenizerFactory();
         // ptb3Escaping=false -> '(' not converted as '-LRB-', Dont use it, it will cause Dependency resolution err.
         // Tokenizer<? extends HasWord> tokenizer = tf.getTokenizer(new StringReader(str), "ptb3Escaping=false");
@@ -62,7 +53,7 @@ public class StanfordParser implements IParser {
     }
 
     // 2. Correct Specific Input
-    private static void tagForm(List<CoreLabel> tokens) {
+    private void tagForm(List<CoreLabel> tokens) {
         Map<String, String> specialChar = new HashMap<String, String>() {
             {
                 put("-LSB-", "[");
@@ -83,7 +74,7 @@ public class StanfordParser implements IParser {
     }
 
     // 3. POS Tagger
-    private static void tagPOS(List<CoreLabel> tokens, Tree tree) {
+    private void tagPOS(List<CoreLabel> tokens, Tree tree) {
         List<TaggedWord> posList = tree.getChild(0).taggedYield();
         for (int i = 0; i < tokens.size(); i++) {
             String word = tokens.get(i).word();
@@ -104,7 +95,7 @@ public class StanfordParser implements IParser {
     }
 
     // 4. Lemma Tagger
-    private static void tagLemma(List<CoreLabel> tokens) {
+    private void tagLemma(List<CoreLabel> tokens) {
         // Not sure if this can be static.
         Morphology morpha = new Morphology();
 
@@ -131,12 +122,12 @@ public class StanfordParser implements IParser {
     }
 
     // 5. NER
-    private static void tagNamedEntity(List<CoreLabel> tokens) {
+    private void tagNamedEntity(List<CoreLabel> tokens) {
         ner.classify(tokens);
     }
 
     // For Lemma
-    private static String phrasalVerb(Morphology morpha, String word, String tag) {
+    private String phrasalVerb(Morphology morpha, String word, String tag) {
         // must be a verb and contain an underscore
         assert (word != null);
         assert (tag != null);
@@ -161,7 +152,7 @@ public class StanfordParser implements IParser {
      * By Maochen
      */
     // What is Mary happy about? -- copula
-    private static Collection<TypedDependency> getDependencies(Tree tree, boolean makeCopulaVerbHead) {
+    private Collection<TypedDependency> getDependencies(Tree tree, boolean makeCopulaVerbHead) {
         SemanticHeadFinder headFinder = new SemanticHeadFinder(!makeCopulaVerbHead); // keep copula verbs as head
         // string -> true return all tokens including punctuations.
         Collection<TypedDependency> typedDependencies = new EnglishGrammaticalStructure(tree, string -> true, headFinder).typedDependencies();
@@ -204,6 +195,20 @@ public class StanfordParser implements IParser {
         return tokens.stream().parallel().map(CoreLabel::originalText).collect(Collectors.toList());
     }
 
+    public StanfordParser() {
+        this(StringUtils.EMPTY);
+    }
+
+    public StanfordParser(String modelPath) {
+        loadModel(modelPath);
+
+        // STUPID NER, Throw IOException in the constructor ... : (
+        try {
+            ner = new NERClassifierCombiner("edu/stanford/nlp/models/ner/english.all.3class.distsim.crf.ser.gz");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
 
     public static void main(String[] args) {
         StanfordParser parser = new StanfordParser();
