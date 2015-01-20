@@ -95,24 +95,17 @@ public class StanfordTreeBuilder {
         }
 
         // 0 is _R_ here
-        int rootVerbIndex = -1;
-        for (TypedDependency td : dependencies) {
+        dependencies.parallelStream().filter(td -> td.gov().index() != -1).forEach(td -> {
             int sourceIndex = td.gov().index();
             int targetIndex = td.dep().index();
             String childDEPLabel = td.reln().toString();
 
-            if (sourceIndex == 0) {
-                rootVerbIndex = targetIndex;
-            }
+            DNode child = depTree.get(targetIndex);
+            DNode parent = depTree.get(sourceIndex);
 
-            if (sourceIndex != -1) {
-                DNode child = depTree.get(targetIndex);
-                DNode parent = depTree.get(sourceIndex);
-                // ClearNLP has different possessive handling.
-                if (child == null) {
-                    LOG.error(parent.getName() + " doesn't have proper child.");
-                    continue;
-                }
+            if (child == null) {
+                LOG.error(parent.getName() + " doesn't have proper child.");
+            } else {
                 // ClearNLP has different possessive handling.
                 if (child.getPOS().equals(LangLib.POS_POS) && !childDEPLabel.equals(LangLib.DEP_POSSESSIVE)) {
                     childDEPLabel = LangLib.DEP_POSSESSIVE;
@@ -123,15 +116,16 @@ public class StanfordTreeBuilder {
                 child.setParent(parent);
                 parent.addChild(child);
             }
-        }
+        });
 
-        for (int i = 1; i < depTree.size(); i++) {
-            DNode node = depTree.get(i);
+
+        depTree.parallelStream().forEach(node -> {
             if (node.getDepLabel() == null) {
                 if (node.getName().matches("\\p{Punct}+")) { // Attach Punctuation
+                    DNode rootVerb = depTree.getRoots().stream().findFirst().orElse(null);
                     node.setDepLabel(LangLib.DEP_PUNCT);
-                    node.setParent(depTree.get(rootVerbIndex));
-                    depTree.get(rootVerbIndex).addChild(node);
+                    node.setParent(rootVerb);
+                    depTree.get(rootVerb.getId()).addChild(node);
                 } else {
                     LOG.error("node does not have label. ->", node.toString());
                 }
@@ -141,7 +135,7 @@ public class StanfordTreeBuilder {
             StanfordTreeDirtyPatch.dirtyPatchNER(node);
             StanfordTreeDirtyPatch.dirtyPatch(node);
             LangTools.generateName(node);
-        }
+        });
 
         // Dont put it before dirty patch.
         // Ex: Is the car slow? -> slow, VBZ should be correct to JJ first and then convert tree.

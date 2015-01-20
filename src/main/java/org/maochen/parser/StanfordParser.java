@@ -42,7 +42,6 @@ public class StanfordParser implements IParser {
             "round", "together", "through", "up"
     );
 
-
     // 1. Tokenize
     private List<CoreLabel> stanfordTokenize(String str) {
         TokenizerFactory<? extends HasWord> tf = parser.getOp().tlpParams.treebankLanguagePack().getTokenizerFactory();
@@ -64,13 +63,12 @@ public class StanfordParser implements IParser {
                 put("''", "\"");
             }
         };
-        for (CoreLabel token : tokens) {
-            if (specialChar.containsKey(token.word())) {
-                String text = specialChar.get(token.word());
-                token.setWord(text);
-                token.setOriginalText(text);
-            }
-        }
+
+        tokens.parallelStream().filter(token -> specialChar.containsKey(token.word())).forEach(token -> {
+            String text = specialChar.get(token.word());
+            token.setWord(text);
+            token.setOriginalText(text);
+        });
     }
 
     // 3. POS Tagger
@@ -172,6 +170,7 @@ public class StanfordParser implements IParser {
     @Override
     public DTree parse(String sentence) {
         if (parser == null) {
+            LOG.info("Use default PCFG model.");
             parser = LexicalizedParser.loadModel();
         }
 
