@@ -213,14 +213,9 @@ public class StanfordParser implements IParser {
     public static void main(String[] args) {
         StanfordParser parser = new StanfordParser();
 
-        parser.loadModel("/Users/Maochen/Desktop/englishPCFG.ser.gz");
+        // parser.loadModel("/Users/Maochen/Desktop/englishPCFG.ser.gz");
         Scanner scan = new Scanner(System.in);
         String input = StringUtils.EMPTY;
-        //        input = "What is blended learning?";
-        //        input = "Example isn't another way to teach, it is the only way to teach.";
-        //        input = "John is singing.";
-        //        input = "John is a teacher.";
-        //        input = "John is at the store.";
 
         String quitRegex = "q|quit|exit";
         while (!input.matches(quitRegex)) {
