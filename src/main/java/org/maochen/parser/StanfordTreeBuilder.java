@@ -48,6 +48,9 @@ public class StanfordTreeBuilder {
     }
 
     private static void convertCopHead(DTree tree) {
+        if (tree.getRoots().isEmpty()) {
+            return;
+        }
         DNode originalRoot = tree.getRoots().get(0); // JJ mostly.
         List<DNode> cops = originalRoot.getChildrenByDepLabels(LangLib.DEP_COP);
 
@@ -88,7 +91,6 @@ public class StanfordTreeBuilder {
 
         for (int i = 0; i < tokens.size(); i++) {
             CoreLabel token = tokens.get(i);
-            token.index();
             DNode node = new DNode(i + 1, token.originalText(), token.lemma(), token.tag(), StringUtils.EMPTY);
             depTree.add(node);
             setNamedEntity(node, token);
@@ -119,7 +121,7 @@ public class StanfordTreeBuilder {
         });
 
 
-        depTree.parallelStream().forEach(node -> {
+        depTree.stream().forEach(node -> {
             if (node.getDepLabel() == null) {
                 if (node.getName().matches("\\p{Punct}+")) { // Attach Punctuation
                     DNode rootVerb = depTree.getRoots().stream().findFirst().orElse(null);

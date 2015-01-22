@@ -121,7 +121,9 @@ public class StanfordParser implements IParser {
 
     // 5. NER
     private void tagNamedEntity(List<CoreLabel> tokens) {
-        ner.classify(tokens);
+        if (ner != null) {
+            ner.classify(tokens);
+        }
     }
 
     // For Lemma
@@ -195,24 +197,27 @@ public class StanfordParser implements IParser {
     }
 
     public StanfordParser() {
-        this(StringUtils.EMPTY);
+        this(StringUtils.EMPTY, true);
     }
 
-    public StanfordParser(String modelPath) {
+    public StanfordParser(String modelPath, boolean initNER) {
         loadModel(modelPath);
 
-        // STUPID NER, Throw IOException in the constructor ... : (
-        try {
-            ner = new NERClassifierCombiner("edu/stanford/nlp/models/ner/english.all.3class.distsim.crf.ser.gz");
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+        if (initNER) {
+            // STUPID NER, Throw IOException in the constructor ... : (
+            try {
+                ner = new NERClassifierCombiner("edu/stanford/nlp/models/ner/english.all.3class.distsim.crf.ser.gz");
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
         }
     }
 
     public static void main(String[] args) {
-        StanfordParser parser = new StanfordParser();
+        StanfordParser parser = new StanfordParser("", false);
 
-        // parser.loadModel("/Users/Maochen/Desktop/englishPCFG.ser.gz");
+        parser.loadModel("/Users/Maochen/workspace/nlpservice/nlp-service-remote/src/main/resources/classifierData/englishPCFG.ser.gz");
+
         Scanner scan = new Scanner(System.in);
         String input = StringUtils.EMPTY;
 
@@ -222,6 +227,7 @@ public class StanfordParser implements IParser {
             input = scan.nextLine();
             if (!input.trim().isEmpty() && !input.matches(quitRegex)) {
                 DTree tree = parser.parse(input);
+                parser.getLexicalizedParser().parse(input).pennPrint();
                 System.out.println(tree.toString());
             }
         }
