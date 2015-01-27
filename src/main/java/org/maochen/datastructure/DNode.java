@@ -26,6 +26,8 @@ public class DNode {
     // Key - id
     private Map<Integer, DNode> children = new HashMap<>();
     private Map<String, String> feats = new HashMap<>();
+    // Parent Node, Semantic Head Label
+    private Map<DNode, String> semanticHeads = new HashMap<>();
 
     private DTree tree = null;
 
@@ -144,6 +146,14 @@ public class DNode {
 
     public boolean isRoot() {
         return this.depLabel.equals(LangLib.DEP_ROOT);
+    }
+
+    public void addSemanticHead(DNode parent, String label) {
+        semanticHeads.put(parent, label);
+    }
+
+    public Map<DNode, String> getSemanticHeads() {
+        return semanticHeads;
     }
 
     public DTree getTree() {

@@ -10,10 +10,9 @@ import java.util.stream.Collectors;
  * Created by Maochen on 12/8/14.
  */
 public class DTree extends ArrayList<DNode> {
-
     private DNode padding;
-
     private String sentenceType = StringUtils.EMPTY;
+    private String originalSentence = StringUtils.EMPTY;
 
     @Override
     public String toString() {
@@ -25,9 +24,10 @@ public class DTree extends ArrayList<DNode> {
 
     @Override
     public boolean add(DNode node) {
-        if (node != null) {
-            node.setTree(this);
-        }
+        if (node == null) return false;
+        if (this.contains(node)) return false;
+
+        node.setTree(this);
         return super.add(node);
     }
 
@@ -37,6 +37,14 @@ public class DTree extends ArrayList<DNode> {
 
     public DNode getPaddingNode() {
         return padding;
+    }
+
+    public String getOriginalSentence() {
+        return originalSentence;
+    }
+
+    public void setOriginalSentence(String originalSentence) {
+        this.originalSentence = originalSentence;
     }
 
     public String getSentenceType() {
