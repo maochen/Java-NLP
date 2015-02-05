@@ -198,7 +198,7 @@ public class StanfordTreeBuilder {
     private static void setNamedEntity(DNode node, CoreLabel token) {
         if (token.ner() != null && !token.ner().equals("O")) {
             // Resolve Time
-            if (token.ner().equalsIgnoreCase(LangLib.NE_TIME)) {
+            if (token.ner().equalsIgnoreCase(LangLib.NE_TIME) || token.ner().equalsIgnoreCase(LangLib.NE_DATE)) {
                 String normalizedTime = token.get(CoreAnnotations.NormalizedNamedEntityTagAnnotation.class);
                 if (normalizedTime != null) {
                     node.setName(normalizedTime);

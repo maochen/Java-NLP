@@ -14,6 +14,7 @@ import edu.stanford.nlp.trees.SemanticHeadFinder;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.TypedDependency;
 import org.apache.commons.lang3.StringUtils;
+import org.maochen.datastructure.DNode;
 import org.maochen.datastructure.DTree;
 import org.maochen.datastructure.LangLib;
 import org.slf4j.Logger;
@@ -213,8 +214,31 @@ public class StanfordParser implements IParser {
         }
     }
 
+    private static String print(boolean useForRecordErr, DTree tree) {
+        if (useForRecordErr) {
+            StringBuilder builder = new StringBuilder();
+
+            for (DNode node : tree) {
+                if (node.equals(tree.getPaddingNode())) {
+                    continue;
+                }
+                builder.append(node.getId()).append(StringUtils.SPACE);
+                builder.append(node.getOriginalText()).append(StringUtils.SPACE);
+                builder.append(node.getLemma()).append(StringUtils.SPACE);
+                builder.append(node.getPOS()).append(StringUtils.SPACE);
+                builder.append(node.getParent().getId()).append(StringUtils.SPACE);
+                builder.append(node.getDepLabel());
+                builder.append(System.lineSeparator());
+            }
+
+            return builder.toString();
+        } else {
+            return tree.toString();
+        }
+    }
+
     public static void main(String[] args) {
-        StanfordParser parser = new StanfordParser("", false);
+        StanfordParser parser = new StanfordParser("", true);
 
         parser.loadModel("/Users/Maochen/workspace/nlpservice/nlp-service-remote/src/main/resources/classifierData/englishPCFG.ser.gz");
 
@@ -228,7 +252,7 @@ public class StanfordParser implements IParser {
             if (!input.trim().isEmpty() && !input.matches(quitRegex)) {
                 DTree tree = parser.parse(input);
                 parser.getLexicalizedParser().parse(input).pennPrint();
-                System.out.println(tree.toString());
+                System.out.println(print(true, tree));
             }
         }
 
