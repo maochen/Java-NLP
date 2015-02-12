@@ -9,44 +9,46 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
+ * This follows CoNLL-X shared task: Multi-Lingual Dependency Parsing Format
+ * <p>
  * Created by Maochen on 12/8/14.
  */
 public class DNode {
     private int id;
     // 'm -> am, 're -> are ...
+    // Normalized Date or Time ... etc
     private String name;
-    private String originalText;
+    private String form;
     private String lemma;
     private String pos;
     private String depLabel;
 
-    private String namedEntity;
-
-    private DNode parent;
+    private DNode head;
     // Key - id
     private Map<Integer, DNode> children = new HashMap<>();
     private Map<String, String> feats = new HashMap<>();
     // Parent Node, Semantic Head Label
     private Map<DNode, String> semanticHeads = new HashMap<>();
 
-    private DTree tree = null;
+    private DTree tree = null; // Refs to the whole dependency tree
+
+    private static final String NAMED_ENTITY_KEY = "named_entity";
 
     public DNode() {
         id = 0;
         name = StringUtils.EMPTY;
-        originalText = StringUtils.EMPTY;
+        form = StringUtils.EMPTY;
         lemma = StringUtils.EMPTY;
         pos = StringUtils.EMPTY;
         depLabel = StringUtils.EMPTY;
-        namedEntity = StringUtils.EMPTY;
-        parent = null;
+        head = null;
     }
 
     public DNode(int id, String name, String lemma, String pos, String depLabel) {
         this();
         this.id = id;
         this.name = name;
-        this.originalText = name;
+        this.form = name;
         this.lemma = lemma;
         this.pos = pos;
         this.depLabel = depLabel;
@@ -60,12 +62,12 @@ public class DNode {
         this.id = id;
     }
 
-    public String getOriginalText() {
-        return originalText;
+    public String getForm() {
+        return form;
     }
 
-    public void setOriginalText(String originalText) {
-        this.originalText = originalText;
+    public void setForm(String form) {
+        this.form = form;
     }
 
     public String getName() {
@@ -100,12 +102,12 @@ public class DNode {
         this.depLabel = depLabel;
     }
 
-    public DNode getParent() {
-        return parent;
+    public DNode getHead() {
+        return head;
     }
 
-    public void setParent(DNode parent) {
-        this.parent = parent;
+    public void setHead(DNode head) {
+        this.head = head;
     }
 
     public List<DNode> getChildren() {
@@ -137,11 +139,13 @@ public class DNode {
     }
 
     public String getNamedEntity() {
-        return namedEntity;
+        return feats.get(NAMED_ENTITY_KEY) == null ? StringUtils.EMPTY : feats.get(NAMED_ENTITY_KEY);
     }
 
     public void setNamedEntity(String namedEntity) {
-        this.namedEntity = namedEntity;
+        if (namedEntity != null) {
+            feats.put(NAMED_ENTITY_KEY, namedEntity);
+        }
     }
 
     public boolean isRoot() {
@@ -170,17 +174,13 @@ public class DNode {
         StringBuilder builder = new StringBuilder();
         builder.append(id).append("\t");
         builder.append(name).append("\t");
-        builder.append(originalText).append("\t");
+        builder.append(form).append("\t");
         builder.append(lemma).append("\t");
         builder.append(pos).append("\t");
         builder.append(depLabel).append("\t");
-        if (!namedEntity.isEmpty()) {
-            builder.append(namedEntity).append("\t");
-        } else {
-            builder.append("_").append("\t");
-        }
-        if (parent != null) {
-            builder.append(parent.id).append("\t");
+
+        if (head != null) {
+            builder.append(head.id).append("\t");
         } else {
             builder.append("NULL").append("\t");
         }

@@ -144,7 +144,7 @@ public class StanfordTreeDirtyPatch {
         }
 
         // hold together -> "together" should be PRT
-        if (node.getLemma().equals("together") && node.getParent() != null && node.getParent().getLemma().equals("hold") && !node.getDepLabel().equals(LangLib.DEP_PRT)) {
+        if (node.getLemma().equals("together") && node.getHead() != null && node.getHead().getLemma().equals("hold") && !node.getDepLabel().equals(LangLib.DEP_PRT)) {
             node.setDepLabel(LangLib.DEP_PRT);
         }
 
@@ -158,8 +158,8 @@ public class StanfordTreeDirtyPatch {
         if (!node.getNamedEntity().isEmpty()) {
             // 5pm. -> (. -> Time)
             if (node.getId() == node.getTree().size() - 1 && LangLib.DEP_PUNCT.equals(node.getDepLabel())) {
-                node.setLemma(node.getOriginalText());
-                node.setName(node.getOriginalText());
+                node.setLemma(node.getForm());
+                node.setName(node.getForm());
                 node.setNamedEntity(StringUtils.EMPTY);
             }
 

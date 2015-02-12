@@ -9,6 +9,7 @@ import edu.stanford.nlp.parser.lexparser.LexicalizedParser;
 import edu.stanford.nlp.process.Morphology;
 import edu.stanford.nlp.process.Tokenizer;
 import edu.stanford.nlp.process.TokenizerFactory;
+import edu.stanford.nlp.tagger.maxent.MaxentTagger;
 import edu.stanford.nlp.trees.EnglishGrammaticalStructure;
 import edu.stanford.nlp.trees.SemanticHeadFinder;
 import edu.stanford.nlp.trees.Tree;
@@ -35,6 +36,8 @@ public class StanfordParser implements IParser {
     private LexicalizedParser parser = null;
 
     private NERClassifierCombiner ner = null;
+
+    private static MaxentTagger posTagger = new MaxentTagger(System.getProperty("pos.model", MaxentTagger.DEFAULT_JAR_PATH));
 
     // This is for Lemma Tagger
     private static final Set<String> particles = ImmutableSet.of(
@@ -223,10 +226,10 @@ public class StanfordParser implements IParser {
                     continue;
                 }
                 builder.append(node.getId()).append(StringUtils.SPACE);
-                builder.append(node.getOriginalText()).append(StringUtils.SPACE);
+                builder.append(node.getForm()).append(StringUtils.SPACE);
                 builder.append(node.getLemma()).append(StringUtils.SPACE);
                 builder.append(node.getPOS()).append(StringUtils.SPACE);
-                builder.append(node.getParent().getId()).append(StringUtils.SPACE);
+                builder.append(node.getHead().getId()).append(StringUtils.SPACE);
                 builder.append(node.getDepLabel());
                 builder.append(System.lineSeparator());
             }
@@ -238,7 +241,7 @@ public class StanfordParser implements IParser {
     }
 
     public static void main(String[] args) {
-        StanfordParser parser = new StanfordParser("", true);
+        StanfordParser parser = new StanfordParser("", false);
 
         parser.loadModel("/Users/Maochen/workspace/nlpservice/nlp-service-remote/src/main/resources/classifierData/englishPCFG.ser.gz");
 

@@ -24,20 +24,20 @@ public class LangTools {
 
     public static void generateName(DNode node) {
         // Can't
-        if (node.getOriginalText().equalsIgnoreCase("ca") && node.getLemma().equals("can")) {
+        if (node.getForm().equalsIgnoreCase("ca") && node.getLemma().equals("can")) {
             node.setName(node.getLemma());
         }
         // I ca/[n't].
-        else if (node.getOriginalText().equalsIgnoreCase("n't") && node.getLemma().equals("not") && node.getDepLabel().equals(LangLib.DEP_NEG)) {
+        else if (node.getForm().equalsIgnoreCase("n't") && node.getLemma().equals("not") && node.getDepLabel().equals(LangLib.DEP_NEG)) {
             node.setName(node.getLemma());
 
         }
 
         // Resolve 'd
-        else if (node.getOriginalText().equalsIgnoreCase("'d") && node.getPOS().equals(LangLib.POS_MD)) {
+        else if (node.getForm().equalsIgnoreCase("'d") && node.getPOS().equals(LangLib.POS_MD)) {
             node.setName(node.getLemma());
-        } else if (contractions.containsKey(node.getOriginalText())) {
-            node.setName(contractions.get(node.getOriginalText()));
+        } else if (contractions.containsKey(node.getForm())) {
+            node.setName(contractions.get(node.getForm()));
         }
     }
 }

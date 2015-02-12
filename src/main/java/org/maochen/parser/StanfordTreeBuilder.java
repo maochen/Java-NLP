@@ -31,11 +31,6 @@ public class StanfordTreeBuilder {
             node.setName(")");
         }
 
-        // Take the 'dep' as 'attr'. Cuz ClearNLP says it is attr. funny right?
-        if (node.getDepLabel().equals(LangLib.DEP_DEP)) {
-            node.setDepLabel(LangLib.DEP_ATTR);
-        }
-
         // ClearNLP does not have vmod.
         if (node.getDepLabel().equals(LangLib.DEP_VMOD)) {
             node.setDepLabel(LangLib.DEP_PARTMOD);
@@ -64,8 +59,8 @@ public class StanfordTreeBuilder {
                 originalRoot.setDepLabel(LangLib.DEP_DEP);
             }
 
-            cop.setParent(tree.getPaddingNode());
-            originalRoot.setParent(cop);
+            cop.setHead(tree.getPaddingNode());
+            originalRoot.setHead(cop);
 
             tree.getPaddingNode().removeChild(originalRoot.getId());
             tree.getPaddingNode().addChild(cop);
@@ -77,7 +72,7 @@ public class StanfordTreeBuilder {
 
                 if (child != cop) {
                     cop.addChild(child);
-                    child.setParent(cop);
+                    child.setHead(cop);
                 }
             }
 
@@ -115,7 +110,7 @@ public class StanfordTreeBuilder {
                 }
 
                 child.setDepLabel(childDEPLabel);
-                child.setParent(parent);
+                child.setHead(parent);
                 parent.addChild(child);
             }
         });
@@ -126,7 +121,7 @@ public class StanfordTreeBuilder {
                 if (node.getName().matches("\\p{Punct}+")) { // Attach Punctuation
                     DNode rootVerb = depTree.getRoots().stream().findFirst().orElse(null);
                     node.setDepLabel(LangLib.DEP_PUNCT);
-                    node.setParent(rootVerb);
+                    node.setHead(rootVerb);
                     depTree.get(rootVerb.getId()).addChild(node);
                 } else {
                     LOG.error("node does not have label. ->", node.toString());
@@ -148,10 +143,10 @@ public class StanfordTreeBuilder {
 
     private static void swapPossessives(DTree depTree) {
         Predicate<DNode> pred = (x) -> {
-            if (x.getParent() == null) {
+            if (x.getHead() == null) {
                 return false;
             }
-            boolean needAlter = x.getParent().isRoot();
+            boolean needAlter = x.getHead().isRoot();
             needAlter &= x.getPOS().startsWith(LangLib.POS_NN);
             return needAlter;
         };
@@ -176,10 +171,10 @@ public class StanfordTreeBuilder {
         if (det != null) {
             originalParent.removeChild(det.getId());
             nounChild.addChild(det);
-            det.setParent(nounChild);
+            det.setHead(nounChild);
         }
 
-        DNode originalGrandParent = originalParent.getParent();
+        DNode originalGrandParent = originalParent.getHead();
         originalParent.removeChild(nounChild.getId());
         originalGrandParent.removeChild(originalParent.getId());
 
@@ -188,10 +183,10 @@ public class StanfordTreeBuilder {
         // Must be poss, dont use child's deplabel, it might be attr which is not accurate
         originalParent.setDepLabel(LangLib.DEP_POSS);
 
-        nounChild.setParent(originalGrandParent);
+        nounChild.setHead(originalGrandParent);
         originalGrandParent.addChild(nounChild);
 
-        originalParent.setParent(nounChild);
+        originalParent.setHead(nounChild);
         nounChild.addChild(originalParent);
     }
 
