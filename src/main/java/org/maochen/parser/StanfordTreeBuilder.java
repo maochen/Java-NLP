@@ -31,11 +31,6 @@ public class StanfordTreeBuilder {
             node.setName(")");
         }
 
-        // ClearNLP does not have vmod.
-        if (node.getDepLabel().equals(LangLib.DEP_VMOD)) {
-            node.setDepLabel(LangLib.DEP_PARTMOD);
-        }
-
         // This is due to the inconsistency of stanford parser.
         if (node.getDepLabel().equals(LangLib.DEP_NUMBER)) {
             node.setDepLabel(LangLib.DEP_NUM);
@@ -130,7 +125,7 @@ public class StanfordTreeBuilder {
 
             patchTree(node);
             StanfordTreeDirtyPatch.dirtyPatchNER(node);
-            StanfordTreeDirtyPatch.dirtyPatch(node);
+//            StanfordTreeDirtyPatch.dirtyPatch(node);
             LangTools.generateName(node);
         });
 
