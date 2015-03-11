@@ -63,6 +63,9 @@ public class StanfordTreeBuilder {
 
             // Add original deps to cop
             for (DNode child : originalRoot.getChildren()) {
+                if (child.getPOS().equals(LangLib.POS_IN)) {
+                    continue;
+                }
                 originalRoot.removeChild(child.getId());
 
                 if (child != cop) {

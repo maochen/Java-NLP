@@ -5,6 +5,7 @@ import edu.stanford.nlp.ie.NERClassifierCombiner;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.ling.HasWord;
 import edu.stanford.nlp.ling.TaggedWord;
+import edu.stanford.nlp.parser.common.ParserQuery;
 import edu.stanford.nlp.parser.lexparser.LexicalizedParser;
 import edu.stanford.nlp.process.Morphology;
 import edu.stanford.nlp.process.Tokenizer;
@@ -14,6 +15,7 @@ import edu.stanford.nlp.trees.EnglishGrammaticalStructure;
 import edu.stanford.nlp.trees.SemanticHeadFinder;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.TypedDependency;
+import edu.stanford.nlp.util.ScoredObject;
 import org.apache.commons.lang3.StringUtils;
 import org.maochen.datastructure.DNode;
 import org.maochen.datastructure.DTree;
@@ -194,6 +196,36 @@ public class StanfordParser implements IParser {
         return depTree;
     }
 
+
+    public Map<DTree, Double> getKBestParse(String sentence, int k) {
+        if (parser == null) {
+            LOG.info("Use default PCFG model.");
+            parser = LexicalizedParser.loadModel();
+        }
+
+        List<CoreLabel> tokens = stanfordTokenize(sentence);
+
+        // Parse right after get through tokenizer.
+        ParserQuery pq = parser.parserQuery();
+        pq.parse(tokens);
+        List<ScoredObject<Tree>> scoredTrees = pq.getKBestPCFGParses(k);
+
+        tagForm(tokens);
+        tagNamedEntity(tokens);
+
+        Map<DTree, Double> result = new HashMap<>();
+        for (ScoredObject<Tree> scoredTuple : scoredTrees) {
+            Tree tree = scoredTuple.object();
+            tagPOS(tokens, tree);
+            tagLemma(tokens);
+
+            Collection<TypedDependency> dependencies = getDependencies(tree, true);
+            DTree depTree = StanfordTreeBuilder.generate(tokens, tree, dependencies);
+            result.put(depTree, scoredTuple.score());
+        }
+        return result;
+    }
+
     public List<String> tokenize(String sentence) {
         List<CoreLabel> tokens = stanfordTokenize(sentence);
         tagForm(tokens);
@@ -244,7 +276,6 @@ public class StanfordParser implements IParser {
         StanfordParser parser = new StanfordParser("", false);
 
         parser.loadModel("/Users/Maochen/workspace/nlpservice/nlp-service-remote/src/main/resources/classifierData/englishPCFG.ser.gz");
-
         Scanner scan = new Scanner(System.in);
         String input = StringUtils.EMPTY;
 
@@ -253,9 +284,15 @@ public class StanfordParser implements IParser {
             System.out.println("Please enter sentence:");
             input = scan.nextLine();
             if (!input.trim().isEmpty() && !input.matches(quitRegex)) {
-                DTree tree = parser.parse(input);
-                parser.getLexicalizedParser().parse(input).pennPrint();
-                System.out.println(print(true, tree));
+                Map<DTree, Double> trees = parser.getKBestParse(input, 3);
+
+                List<Map.Entry<DTree, Double>> results = trees.entrySet().parallelStream().collect(Collectors.toList());
+                Collections.sort(results,(o1, o2) -> Double.compare(o2.getValue(), o1.getValue()));
+                for (Map.Entry<DTree, Double> entry : results) {
+                    System.out.println("--------------------------");
+                    System.out.println(entry.getValue());
+                    System.out.println(print(false, entry.getKey()));
+                }
             }
         }
 
