@@ -1,6 +1,8 @@
 package org.maochen.parser;
 
+import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Table;
 import edu.stanford.nlp.ie.NERClassifierCombiner;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.ling.HasWord;
@@ -37,7 +39,7 @@ public class StanfordParser implements IParser {
 
     private LexicalizedParser parser = null;
 
-    private NERClassifierCombiner ner = null;
+    private List<NERClassifierCombiner> ners = new ArrayList<>();
 
     private static MaxentTagger posTagger = new MaxentTagger(System.getProperty("pos.model", MaxentTagger.DEFAULT_JAR_PATH));
 
@@ -65,6 +67,8 @@ public class StanfordParser implements IParser {
                 put("-RSB-", "]");
                 put("-LRB-", "(");
                 put("-RRB-", ")");
+                put("-LCB-", "{");
+                put("-RCB-", "}");
                 put("``", "\"");
                 put("''", "\"");
             }
@@ -127,9 +131,7 @@ public class StanfordParser implements IParser {
 
     // 5. NER
     private void tagNamedEntity(List<CoreLabel> tokens) {
-        if (ner != null) {
-            ner.classify(tokens);
-        }
+        ners.stream().forEach(ner -> ner.classify(tokens));
     }
 
     // For Lemma
@@ -197,7 +199,7 @@ public class StanfordParser implements IParser {
     }
 
 
-    public Map<DTree, Double> getKBestParse(String sentence, int k) {
+    public Table<DTree, Tree, Double> getKBestParse(String sentence, int k) {
         if (parser == null) {
             LOG.info("Use default PCFG model.");
             parser = LexicalizedParser.loadModel();
@@ -213,7 +215,7 @@ public class StanfordParser implements IParser {
         tagForm(tokens);
         tagNamedEntity(tokens);
 
-        Map<DTree, Double> result = new HashMap<>();
+        Table<DTree, Tree, Double> result = HashBasedTable.create();
         for (ScoredObject<Tree> scoredTuple : scoredTrees) {
             Tree tree = scoredTuple.object();
             tagPOS(tokens, tree);
@@ -221,7 +223,7 @@ public class StanfordParser implements IParser {
 
             Collection<TypedDependency> dependencies = getDependencies(tree, true);
             DTree depTree = StanfordTreeBuilder.generate(tokens, tree, dependencies);
-            result.put(depTree, scoredTuple.score());
+            result.put(depTree, tree, scoredTuple.score());
         }
         return result;
     }
@@ -242,7 +244,7 @@ public class StanfordParser implements IParser {
         if (initNER) {
             // STUPID NER, Throw IOException in the constructor ... : (
             try {
-                ner = new NERClassifierCombiner("edu/stanford/nlp/models/ner/english.all.3class.distsim.crf.ser.gz");
+                ners.add(new NERClassifierCombiner("edu/stanford/nlp/models/ner/english.all.3class.distsim.crf.ser.gz"));
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
@@ -284,15 +286,20 @@ public class StanfordParser implements IParser {
             System.out.println("Please enter sentence:");
             input = scan.nextLine();
             if (!input.trim().isEmpty() && !input.matches(quitRegex)) {
-                Map<DTree, Double> trees = parser.getKBestParse(input, 3);
+//                                System.out.println(print(false, parser.parse(input)));
+                Table<DTree, Tree, Double> trees = parser.getKBestParse(input, 3);
 
-                List<Map.Entry<DTree, Double>> results = trees.entrySet().parallelStream().collect(Collectors.toList());
-                Collections.sort(results,(o1, o2) -> Double.compare(o2.getValue(), o1.getValue()));
-                for (Map.Entry<DTree, Double> entry : results) {
+                List<Table.Cell<DTree, Tree, Double>> results = trees.cellSet().parallelStream().collect(Collectors.toList());
+                Collections.sort(results, (o1, o2) -> Double.compare(o2.getValue(), o1.getValue()));
+                for (Table.Cell<DTree, Tree, Double> entry : results) {
                     System.out.println("--------------------------");
                     System.out.println(entry.getValue());
-                    System.out.println(print(false, entry.getKey()));
+                    System.out.println(entry.getColumnKey().pennString());
+                    System.out.println("");
+                    System.out.println(print(false, entry.getRowKey()));
                 }
+
+
             }
         }
 
