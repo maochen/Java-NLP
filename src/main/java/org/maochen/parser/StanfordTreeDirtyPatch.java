@@ -139,7 +139,6 @@ public class StanfordTreeDirtyPatch {
 
         // For aux verb tagged as Noun.
         if (node.getId() == 1 && auxVerbFix.containsKey(node.getName().toLowerCase())) {
-            node.setDepLabel(LangLib.DEP_AUX);
             node.setPOS(auxVerbFix.get(node.getName().toLowerCase()));
         }
 
