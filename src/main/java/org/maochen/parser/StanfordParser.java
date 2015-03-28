@@ -276,7 +276,7 @@ public class StanfordParser implements IParser {
     public static void main(String[] args) {
         StanfordParser parser = new StanfordParser("", false);
 
-        parser.loadModel("/Users/Maochen/workspace/nlpservice/nlp-service-remote/src/main/resources/classifierData/englishPCFG.ser.gz");
+//        parser.loadModel("/Users/Maochen/workspace/nlpservice/nlp-service-remote/src/main/resources/classifierData/englishPCFG.ser.gz");
         Scanner scan = new Scanner(System.in);
         String input = StringUtils.EMPTY;
 
@@ -286,6 +286,8 @@ public class StanfordParser implements IParser {
             input = scan.nextLine();
             if (!input.trim().isEmpty() && !input.matches(quitRegex)) {
 //                                System.out.println(print(false, parser.parse(input)));
+
+
                 Table<DTree, Tree, Double> trees = parser.getKBestParse(input, 3);
 
                 List<Table.Cell<DTree, Tree, Double>> results = trees.cellSet().parallelStream().collect(Collectors.toList());
