@@ -20,6 +20,7 @@ public class LangTools {
         put("'ve", "have");
         put("can't", "cannot");
         put("ma'am", "madam");
+        put("'ll", "will");
     }};
 
     public static void generateName(DNode node) {

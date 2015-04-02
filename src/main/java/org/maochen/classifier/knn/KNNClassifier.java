@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Simple Wrapper, Id is based on the input sequence.
@@ -58,18 +59,17 @@ public class KNNClassifier implements IClassifier {
         KNNEngine engine = new KNNEngine(predict, trainingData, k);
 
         if (mode == 1) {
-            engine.ChebyshevDistance();
+            engine.getDistance(engine.chebyshevDistance);
         } else if (mode == 2) {
-            engine.ManhattanDistance();
+            engine.getDistance(engine.manhattanDistance);
         } else {
-            engine.EuclideanDistance();
+            engine.getDistance(engine.euclideanDistance);
         }
 
         predict.label = engine.getResult();
 
-        Map<String, Double> outputMap = new HashMap<String, Double>();
-
-        trainingData.stream().parallel().forEach(x -> outputMap.put(String.valueOf(x.id), x.distance));
+        Map<String, Double> outputMap = new ConcurrentHashMap<>();
+        trainingData.parallelStream().forEach(x -> outputMap.put(String.valueOf(x.id), x.distance));
 
         return outputMap;
     }
@@ -90,7 +90,7 @@ public class KNNClassifier implements IClassifier {
 
         IClassifier knn = new KNNClassifier();
         knn.train(trainList);
-        Map<String, String> paraMap = new HashMap<String, String>();
+        Map<String, String> paraMap = new HashMap<>();
         paraMap.put("k", String.valueOf(k));
 
         System.out.println("Euclidean Distance:");

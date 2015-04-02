@@ -28,7 +28,7 @@ import java.util.stream.IntStream;
  */
 public class VectorUtils {
 
-    public static double[] operate(double[] a, double[] b, BinaryOperator<Double> op) {
+    public static double[] zip(double[] a, double[] b, BinaryOperator<Double> op) {
         if (a.length != b.length) throw new IllegalArgumentException("not same length");
         return IntStream.range(0, a.length).parallel().mapToDouble(i -> op.apply(a[i], b[i])).toArray();
     }
@@ -37,16 +37,12 @@ public class VectorUtils {
         return Arrays.stream(a).parallel().map(x -> x * scale).toArray();
     }
 
-    public static double gaussianDensityDistribution(double mean, double variance, double x) {
+    public static double gaussianPDF(double mean, double variance, double x) {
         double twoVariance = 2 * variance;
-        double val = 1 / Math.sqrt(Math.PI * twoVariance);
-        val = val * Math.exp(-Math.pow((x - mean), 2) / twoVariance);
+        double probability = 1 / Math.sqrt(Math.PI * twoVariance);
+        probability = probability * Math.exp(-Math.pow((x - mean), 2) / twoVariance);
 
-        return val;
-    }
-
-    public static double[] allXVector(double val, int length) {
-        return IntStream.range(0, length).parallel().mapToDouble(x -> val).toArray();
+        return probability;
     }
 
     public static float[] doubleToFloat(double[] vector) {
@@ -55,8 +51,14 @@ public class VectorUtils {
         return result;
     }
 
+    public static double[] floatToDouble(float[] vector) {
+        double[] result = new double[vector.length];
+        IntStream.range(0, vector.length).parallel().forEach(i -> result[i] = vector[i]);
+        return result;
+    }
+
     public static String[] intToString(int[] vectorIndex) {
-        return Arrays.stream(vectorIndex).parallel().<String>mapToObj(String::valueOf).toArray(String[]::new);
+        return Arrays.stream(vectorIndex).parallel().mapToObj(String::valueOf).toArray(String[]::new);
     }
 
 }

@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.function.BiFunction;
 
 /**
  * Should not exposed.
@@ -26,48 +27,17 @@ final class KNNEngine {
         this.k = k;
     }
 
+    public BiFunction<double[], double[], Double> euclideanDistance = (v1, v2) -> Math.sqrt(Arrays.stream(VectorUtils.zip(v1, v2, (x, y) -> Math.pow(x - y, 2))).parallel().sum());
+    public BiFunction<double[], double[], Double> chebyshevDistance = (v1, v2) -> Math.sqrt(Arrays.stream(VectorUtils.zip(v1, v2, (x, y) -> Math.abs(x - y))).max().getAsDouble());
+    public BiFunction<double[], double[], Double> manhattanDistance = (v1, v2) -> Math.sqrt(Arrays.stream(VectorUtils.zip(v1, v2, (x, y) -> Math.abs(x - y))).parallel().sum());
 
-
-    public void EuclideanDistance() {
+    public void getDistance(BiFunction<double[], double[], Double> distanceFunction) {
         for (Tuple tuple : trainingData) {
             if (predict.featureVector.length != tuple.featureVector.length) {
                 LOG.error("2 Vectors must has same dimension.");
                 return;
             }
-
-            double result = Arrays.stream(VectorUtils.operate(predict.featureVector, tuple.featureVector, (x, y) -> Math.pow(x - y, 2)))
-                    .parallel().sum();
-            result = Math.sqrt(result);
-            tuple.distance = result;
-        }
-    }
-
-    public void ChebyshevDistance() {
-        for (Tuple tuple : trainingData) {
-            if (predict.featureVector.length != tuple.featureVector.length) {
-                LOG.error("2 Vectors must has same dimension.");
-                return;
-            }
-
-            double result = Arrays.stream(VectorUtils.operate(predict.featureVector, tuple.featureVector, (x, y) -> Math.abs(x - y)))
-                    .max().getAsDouble();
-
-            result = Math.sqrt(result);
-            tuple.distance = result;
-        }
-    }
-
-    public void ManhattanDistance() {
-        for (Tuple tuple : trainingData) {
-            if (predict.featureVector.length != tuple.featureVector.length) {
-                LOG.error("2 Vectors must has same dimension.");
-                return;
-            }
-
-            double result = Arrays.stream(VectorUtils.operate(predict.featureVector, tuple.featureVector, (x, y) -> Math.abs(x - y)))
-                    .parallel().sum();
-            result = Math.sqrt(result);
-            tuple.distance = result;
+            tuple.distance = distanceFunction.apply(predict.featureVector, tuple.featureVector);
         }
     }
 
@@ -88,7 +58,6 @@ final class KNNEngine {
             int count = resultMap.containsKey(tuple.label) ? resultMap.get(tuple.label) : 0;
             count++;
             resultMap.put(tuple.label, count);
-
         }
 
         String maxVote = StringUtils.EMPTY;

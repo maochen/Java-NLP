@@ -50,7 +50,7 @@ public class NaiveBayesClassifier implements IClassifier {
 
             for (int i = 0; i < predict.featureVector.length; i++) {
                 double fi = predict.featureVector[i];
-                posteriorLabel = posteriorLabel * VectorUtils.gaussianDensityDistribution(trainingEngine.meanVectors[labelIndex][i], trainingEngine.varianceVectors[labelIndex][i], fi);
+                posteriorLabel = posteriorLabel * VectorUtils.gaussianPDF(trainingEngine.meanVectors[labelIndex][i], trainingEngine.varianceVectors[labelIndex][i], fi);
             }
 
             probs.put(labelIndex, posteriorLabel);

@@ -13,7 +13,6 @@ import java.util.List;
 final class TrainingEngine {
 
     LabelIndexer labelIndexer;
-
     List<Tuple> trainingData;
 
     // row=labelSize,col=featureLength
@@ -28,7 +27,7 @@ final class TrainingEngine {
         for (Tuple t : trainingData) {
             int index = labelIndexer.getIndex(t.label);
             count[index]++;
-            meanVectors[index] = VectorUtils.operate(meanVectors[index], t.featureVector, (x, y) -> x + y);
+            meanVectors[index] = VectorUtils.zip(meanVectors[index], t.featureVector, (x, y) -> x + y);
         }
 
         for (int i = 0; i < meanVectors.length; i++) {
@@ -43,10 +42,10 @@ final class TrainingEngine {
     public void calculateVariance() {
         for (Tuple t : trainingData) {
             int index = labelIndexer.getIndex(t.label);
-            double[] diff = VectorUtils.operate(t.featureVector, meanVectors[index], (x, y) -> x - y);
+            double[] diff = VectorUtils.zip(t.featureVector, meanVectors[index], (x, y) -> x - y);
             diff = Arrays.stream(diff).map(x -> x * x).toArray();
 
-            double[] varianceVector = VectorUtils.operate(varianceVectors[index], diff, (x, y) -> x + y);
+            double[] varianceVector = VectorUtils.zip(varianceVectors[index], diff, (x, y) -> x + y);
             varianceVectors[index] = varianceVector;
         }
 
@@ -76,9 +75,8 @@ final class TrainingEngine {
         varianceVectors = new double[labelSize][vectorLength];
 
         for (int i = 0; i < labelSize; i++) {
-            meanVectors[i] = VectorUtils.allXVector(0, vectorLength);
-            varianceVectors[i] = VectorUtils.allXVector(0, vectorLength);
+            meanVectors[i] = new double[vectorLength];
+            varianceVectors[i] = new double[vectorLength];
         }
     }
-
 }

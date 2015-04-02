@@ -10,6 +10,7 @@ import java.util.Map;
 /**
  * Created by Maochen on 1/19/15.
  */
+@Deprecated
 public class StanfordTreeDirtyPatch {
     private static final Map<String, DNode> words = new HashMap<String, DNode>() {{
         DNode locate = new DNode(0, "located", "locate", LangLib.POS_VBD, StringUtils.EMPTY);
