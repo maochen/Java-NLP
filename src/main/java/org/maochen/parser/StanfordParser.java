@@ -276,7 +276,7 @@ public class StanfordParser implements IParser {
     public static void main(String[] args) {
         StanfordParser parser = new StanfordParser("", false);
 
-//        parser.loadModel("/Users/Maochen/workspace/nlpservice/nlp-service-remote/src/main/resources/classifierData/englishPCFG.ser.gz");
+        parser.loadModel("/Users/Maochen/workspace/nlpservice/nlp-service-remote/src/main/resources/classifierData/englishPCFG.ser.gz");
         Scanner scan = new Scanner(System.in);
         String input = StringUtils.EMPTY;
 
