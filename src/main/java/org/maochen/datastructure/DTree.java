@@ -79,7 +79,8 @@ public class DTree extends ArrayList<DNode> {
     public DTree() {
         padding = new DNode();
         padding.setId(0);
-        padding.setName("^");
+        padding.setForm("^");
+        padding.setLemma("^");
         this.add(padding);
     }
 }
