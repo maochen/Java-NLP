@@ -1,6 +1,7 @@
 package org.maochen.utils;
 
 import org.maochen.datastructure.DNode;
+import org.maochen.datastructure.DTree;
 import org.maochen.datastructure.LangLib;
 
 import java.util.HashMap;
@@ -40,5 +41,43 @@ public class LangTools {
         } else if (contractions.containsKey(node.getForm())) {
             node.setLemma(contractions.get(node.getForm()));
         }
+    }
+
+    public static DTree getDTreeFromCoNLLXString(final String input, boolean isLemmaMissing) {
+        if (input == null || input.trim().isEmpty()) {
+            return null;
+        }
+
+        String[] tokens = input.split(System.lineSeparator());
+        DTree tree = new DTree();
+        for (String token : tokens) {
+            String[] fields = token.split("\t");
+            int currentIndex = 0;
+            int id = Integer.parseInt(fields[currentIndex++]);
+            String form = fields[currentIndex++];
+            String lemma = isLemmaMissing ? form : fields[currentIndex++];
+            currentIndex++;
+            String cPOSTag = fields[currentIndex++];
+            String pos = fields[currentIndex++];
+            currentIndex++;
+
+            String headIndex = fields[currentIndex++];
+            String depLabel = fields[currentIndex];
+
+            DNode node = new DNode(id, form, lemma, pos, depLabel);
+            node.setcPOSTag(cPOSTag);
+            node.addFeature("head", headIndex);
+            tree.add(node);
+        }
+
+        for (int i = 1; i < tree.size(); i++) {
+            DNode node = tree.get(i);
+            int headIndex = Integer.parseInt(node.getFeature("head"));
+            DNode head = tree.get(headIndex);
+            head.addChild(node);
+            node.removeFeature("head");
+            node.setHead(head);
+        }
+        return tree;
     }
 }

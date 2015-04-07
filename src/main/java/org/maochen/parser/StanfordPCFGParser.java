@@ -40,7 +40,7 @@ public class StanfordPCFGParser implements IParser {
 
     private List<NERClassifierCombiner> ners = new ArrayList<>();
 
-//    private static MaxentTagger posTagger = new MaxentTagger(System.getProperty("pos.model", MaxentTagger.DEFAULT_JAR_PATH));
+    //    private static MaxentTagger posTagger = new MaxentTagger(System.getProperty("pos.model", MaxentTagger.DEFAULT_JAR_PATH));
 
     // This is for Lemma Tagger
     private static final Set<String> particles = ImmutableSet.of(
@@ -173,15 +173,17 @@ public class StanfordPCFGParser implements IParser {
     }
 
     public LexicalizedParser getLexicalizedParser() {
+        if (parser == null) {
+            LOG.info("Use default PCFG model.");
+            parser = LexicalizedParser.loadModel();
+        }
+
         return parser;
     }
 
     @Override
     public DTree parse(String sentence) {
-        if (parser == null) {
-            LOG.info("Use default PCFG model.");
-            parser = LexicalizedParser.loadModel();
-        }
+        getLexicalizedParser();// Make sure parser get init.
 
         List<CoreLabel> tokens = stanfordTokenize(sentence);
         // Parse right after get through tokenizer.
@@ -285,7 +287,7 @@ public class StanfordPCFGParser implements IParser {
             System.out.println("Please enter sentence:");
             input = scan.nextLine();
             if (!input.trim().isEmpty() && !input.matches(quitRegex)) {
-//                                System.out.println(print(false, parser.parse(input)));
+                //                                System.out.println(print(false, parser.parse(input)));
 
 
                 Table<DTree, Tree, Double> trees = parser.getKBestParse(input, 3);
