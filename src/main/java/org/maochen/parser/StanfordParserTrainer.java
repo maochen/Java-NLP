@@ -7,6 +7,7 @@ import edu.stanford.nlp.parser.lexparser.LexicalizedParser;
 import edu.stanford.nlp.parser.lexparser.Options;
 import edu.stanford.nlp.trees.*;
 import org.apache.commons.lang3.StringUtils;
+import org.maochen.datastructure.DTree;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -80,7 +81,7 @@ public class StanfordParserTrainer {
             x.setOriginalText(x.word());
             x.setLemma(x.word());
         });
-        org.maochen.datastructure.DTree dtree = StanfordTreeBuilder.generate(tokens, tree, dependencies);
+        DTree dtree = StanfordTreeBuilder.generate(tokens, dependencies);
         System.out.println(dtree);
     }
 

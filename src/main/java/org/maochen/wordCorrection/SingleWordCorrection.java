@@ -2,7 +2,7 @@ package org.maochen.wordcorrection;
 
 import org.apache.commons.lang3.StringUtils;
 import org.maochen.datastructure.DoubleKeyMap;
-import org.maochen.parser.StanfordParser;
+import org.maochen.parser.StanfordPCFGParser;
 
 import java.io.*;
 import java.util.HashMap;
@@ -139,7 +139,7 @@ public class SingleWordCorrection {
     }
 
     // Parser here is just for tokenize.
-    public void buildModel(String wordFileName, StanfordParser parser) throws IOException {
+    public void buildModel(String wordFileName, StanfordPCFGParser parser) throws IOException {
         BufferedReader br = new BufferedReader(new FileReader(new File(wordFileName)));
 
         String str;
@@ -217,7 +217,7 @@ public class SingleWordCorrection {
     }
 
     public static void main(String[] args) throws IOException {
-        StanfordParser parser = new StanfordParser();
+        StanfordPCFGParser parser = new StanfordPCFGParser();
 
         String path = SingleWordCorrection.class.getClassLoader().getResource("the_adventures_of_sherlock_holmes.txt").getFile();
         SingleWordCorrection swc = new SingleWordCorrection();

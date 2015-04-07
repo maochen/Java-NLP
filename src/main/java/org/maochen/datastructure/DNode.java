@@ -28,46 +28,43 @@ import java.util.stream.Collectors;
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA  02111-1307 USA
  * <p>
- * This follows CoNLL-X shared task: Multi-Lingual Dependency Parsing Format
+ * This follows CoNLL-U shared task: Multi-Lingual Dependency Parsing Format
+ * http://universaldependencies.github.io/docs/format.html
  * <p>
  * Created by Maochen on 12/8/14.
  */
 public class DNode {
     private int id;
-    // 'm -> am, 're -> are ...
-    // Normalized Date or Time ... etc
-    private String name;
     private String form;
     private String lemma;
+    private String cPOSTag;
     private String pos;
-    private String depLabel;
-
+    private Map<String, String> feats = new HashMap<>();
     private DNode head;
+    private String depLabel;
+    // Still considering item 9 and 10.
+
     // Key - id
     private Map<Integer, DNode> children = new HashMap<>();
-    private Map<String, String> feats = new HashMap<>();
     // Parent Node, Semantic Head Label
     private Map<DNode, String> semanticHeads = new HashMap<>();
-
     private DTree tree = null; // Refs to the whole dependency tree
-
     private static final String NAMED_ENTITY_KEY = "named_entity";
 
     public DNode() {
         id = 0;
-        name = StringUtils.EMPTY;
         form = StringUtils.EMPTY;
         lemma = StringUtils.EMPTY;
+        cPOSTag = StringUtils.EMPTY;
         pos = StringUtils.EMPTY;
-        depLabel = StringUtils.EMPTY;
         head = null;
+        depLabel = StringUtils.EMPTY;
     }
 
-    public DNode(int id, String name, String lemma, String pos, String depLabel) {
+    public DNode(int id, String form, String lemma, String pos, String depLabel) {
         this();
         this.id = id;
-        this.name = name;
-        this.form = name;
+        this.form = form;
         this.lemma = lemma;
         this.pos = pos;
         this.depLabel = depLabel;
@@ -89,20 +86,20 @@ public class DNode {
         this.form = form;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getLemma() {
         return lemma;
     }
 
     public void setLemma(String lemma) {
         this.lemma = lemma;
+    }
+
+    public String getcPOSTag() {
+        return cPOSTag;
+    }
+
+    public void setcPOSTag(String cPOSTag) {
+        this.cPOSTag = cPOSTag;
     }
 
     public String getPOS() {
@@ -187,22 +184,39 @@ public class DNode {
         this.tree = tree;
     }
 
-    // This is CoNLL format.
+    // This is CoNLL-U format.
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append(id).append("\t");
-        builder.append(name).append("\t");
         builder.append(form).append("\t");
         builder.append(lemma).append("\t");
+
+        // For now, cPOSTag is not differentiate with the POS.
+        if (cPOSTag.isEmpty()) {
+            builder.append(pos).append("\t");
+        } else {
+            builder.append(cPOSTag).append("\t");
+        }
+
         builder.append(pos).append("\t");
-        builder.append(depLabel).append("\t");
+        if (feats.isEmpty()) {
+            builder.append("_").append("\t");
+        } else {
+            builder.append(feats).append("\t");
+        }
 
         if (head != null) {
             builder.append(head.id).append("\t");
         } else {
             builder.append("NULL").append("\t");
         }
+
+        builder.append(depLabel).append("\t");
+
+        // These two corresponds to the 9 and 10 in the standard.
+        builder.append("_").append("\t");
+        builder.append("_").append("\t");
         return builder.toString().trim();
     }
 }

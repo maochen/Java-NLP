@@ -6,7 +6,7 @@ import org.maochen.datastructure.DNode;
 import org.maochen.datastructure.DTree;
 import org.maochen.datastructure.LangLib;
 import org.maochen.parser.IParser;
-import org.maochen.parser.StanfordParser;
+import org.maochen.parser.StanfordPCFGParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -205,7 +205,7 @@ public class FeatureExtractor {
     public FeatureExtractor(String filepathPrefix, String delimiter) {
         this.delimiter = delimiter;
 
-        parser = new StanfordParser();
+        parser = new StanfordPCFGParser();
         this.filepathPrefix = filepathPrefix;
 
         biGramWordMap = deserialize(filepathPrefix + "/bigram_word");

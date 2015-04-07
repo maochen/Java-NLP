@@ -2,7 +2,6 @@ package org.maochen.parser;
 
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
-import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.TypedDependency;
 import org.apache.commons.lang3.StringUtils;
 import org.maochen.datastructure.DNode;
@@ -25,10 +24,10 @@ public class StanfordTreeBuilder {
 
     // This is because of the difference of the stanford vs clearnlp standards. It is not err.
     private static void patchTree(DNode node) {
-        if (node.getName().equalsIgnoreCase("-LRB-")) {
-            node.setName("(");
-        } else if (node.getName().equalsIgnoreCase("-RRB-")) {
-            node.setName(")");
+        if (node.getLemma().equalsIgnoreCase("-LRB-")) {
+            node.setForm("(");
+        } else if (node.getLemma().equalsIgnoreCase("-RRB-")) {
+            node.setForm(")");
         }
 
         // This is due to the inconsistency of stanford parser.
@@ -78,8 +77,7 @@ public class StanfordTreeBuilder {
         }
     }
 
-    public static DTree generate(List<CoreLabel> tokens, Tree tree, Collection<TypedDependency> dependencies) {
-        tree.setSpans();
+    public static DTree generate(List<CoreLabel> tokens, Collection<TypedDependency> dependencies) {
         DTree depTree = new DTree();
 
         for (int i = 0; i < tokens.size(); i++) {
@@ -99,7 +97,7 @@ public class StanfordTreeBuilder {
             DNode parent = depTree.get(sourceIndex);
 
             if (child == null) {
-                LOG.error(parent.getName() + " doesn't have proper child.");
+                LOG.error(parent.getForm() + " doesn't have proper child.");
             } else {
                 // ClearNLP has different possessive handling.
                 if (child.getPOS().equals(LangLib.POS_POS) && !childDEPLabel.equals(LangLib.DEP_POSSESSIVE)) {
@@ -116,7 +114,7 @@ public class StanfordTreeBuilder {
 
         depTree.stream().forEach(node -> {
             if (node.getDepLabel() == null) {
-                if (node.getName().matches("\\p{Punct}+")) { // Attach Punctuation
+                if (node.getForm().matches("\\p{Punct}+")) { // Attach Punctuation
                     DNode rootVerb = depTree.getRoots().stream().findFirst().orElse(null);
                     node.setDepLabel(LangLib.DEP_PUNCT);
                     node.setHead(rootVerb);
@@ -128,7 +126,7 @@ public class StanfordTreeBuilder {
 
             patchTree(node);
             StanfordTreeDirtyPatch.dirtyPatchNER(node);
-//            StanfordTreeDirtyPatch.dirtyPatch(node);
+            //            StanfordTreeDirtyPatch.dirtyPatch(node);
             LangTools.generateName(node);
         });
 
@@ -194,7 +192,7 @@ public class StanfordTreeBuilder {
             if (token.ner().equalsIgnoreCase(LangLib.NE_TIME) || token.ner().equalsIgnoreCase(LangLib.NE_DATE)) {
                 String normalizedTime = token.get(CoreAnnotations.NormalizedNamedEntityTagAnnotation.class);
                 if (normalizedTime != null) {
-                    node.setName(normalizedTime);
+                    node.setLemma(normalizedTime);
                 } else {
                     LOG.warn("Time NamedEntity but doesn't has proper parsed time. " + token.originalText());
                 }

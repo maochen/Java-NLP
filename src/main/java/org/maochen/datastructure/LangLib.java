@@ -20,15 +20,35 @@ package org.maochen.datastructure;
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA  02111-1307 USA
  * <p>
- * POS Tags are derived from Penn POS
- * http://www.ling.upenn.edu/courses/Fall_2003/ling001/penn_treebank_pos.html
- * <p>
- * Dependency Labels are derived from Stanford Typed Dependencies.
- * http://nlp.stanford.edu/software/dependencies_manual.pdf
- * <p>
  * Created by Maochen on 12/8/14.
  */
 public class LangLib {
+    /**
+     * CPOSTAGs are derived from CoNLL-U Format
+     * http://universaldependencies.github.io/docs/format.html
+     */
+    public static final String CPOSTAG_ADJ = "ADJ"; // adjective
+    public static final String CPOSTAG_ADP = "ADP"; // adposition
+    public static final String CPOSTAG_ADV = "ADV"; // adverb
+    public static final String CPOSTAG_AUX = "AUX"; // auxiliary verb
+    public static final String CPOSTAG_CONJ = "CONJ"; // coordinating conjunction
+    public static final String CPOSTAG_DET = "DET"; // determiner
+    public static final String CPOSTAG_INTJ = "INTJ"; // interjection
+    public static final String CPOSTAG_NOUN = "NOUN"; // noun
+    public static final String CPOSTAG_NUM = "NUM"; // numeral
+    public static final String CPOSTAG_PART = "PART"; // particle
+    public static final String CPOSTAG_PRON = "PRON"; // pronoun
+    public static final String CPOSTAG_PROPN = "PROPN"; // proper noun
+    public static final String CPOSTAG_PUNCT = "PUNCT"; // punctuation
+    public static final String CPOSTAG_SCONJ = "SCONJ"; // subordinating conjunction
+    public static final String CPOSTAG_SYM = "SYM"; // symbol
+    public static final String CPOSTAG_VERB = "VERB"; // verb
+    public static final String CPOSTAG_X = "X"; // other
+
+    /**
+     * POS Tags are derived from Penn POS
+     * http://www.ling.upenn.edu/courses/Fall_2003/ling001/penn_treebank_pos.html
+     */
     public static final String POS_CC = "CC"; //Coordinating conjunction
     public static final String POS_CD = "CD"; //Cardinal number
     public static final String POS_DT = "DT"; //Determiner
@@ -80,6 +100,10 @@ public class LangLib {
     public static final String NE_DATE = "DATE";
     public static final String NE_MISC = "MISC";
 
+    /**
+     * Dependency Labels are derived from Stanford Typed Dependencies.
+     * http://nlp.stanford.edu/software/dependencies_manual.pdf
+     */
     public static final String DEP_PASS = "pass"; // passive dependency label
     public static final String DEP_SUBJ = "subj"; // subjects dependency label
     public static final String DEP_ACOMP = "acomp"; // adjectival complements dependency label

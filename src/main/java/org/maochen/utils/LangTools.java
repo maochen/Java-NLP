@@ -26,19 +26,19 @@ public class LangTools {
     public static void generateName(DNode node) {
         // Can't
         if (node.getForm().equalsIgnoreCase("ca") && node.getLemma().equals("can")) {
-            node.setName(node.getLemma());
+            node.setLemma(node.getLemma());
         }
         // I ca/[n't].
         else if (node.getForm().equalsIgnoreCase("n't") && node.getLemma().equals("not") && node.getDepLabel().equals(LangLib.DEP_NEG)) {
-            node.setName(node.getLemma());
+            node.setLemma(node.getLemma());
 
         }
 
         // Resolve 'd
         else if (node.getForm().equalsIgnoreCase("'d") && node.getPOS().equals(LangLib.POS_MD)) {
-            node.setName(node.getLemma());
+            node.setLemma(node.getLemma());
         } else if (contractions.containsKey(node.getForm())) {
-            node.setName(contractions.get(node.getForm()));
+            node.setLemma(contractions.get(node.getForm()));
         }
     }
 }

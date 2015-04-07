@@ -32,9 +32,9 @@ import java.util.stream.Collectors;
 /**
  * Created by Maochen on 12/8/14.
  */
-public class StanfordParser implements IParser {
+public class StanfordPCFGParser implements IParser {
 
-    private static final Logger LOG = LoggerFactory.getLogger(StanfordParser.class);
+    private static final Logger LOG = LoggerFactory.getLogger(StanfordPCFGParser.class);
 
     private LexicalizedParser parser = null;
 
@@ -162,7 +162,7 @@ public class StanfordParser implements IParser {
     private Collection<TypedDependency> getDependencies(Tree tree, boolean makeCopulaVerbHead) {
         SemanticHeadFinder headFinder = new SemanticHeadFinder(!makeCopulaVerbHead); // keep copula verbs as head
         // string -> true return all tokens including punctuations.
-        Collection<TypedDependency> typedDependencies = new EnglishGrammaticalStructure(tree, string -> true, headFinder).typedDependencies();
+        Collection<TypedDependency> typedDependencies = new EnglishGrammaticalStructure(tree, string -> true, headFinder, true).typedDependencies();
         return typedDependencies;
     }
 
@@ -193,7 +193,7 @@ public class StanfordParser implements IParser {
         tagLemma(tokens);
         tagNamedEntity(tokens);
 
-        DTree depTree = StanfordTreeBuilder.generate(tokens, tree, dependencies);
+        DTree depTree = StanfordTreeBuilder.generate(tokens, dependencies);
         return depTree;
     }
 
@@ -221,7 +221,7 @@ public class StanfordParser implements IParser {
             tagLemma(tokens);
 
             Collection<TypedDependency> dependencies = getDependencies(tree, true);
-            DTree depTree = StanfordTreeBuilder.generate(tokens, tree, dependencies);
+            DTree depTree = StanfordTreeBuilder.generate(tokens, dependencies);
             result.put(depTree, tree, scoredTuple.score());
         }
         return result;
@@ -233,11 +233,11 @@ public class StanfordParser implements IParser {
         return tokens.stream().parallel().map(CoreLabel::originalText).collect(Collectors.toList());
     }
 
-    public StanfordParser() {
+    public StanfordPCFGParser() {
         this(StringUtils.EMPTY, true);
     }
 
-    public StanfordParser(String modelPath, boolean initNER) {
+    public StanfordPCFGParser(String modelPath, boolean initNER) {
         loadModel(modelPath);
 
         if (initNER) {
@@ -274,7 +274,7 @@ public class StanfordParser implements IParser {
     }
 
     public static void main(String[] args) {
-        StanfordParser parser = new StanfordParser("", false);
+        StanfordPCFGParser parser = new StanfordPCFGParser("", false);
 
         parser.loadModel("/Users/Maochen/workspace/nlpservice/nlp-service-remote/src/main/resources/classifierData/englishPCFG.ser.gz");
         Scanner scan = new Scanner(System.in);

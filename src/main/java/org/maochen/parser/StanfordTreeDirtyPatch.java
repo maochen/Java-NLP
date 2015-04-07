@@ -14,51 +14,51 @@ import java.util.Map;
 public class StanfordTreeDirtyPatch {
     private static final Map<String, DNode> words = new HashMap<String, DNode>() {{
         DNode locate = new DNode(0, "located", "locate", LangLib.POS_VBD, StringUtils.EMPTY);
-        put(locate.getName(), locate);
+        put(locate.getLemma(), locate);
         DNode working = new DNode(0, "working", "work", LangLib.POS_VBG, StringUtils.EMPTY);
-        put(working.getName(), working);
+        put(working.getLemma(), working);
         DNode to = new DNode(1, "to", "to", LangLib.POS_IN, StringUtils.EMPTY);
-        put(to.getName(), to);
+        put(to.getLemma(), to);
         DNode in = new DNode(2, "in", "in", LangLib.POS_IN, StringUtils.EMPTY);
-        put(in.getName(), in);
+        put(in.getLemma(), in);
         DNode on = new DNode(2, "on", "on", LangLib.POS_IN, StringUtils.EMPTY);
-        put(on.getName(), on);
+        put(on.getLemma(), on);
         DNode blue = new DNode(2, "blue", "blue", LangLib.POS_JJ, StringUtils.EMPTY);
-        put(blue.getName(), blue);
+        put(blue.getLemma(), blue);
         DNode red = new DNode(2, "red", "red", LangLib.POS_JJ, StringUtils.EMPTY);
-        put(red.getName(), red);
+        put(red.getLemma(), red);
         DNode slow = new DNode(2, "slow", "slow", LangLib.POS_JJ, StringUtils.EMPTY);
-        put(slow.getName(), slow);
+        put(slow.getLemma(), slow);
         DNode french = new DNode(3, "french", "french", LangLib.POS_NNP, LangLib.DEP_NSUBJ);
-        put(french.getName(), french);
+        put(french.getLemma(), french);
         DNode insect = new DNode(4, "insect", "insect", LangLib.POS_NN, StringUtils.EMPTY);
-        put(insect.getName(), insect);
+        put(insect.getLemma(), insect);
         DNode username = new DNode(5, "username", "username", LangLib.POS_NN, StringUtils.EMPTY);
-        put(username.getName(), username);
+        put(username.getLemma(), username);
         DNode can = new DNode(6, "can", "can", LangLib.POS_MD, LangLib.DEP_AUX);
-        put(can.getName(), can);
+        put(can.getLemma(), can);
         DNode could = new DNode(6, "could", "can", LangLib.POS_MD, LangLib.DEP_AUX);
-        put(could.getName(), could);
+        put(could.getLemma(), could);
         DNode coulda = new DNode(6, "coulda", "can", LangLib.POS_MD, LangLib.DEP_AUX);
-        put(coulda.getName(), coulda);
+        put(coulda.getLemma(), coulda);
         DNode shall = new DNode(6, "shall", "shall", LangLib.POS_MD, LangLib.DEP_AUX);
-        put(shall.getName(), shall);
+        put(shall.getLemma(), shall);
         DNode should = new DNode(6, "should", "shall", LangLib.POS_MD, LangLib.DEP_AUX);
-        put(should.getName(), should);
+        put(should.getLemma(), should);
         DNode shoulda = new DNode(6, "shoulda", "shall", LangLib.POS_MD, LangLib.DEP_AUX);
-        put(shoulda.getName(), shoulda);
+        put(shoulda.getLemma(), shoulda);
         DNode will = new DNode(6, "will", "will", LangLib.POS_MD, LangLib.DEP_AUX);
-        put(will.getName(), will);
+        put(will.getLemma(), will);
         DNode would = new DNode(6, "would", "will", LangLib.POS_MD, LangLib.DEP_AUX);
-        put(would.getName(), would);
+        put(would.getLemma(), would);
         DNode may = new DNode(6, "may", "may", LangLib.POS_MD, LangLib.DEP_AUX);
-        put(may.getName(), may);
+        put(may.getLemma(), may);
         DNode might = new DNode(6, "might", "may", LangLib.POS_MD, LangLib.DEP_AUX);
-        put(might.getName(), might);
+        put(might.getLemma(), might);
         DNode must = new DNode(6, "must", "must", LangLib.POS_MD, LangLib.DEP_AUX);
-        put(must.getName(), must);
+        put(must.getLemma(), must);
         DNode musta = new DNode(6, "musta", "must", LangLib.POS_MD, LangLib.DEP_AUX);
-        put(musta.getName(), musta);
+        put(musta.getLemma(), musta);
     }};
 
 
@@ -76,18 +76,18 @@ public class StanfordTreeDirtyPatch {
         // PS2: "be simulated", actually the whole tree should start with node instead of "be", cannot fix the dep.
 
         // Dont assign verb that['s] to possessive
-        if (node.getName().equalsIgnoreCase("'s") && !node.getPOS().startsWith(LangLib.POS_VB)) {
+        if (node.getLemma().equalsIgnoreCase("'s") && !node.getPOS().startsWith(LangLib.POS_VB)) {
             node.setPOS(LangLib.POS_POS);
         }
 
         // Inconsistency in VBG and JJ
         // Ex: What is the reason for missing internal account? --> missing can be either JJ or VBG.
-        else if (LangLib.POS_JJ.equals(node.getPOS()) && node.getName().endsWith("ing")) {
+        else if (LangLib.POS_JJ.equals(node.getPOS()) && node.getLemma().endsWith("ing")) {
             node.setPOS(LangLib.POS_VBG);
         }
 
         // Mislabeled VBG as NN.
-        else if (node.getPOS().startsWith(LangLib.POS_NN) && node.getName().endsWith("ing") && node.getDepLabel().equals(LangLib.DEP_ROOT)) {
+        else if (node.getPOS().startsWith(LangLib.POS_NN) && node.getLemma().endsWith("ing") && node.getDepLabel().equals(LangLib.DEP_ROOT)) {
             node.setPOS(LangLib.POS_VBG);
         }
 
@@ -97,13 +97,13 @@ public class StanfordTreeDirtyPatch {
         }
 
         // Fix root spread as verb
-        else if (node.getName().toLowerCase().equals("spread") && node.getPOS().startsWith(LangLib.POS_NN) && node.getDepLabel().equals(LangLib.DEP_ROOT)) {
+        else if (node.getLemma().toLowerCase().equals("spread") && node.getPOS().startsWith(LangLib.POS_NN) && node.getDepLabel().equals(LangLib.DEP_ROOT)) {
             node.setPOS(LangLib.POS_VBD);
         }
 
-        DNode fixedNode = words.get(node.getName().toLowerCase());
+        DNode fixedNode = words.get(node.getLemma().toLowerCase());
         if (fixedNode != null) {
-            if (node.getName().toLowerCase().equals("to")) {
+            if (node.getLemma().toLowerCase().equals("to")) {
                 if (node.getDepLabel().equals(LangLib.DEP_PREP)) {
                     node.setPOS(LangLib.POS_IN);
                 } else {
@@ -112,7 +112,7 @@ public class StanfordTreeDirtyPatch {
             }
 
             // French fix.
-            else if ("french".equalsIgnoreCase(node.getName()) && node.getDepLabel().startsWith(LangLib.DEP_NSUBJ)) {
+            else if ("french".equalsIgnoreCase(node.getLemma()) && node.getDepLabel().startsWith(LangLib.DEP_NSUBJ)) {
                 node.setPOS(LangLib.POS_NNP);
             }
 
@@ -139,8 +139,8 @@ public class StanfordTreeDirtyPatch {
         }
 
         // For aux verb tagged as Noun.
-        if (node.getId() == 1 && auxVerbFix.containsKey(node.getName().toLowerCase())) {
-            node.setPOS(auxVerbFix.get(node.getName().toLowerCase()));
+        if (node.getId() == 1 && auxVerbFix.containsKey(node.getLemma().toLowerCase())) {
+            node.setPOS(auxVerbFix.get(node.getLemma().toLowerCase()));
         }
 
         // hold together -> "together" should be PRT
@@ -159,7 +159,6 @@ public class StanfordTreeDirtyPatch {
             // 5pm. -> (. -> Time)
             if (node.getId() == node.getTree().size() - 1 && LangLib.DEP_PUNCT.equals(node.getDepLabel())) {
                 node.setLemma(node.getForm());
-                node.setName(node.getForm());
                 node.setNamedEntity(StringUtils.EMPTY);
             }
 
