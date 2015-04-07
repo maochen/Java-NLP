@@ -61,11 +61,12 @@ public class DNode {
         depLabel = StringUtils.EMPTY;
     }
 
-    public DNode(int id, String form, String lemma, String pos, String depLabel) {
+    public DNode(int id, String form, String lemma,String cPOSTag, String pos, String depLabel) {
         this();
         this.id = id;
         this.form = form;
         this.lemma = lemma;
+        this.cPOSTag = cPOSTag;
         this.pos = pos;
         this.depLabel = depLabel;
     }

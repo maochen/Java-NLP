@@ -1,4 +1,4 @@
-package org.maochen.parser;
+package org.maochen.parser.stanford.pcfg;
 
 import edu.stanford.nlp.io.ExtensionFileFilter;
 import edu.stanford.nlp.io.NumberRangeFileFilter;
@@ -8,6 +8,7 @@ import edu.stanford.nlp.parser.lexparser.Options;
 import edu.stanford.nlp.trees.*;
 import org.apache.commons.lang3.StringUtils;
 import org.maochen.datastructure.DTree;
+import org.maochen.parser.StanfordTreeBuilder;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -22,7 +23,7 @@ import java.util.Scanner;
  * <p>
  * Created by Maochen on 1/9/15.
  */
-public class StanfordParserTrainer {
+public class StanfordPCFGParserTrainer {
     public static final String wsj = "/Users/Maochen/Desktop/treebank_3/parsed/mrg/wsj/";
     public static final String extra = "/Users/Maochen/Desktop/extra/treebank_extra_data/";
     public static final String taggedFiles = extra + "/train-tech-english";
@@ -81,7 +82,7 @@ public class StanfordParserTrainer {
             x.setOriginalText(x.word());
             x.setLemma(x.word());
         });
-        DTree dtree = StanfordTreeBuilder.generate(tokens, dependencies);
+        DTree dtree = StanfordTreeBuilder.generate(tokens, dependencies, null);
         System.out.println(dtree);
     }
 

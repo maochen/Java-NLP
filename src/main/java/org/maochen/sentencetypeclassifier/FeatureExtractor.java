@@ -6,7 +6,7 @@ import org.maochen.datastructure.DNode;
 import org.maochen.datastructure.DTree;
 import org.maochen.datastructure.LangLib;
 import org.maochen.parser.IParser;
-import org.maochen.parser.StanfordPCFGParser;
+import org.maochen.parser.stanford.pcfg.StanfordPCFGParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

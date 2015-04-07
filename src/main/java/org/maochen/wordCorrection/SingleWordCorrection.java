@@ -2,7 +2,7 @@ package org.maochen.wordcorrection;
 
 import org.apache.commons.lang3.StringUtils;
 import org.maochen.datastructure.DoubleKeyMap;
-import org.maochen.parser.StanfordPCFGParser;
+import org.maochen.parser.stanford.pcfg.StanfordPCFGParser;
 
 import java.io.*;
 import java.util.HashMap;

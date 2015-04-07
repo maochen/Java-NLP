@@ -2,6 +2,7 @@ package org.maochen.parser;
 
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
+import edu.stanford.nlp.ling.Label;
 import edu.stanford.nlp.trees.TypedDependency;
 import org.apache.commons.lang3.StringUtils;
 import org.maochen.datastructure.DNode;
@@ -77,12 +78,14 @@ public class StanfordTreeBuilder {
         }
     }
 
-    public static DTree generate(List<CoreLabel> tokens, Collection<TypedDependency> dependencies) {
+    // cPOSTag is not used here.
+    public static DTree generate(List<CoreLabel> tokens, Collection<TypedDependency> dependencies, List<Label> cPOSTag) {
         DTree depTree = new DTree();
 
         for (int i = 0; i < tokens.size(); i++) {
             CoreLabel token = tokens.get(i);
-            DNode node = new DNode(i + 1, token.originalText(), token.lemma(), token.tag(), StringUtils.EMPTY);
+            String cPOSTagValue = cPOSTag == null ? LangTools.getCPOSTag(token.tag()) : cPOSTag.get(i).value();
+            DNode node = new DNode(i + 1, token.originalText(), token.lemma(), cPOSTagValue, token.tag(), StringUtils.EMPTY);
             depTree.add(node);
             setNamedEntity(node, token);
         }

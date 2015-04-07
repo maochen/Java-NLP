@@ -1,4 +1,4 @@
-package org.maochen.parser;
+package org.maochen.parser.stanford.pcfg;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableSet;
@@ -6,21 +6,21 @@ import com.google.common.collect.Table;
 import edu.stanford.nlp.ie.NERClassifierCombiner;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.ling.HasWord;
+import edu.stanford.nlp.ling.Label;
 import edu.stanford.nlp.ling.TaggedWord;
 import edu.stanford.nlp.parser.common.ParserQuery;
 import edu.stanford.nlp.parser.lexparser.LexicalizedParser;
 import edu.stanford.nlp.process.Morphology;
 import edu.stanford.nlp.process.Tokenizer;
 import edu.stanford.nlp.process.TokenizerFactory;
-import edu.stanford.nlp.trees.EnglishGrammaticalStructure;
-import edu.stanford.nlp.trees.SemanticHeadFinder;
-import edu.stanford.nlp.trees.Tree;
-import edu.stanford.nlp.trees.TypedDependency;
+import edu.stanford.nlp.trees.*;
 import edu.stanford.nlp.util.ScoredObject;
 import org.apache.commons.lang3.StringUtils;
 import org.maochen.datastructure.DNode;
 import org.maochen.datastructure.DTree;
 import org.maochen.datastructure.LangLib;
+import org.maochen.parser.IParser;
+import org.maochen.parser.StanfordTreeBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,56 +52,57 @@ public class StanfordPCFGParser implements IParser {
     // 1. Tokenize
     private List<CoreLabel> stanfordTokenize(String str) {
         TokenizerFactory<? extends HasWord> tf = parser.getOp().tlpParams.treebankLanguagePack().getTokenizerFactory();
+
         // ptb3Escaping=false -> '(' not converted as '-LRB-', Dont use it, it will cause Dependency resolution err.
-        // Tokenizer<? extends HasWord> tokenizer = tf.getTokenizer(new StringReader(str), "ptb3Escaping=false");
+        Tokenizer<? extends HasWord> originalWordTokenizer = tf.getTokenizer(new StringReader(str), "ptb3Escaping=false");
         Tokenizer<? extends HasWord> tokenizer = tf.getTokenizer(new StringReader(str));
-        return (List<CoreLabel>) tokenizer.tokenize();
+
+        List<? extends HasWord> originalTokens = originalWordTokenizer.tokenize();
+        List<? extends HasWord> tokens = tokenizer.tokenize();
+        // Curse you Stanford!
+        List<CoreLabel> coreLabels = new ArrayList<>(tokens.size());
+
+        for (int i = 0; i < tokens.size(); i++) {
+            CoreLabel coreLabel = new CoreLabel();
+            coreLabel.setWord(tokens.get(i).word());
+            coreLabel.setOriginalText(originalTokens.get(i).word());
+            coreLabels.add(coreLabel);
+        }
+
+        return coreLabels;
     }
 
-    // 2. Correct Specific Input
-    private void tagForm(List<CoreLabel> tokens) {
-        Map<String, String> specialChar = new HashMap<String, String>() {
-            {
-                put("-LSB-", "[");
-                put("-RSB-", "]");
-                put("-LRB-", "(");
-                put("-RRB-", ")");
-                put("-LCB-", "{");
-                put("-RCB-", "}");
-                put("``", "\"");
-                put("''", "\"");
-            }
-        };
-
-        tokens.parallelStream().filter(token -> specialChar.containsKey(token.word())).forEach(token -> {
-            String text = specialChar.get(token.word());
-            token.setWord(text);
-            token.setOriginalText(text);
-        });
-    }
-
-    // 3. POS Tagger
+    // 2. POS Tagger
     private void tagPOS(List<CoreLabel> tokens, Tree tree) {
+        List<Label> uposLabels = new ArrayList<>();
         List<TaggedWord> posList = tree.getChild(0).taggedYield();
         for (int i = 0; i < tokens.size(); i++) {
-            String word = tokens.get(i).word();
             String pos = posList.get(i).tag();
-            switch (word) {
-                case "(":
-                    pos = "-LRB-";
-                    break;
-                case ")":
-                    pos = "-RRB-";
-                    break;
-                case "-":
-                    pos = "HYPH";
-                    break;
-            }
             tokens.get(i).setTag(pos);
         }
     }
 
-    // 4. Lemma Tagger
+    // For Lemma
+    private String phrasalVerb(Morphology morpha, String word, String tag) {
+        // must be a verb and contain an underscore
+        assert (word != null);
+        assert (tag != null);
+        if (!tag.startsWith(LangLib.POS_VB) || !word.contains("_")) return null;
+
+        // check whether the last part is a particle
+        String[] verb = word.split("_");
+        if (verb.length != 2) return null;
+        String particle = verb[1];
+        if (particles.contains(particle)) {
+            String base = verb[0];
+            String lemma = morpha.lemma(base, tag);
+            return lemma + '_' + particle;
+        }
+
+        return null;
+    }
+
+    // 3. Lemma Tagger
     private void tagLemma(List<CoreLabel> tokens) {
         // Not sure if this can be static.
         Morphology morpha = new Morphology();
@@ -128,29 +129,9 @@ public class StanfordPCFGParser implements IParser {
         }
     }
 
-    // 5. NER
+    // 4. NER
     private void tagNamedEntity(List<CoreLabel> tokens) {
         ners.stream().forEach(ner -> ner.classify(tokens));
-    }
-
-    // For Lemma
-    private String phrasalVerb(Morphology morpha, String word, String tag) {
-        // must be a verb and contain an underscore
-        assert (word != null);
-        assert (tag != null);
-        if (!tag.startsWith(LangLib.POS_VB) || !word.contains("_")) return null;
-
-        // check whether the last part is a particle
-        String[] verb = word.split("_");
-        if (verb.length != 2) return null;
-        String particle = verb[1];
-        if (particles.contains(particle)) {
-            String base = verb[0];
-            String lemma = morpha.lemma(base, tag);
-            return lemma + '_' + particle;
-        }
-
-        return null;
     }
 
     /**
@@ -190,12 +171,10 @@ public class StanfordPCFGParser implements IParser {
         Tree tree = parser.parse(tokens);
         Collection<TypedDependency> dependencies = getDependencies(tree, true);
 
-        tagForm(tokens);
-        tagPOS(tokens, tree);
         tagLemma(tokens);
         tagNamedEntity(tokens);
 
-        DTree depTree = StanfordTreeBuilder.generate(tokens, dependencies);
+        DTree depTree = StanfordTreeBuilder.generate(tokens, dependencies, null);
         return depTree;
     }
 
@@ -213,7 +192,6 @@ public class StanfordPCFGParser implements IParser {
         pq.parse(tokens);
         List<ScoredObject<Tree>> scoredTrees = pq.getKBestPCFGParses(k);
 
-        tagForm(tokens);
         tagNamedEntity(tokens);
 
         Table<DTree, Tree, Double> result = HashBasedTable.create();
@@ -223,7 +201,7 @@ public class StanfordPCFGParser implements IParser {
             tagLemma(tokens);
 
             Collection<TypedDependency> dependencies = getDependencies(tree, true);
-            DTree depTree = StanfordTreeBuilder.generate(tokens, dependencies);
+            DTree depTree = StanfordTreeBuilder.generate(tokens, dependencies, null);
             result.put(depTree, tree, scoredTuple.score());
         }
         return result;
@@ -231,7 +209,6 @@ public class StanfordPCFGParser implements IParser {
 
     public List<String> tokenize(String sentence) {
         List<CoreLabel> tokens = stanfordTokenize(sentence);
-        tagForm(tokens);
         return tokens.stream().parallel().map(CoreLabel::originalText).collect(Collectors.toList());
     }
 

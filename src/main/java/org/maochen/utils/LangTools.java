@@ -43,6 +43,29 @@ public class LangTools {
         }
     }
 
+    // TODO: WIP.
+    public static String getCPOSTag(String pos) {
+        if (pos.equals(LangLib.POS_NNP) || pos.equals(LangLib.POS_NNPS)) {
+            return LangLib.CPOSTAG_PROPN;
+        } else if (pos.equals(LangLib.POS_NN) || pos.equals(LangLib.POS_NNS)) {
+            return LangLib.CPOSTAG_NOUN;
+        } else if (pos.startsWith(LangLib.POS_JJ)) {
+            return LangLib.CPOSTAG_ADJ;
+        } else if (pos.equals(LangLib.POS_MD)) {
+            return LangLib.CPOSTAG_AUX;
+        } else if (pos.equals(LangLib.POS_CC)) {
+            return LangLib.CPOSTAG_CONJ;
+        } else if (pos.equals(LangLib.POS_IN)) {
+            return LangLib.CPOSTAG_ADP;
+        } else if (pos.equals(LangLib.POS_DT)) {
+            return LangLib.CPOSTAG_DET;
+        } else if (pos.equals(".")) {
+            return LangLib.CPOSTAG_PUNCT;
+        } else {
+            return LangLib.CPOSTAG_X;
+        }
+    }
+
     public static DTree getDTreeFromCoNLLXString(final String input, boolean isLemmaMissing) {
         if (input == null || input.trim().isEmpty()) {
             return null;
@@ -64,8 +87,7 @@ public class LangTools {
             String headIndex = fields[currentIndex++];
             String depLabel = fields[currentIndex];
 
-            DNode node = new DNode(id, form, lemma, pos, depLabel);
-            node.setcPOSTag(cPOSTag);
+            DNode node = new DNode(id, form, lemma, cPOSTag, pos, depLabel);
             node.addFeature("head", headIndex);
             tree.add(node);
         }
