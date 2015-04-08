@@ -8,7 +8,6 @@ import edu.stanford.nlp.parser.lexparser.Options;
 import edu.stanford.nlp.trees.*;
 import org.apache.commons.lang3.StringUtils;
 import org.maochen.datastructure.DTree;
-import org.maochen.parser.StanfordTreeBuilder;
 
 import java.io.File;
 import java.io.FileFilter;

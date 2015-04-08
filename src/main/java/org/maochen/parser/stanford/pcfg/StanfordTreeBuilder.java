@@ -1,4 +1,4 @@
-package org.maochen.parser;
+package org.maochen.parser.stanford.pcfg;
 
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.maochen.datastructure.DNode;
 import org.maochen.datastructure.DTree;
 import org.maochen.datastructure.LangLib;
+import org.maochen.parser.stanford.nn.StanfordNNDepParser;
 import org.maochen.utils.LangTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,8 @@ import java.util.function.Predicate;
  * For the Stanford parse tree.
  * Created by Maochen on 10/28/14.
  */
+
+// Should only be used in PCFG Parser.
 public class StanfordTreeBuilder {
     private static final Logger LOG = LoggerFactory.getLogger(StanfordTreeBuilder.class);
 
@@ -128,7 +131,7 @@ public class StanfordTreeBuilder {
             }
 
             patchTree(node);
-            StanfordTreeDirtyPatch.dirtyPatchNER(node);
+            StanfordNNDepParser.StanfordTreeDirtyPatch.dirtyPatchNER(node);
             //            StanfordTreeDirtyPatch.dirtyPatch(node);
             LangTools.generateName(node);
         });

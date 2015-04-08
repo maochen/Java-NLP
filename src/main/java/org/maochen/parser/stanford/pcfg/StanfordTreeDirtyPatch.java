@@ -1,4 +1,4 @@
-package org.maochen.parser;
+package org.maochen.parser.stanford.pcfg;
 
 import org.apache.commons.lang3.StringUtils;
 import org.maochen.datastructure.DNode;

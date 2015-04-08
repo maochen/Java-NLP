@@ -93,7 +93,7 @@ public class LangTools {
             int currentIndex = 0;
             int id = Integer.parseInt(fields[currentIndex++]);
             String form = fields[currentIndex++];
-            String lemma = isLemmaMissing ? form : fields[currentIndex++];
+            String lemma = isLemmaMissing ? form : fields[currentIndex];
             currentIndex++;
             String cPOSTag = fields[currentIndex++];
             String pos = fields[currentIndex++];
