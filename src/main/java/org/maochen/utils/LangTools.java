@@ -49,17 +49,23 @@ public class LangTools {
             return LangLib.CPOSTAG_PROPN;
         } else if (pos.equals(LangLib.POS_NN) || pos.equals(LangLib.POS_NNS)) {
             return LangLib.CPOSTAG_NOUN;
+        } else if (pos.startsWith(LangLib.POS_VB)) {
+            return LangLib.CPOSTAG_VERB;
         } else if (pos.startsWith(LangLib.POS_JJ)) {
             return LangLib.CPOSTAG_ADJ;
+        } else if (pos.equals(LangLib.POS_IN)) {
+            return LangLib.CPOSTAG_ADP;
+        } else if (pos.startsWith(LangLib.POS_RB) || pos.equals(LangLib.POS_WRB)) {
+            return LangLib.CPOSTAG_ADV;
         } else if (pos.equals(LangLib.POS_MD)) {
             return LangLib.CPOSTAG_AUX;
         } else if (pos.equals(LangLib.POS_CC)) {
             return LangLib.CPOSTAG_CONJ;
-        } else if (pos.equals(LangLib.POS_IN)) {
-            return LangLib.CPOSTAG_ADP;
         } else if (pos.equals(LangLib.POS_DT)) {
             return LangLib.CPOSTAG_DET;
-        } else if (pos.equals(".")) {
+        } else if (pos.equals(LangLib.POS_WRB)) {
+            return LangLib.CPOSTAG_X;
+        } else if (pos.equals(".") || pos.matches("-.*B-")) {
             return LangLib.CPOSTAG_PUNCT;
         } else {
             return LangLib.CPOSTAG_X;

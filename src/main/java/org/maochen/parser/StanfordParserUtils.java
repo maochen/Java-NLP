@@ -32,6 +32,7 @@ public class StanfordParserUtils {
 //        StanfordNNDepParser depParser = new StanfordNNDepParser();
 
         String sentence = "Bill should went over the river and went through the woods.";
+        sentence = "Mary can almost (always) tell when movies use fake dinosaurs and make changes.";
 //                GrammaticalStructure egs = depParser.getGrammaticalStructure(sentence);
 //                System.out.println(egs.typedDependenciesCollapsed());
 
@@ -45,7 +46,7 @@ public class StanfordParserUtils {
         System.out.println(egs.typedDependenciesCCprocessed());
 
         String conllx = EnglishGrammaticalStructure.dependenciesToString(egs, egs.typedDependenciesCCprocessed(), tree, true, true);
-                System.out.println(conllx);
+        System.out.println(conllx);
         DTree dtree = LangTools.getDTreeFromCoNLLXString(conllx, true);
 //        System.out.println(dtree);
     }
