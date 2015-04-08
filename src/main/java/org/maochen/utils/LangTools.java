@@ -43,7 +43,6 @@ public class LangTools {
         }
     }
 
-    // TODO: WIP.
     public static String getCPOSTag(String pos) {
         if (pos.equals(LangLib.POS_NNP) || pos.equals(LangLib.POS_NNPS)) {
             return LangLib.CPOSTAG_PROPN;
@@ -53,7 +52,7 @@ public class LangTools {
             return LangLib.CPOSTAG_VERB;
         } else if (pos.startsWith(LangLib.POS_JJ)) {
             return LangLib.CPOSTAG_ADJ;
-        } else if (pos.equals(LangLib.POS_IN)) {
+        } else if (pos.equals(LangLib.POS_IN) || pos.equals(LangLib.POS_TO)) {
             return LangLib.CPOSTAG_ADP;
         } else if (pos.startsWith(LangLib.POS_RB) || pos.equals(LangLib.POS_WRB)) {
             return LangLib.CPOSTAG_ADV;
@@ -61,13 +60,23 @@ public class LangTools {
             return LangLib.CPOSTAG_AUX;
         } else if (pos.equals(LangLib.POS_CC)) {
             return LangLib.CPOSTAG_CONJ;
-        } else if (pos.equals(LangLib.POS_DT)) {
+        } else if (pos.equals(LangLib.POS_CD)) {
+            return LangLib.CPOSTAG_NUM;
+        } else if (pos.equals(LangLib.POS_DT) || pos.equals(LangLib.POS_WDT)) {
             return LangLib.CPOSTAG_DET;
+        } else if (pos.equals(LangLib.POS_POS)) {
+            return LangLib.CPOSTAG_PART;
+        } else if (pos.startsWith(LangLib.POS_PRP) || pos.startsWith(LangLib.POS_WP)) {
+            return LangLib.CPOSTAG_PRON;
+        } else if (pos.equals(LangLib.POS_UH)) {
+            return LangLib.CPOSTAG_INTJ;
         } else if (pos.equals(LangLib.POS_WRB)) {
             return LangLib.CPOSTAG_X;
+        } else if (pos.equals(LangLib.POS_SYM)) {
+            return LangLib.CPOSTAG_SYM;
         } else if (pos.equals(".") || pos.matches("-.*B-")) {
             return LangLib.CPOSTAG_PUNCT;
-        } else {
+        } else { // FW
             return LangLib.CPOSTAG_X;
         }
     }

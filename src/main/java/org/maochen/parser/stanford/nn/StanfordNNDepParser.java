@@ -12,21 +12,20 @@ import edu.stanford.nlp.process.PTBTokenizer;
 import edu.stanford.nlp.process.Tokenizer;
 import edu.stanford.nlp.process.TokenizerFactory;
 import edu.stanford.nlp.tagger.maxent.MaxentTagger;
-import edu.stanford.nlp.trees.EnglishGrammaticalStructure;
 import edu.stanford.nlp.trees.GrammaticalStructure;
 import edu.stanford.nlp.trees.Tree;
+import edu.stanford.nlp.trees.TreeGraphNode;
 import edu.stanford.nlp.trees.TypedDependency;
+import edu.stanford.nlp.util.Generics;
 import org.maochen.datastructure.DTree;
 import org.maochen.datastructure.LangLib;
 import org.maochen.parser.IParser;
 import org.maochen.parser.StanfordTreeBuilder;
+import org.maochen.utils.LangTools;
 
 import java.io.FileNotFoundException;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by Maochen on 4/6/15.
@@ -129,14 +128,20 @@ public class StanfordNNDepParser implements IParser {
         return gs;
     }
 
-    public String getCoNLLXString(GrammaticalStructure gs, Tree tree) {
-        String conllx = EnglishGrammaticalStructure.dependenciesToString(gs, gs.typedDependencies(), tree, true, true);
-        return conllx;
-    }
-
     // 5. Named Entity Tagger
     private void tagNamedEntity(List<CoreLabel> tokens) {
         ners.stream().forEach(ner -> ner.classify(tokens));
+    }
+
+    @Override
+    public DTree parse(String sentence) {
+        List<CoreLabel> tokenizedSentence = stanfordTokenize(sentence);
+        tagPOS(tokenizedSentence);
+        tagLemma(tokenizedSentence);
+        Collection<TypedDependency> dependencies = tagDependencies(tokenizedSentence).typedDependencies();
+        tagNamedEntity(tokenizedSentence);
+        DTree depTree = StanfordTreeBuilder.generate(tokenizedSentence, dependencies, null);
+        return depTree;
     }
 
     public StanfordNNDepParser() {
@@ -157,15 +162,52 @@ public class StanfordNNDepParser implements IParser {
         }
     }
 
-    @Override
-    public DTree parse(String sentence) {
-        List<CoreLabel> tokenizedSentence = stanfordTokenize(sentence);
-        tagPOS(tokenizedSentence);
-        tagLemma(tokenizedSentence);
-        Collection<TypedDependency> dependencies = tagDependencies(tokenizedSentence).typedDependencies();
-        tagNamedEntity(tokenizedSentence);
-        DTree depTree = StanfordTreeBuilder.generate(tokenizedSentence, dependencies, null);
-        return depTree;
+    public static String getCoNLLXString(GrammaticalStructure gs, List<CoreLabel> coreLabels) {
+        StringBuilder bf = new StringBuilder();
+
+        Map<Integer, Integer> indexToPos = Generics.newHashMap();
+        indexToPos.put(0, 0); // to deal with the special node "ROOT"
+        List<Tree> gsLeaves = gs.root().getLeaves();
+        for (int i = 0; i < gsLeaves.size(); i++) {
+            TreeGraphNode leaf = (TreeGraphNode) gsLeaves.get(i);
+            indexToPos.put(leaf.label().index(), i + 1);
+        }
+
+
+        String[] words = new String[coreLabels.size()];
+        String[] pos = new String[coreLabels.size()];
+        String[] upos = new String[coreLabels.size()];
+
+        String[] relns = new String[coreLabels.size()];
+        int[] govs = new int[coreLabels.size()];
+
+        int index = 0;
+        for (CoreLabel token : coreLabels) {
+            index++;
+            if (!indexToPos.containsKey(index)) {
+                continue;
+            }
+            int depPos = indexToPos.get(index) - 1;
+            words[depPos] = token.word();
+            pos[depPos] = token.tag();
+            upos[depPos] = LangTools.getCPOSTag(pos[depPos]);
+        }
+
+        for (TypedDependency dep : gs.typedDependencies()) {
+            int depPos = indexToPos.get(dep.dep().index()) - 1;
+            govs[depPos] = indexToPos.get(dep.gov().index());
+            relns[depPos] = dep.reln().toString();
+        }
+
+        for (int i = 0; i < relns.length; i++) {
+            if (words[i] == null) {
+                continue;
+            }
+            String out = String.format("%d\t%s\t_\t%s\t%s\t_\t%d\t%s\t_\t_\n", i + 1, words[i], upos[i], pos[i], govs[i], (relns[i] != null ? relns[i] : "erased"));
+            bf.append(out);
+        }
+
+        return bf.toString();
     }
 
     // This is just for debugging.

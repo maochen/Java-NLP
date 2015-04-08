@@ -32,7 +32,8 @@ public class StanfordParserUtils {
 //        StanfordNNDepParser depParser = new StanfordNNDepParser();
 
         String sentence = "Bill should went over the river and went through the woods.";
-        sentence = "Mary can almost (always) tell when movies use fake dinosaurs and make changes.";
+        sentence = "They can almost (always) tell when movies use fake dinosaurs and make changes.";
+        sentence="What a nice day.";
 //                GrammaticalStructure egs = depParser.getGrammaticalStructure(sentence);
 //                System.out.println(egs.typedDependenciesCollapsed());
 
