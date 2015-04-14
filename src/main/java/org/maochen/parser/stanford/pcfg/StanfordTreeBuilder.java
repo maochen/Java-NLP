@@ -8,7 +8,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.maochen.datastructure.DNode;
 import org.maochen.datastructure.DTree;
 import org.maochen.datastructure.LangLib;
-import org.maochen.parser.stanford.nn.StanfordNNDepParser;
 import org.maochen.utils.LangTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -131,7 +130,7 @@ public class StanfordTreeBuilder {
             }
 
             patchTree(node);
-            StanfordNNDepParser.StanfordTreeDirtyPatch.dirtyPatchNER(node);
+            StanfordTreeDirtyPatch.dirtyPatchNER(node);
             //            StanfordTreeDirtyPatch.dirtyPatch(node);
             LangTools.generateName(node);
         });

@@ -85,14 +85,14 @@ public class StanfordPCFGParserTrainer {
         System.out.println(dtree);
     }
 
-    public static String trainPCFGModel() throws IOException {
+    public static String train() throws IOException {
         String modelPath = modelOutputFolder + "/englishPCFG.ser.gz";
         trainEngine(wsj, 1, 2502, extra, ".mrg", 1.0, modelPath, 40, taggedFiles);
         return modelPath;
     }
 
     public static void main(String[] args) throws IOException {
-        String modelPath = trainPCFGModel();
+        String modelPath = train();
         LexicalizedParser parser = LexicalizedParser.loadModel(modelPath, new ArrayList<>());
         Scanner scan = new Scanner(System.in);
         String input = StringUtils.EMPTY;

@@ -74,7 +74,7 @@ public class LangTools {
             return LangLib.CPOSTAG_X;
         } else if (pos.equals(LangLib.POS_SYM)) {
             return LangLib.CPOSTAG_SYM;
-        } else if (pos.equals(".") || pos.matches("-.*B-")) {
+        } else if (pos.equals(".") || pos.equals(",") || pos.matches("-.*B-")) {
             return LangLib.CPOSTAG_PUNCT;
         } else { // FW
             return LangLib.CPOSTAG_X;

@@ -1,55 +1,48 @@
 package org.maochen.parser;
 
-import edu.stanford.nlp.io.NumberRangeFileFilter;
-import edu.stanford.nlp.trees.*;
-import org.maochen.datastructure.DTree;
-import org.maochen.parser.stanford.pcfg.StanfordPCFGParser;
+import edu.stanford.nlp.ling.CoreAnnotations;
+import edu.stanford.nlp.ling.CoreLabel;
+import edu.stanford.nlp.trees.TypedDependency;
+import org.maochen.parser.stanford.nn.StanfordNNDepParser;
 import org.maochen.utils.LangTools;
 
-import java.io.FileFilter;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Maochen on 4/6/15.
  */
 public class StanfordParserUtils {
 
-    public static void generateCoNLLXTree(String trainDirPath, int startRange, int endRange, boolean makeCopulaVerbHead) {
-        DiskTreebank trainTreeBank = new DiskTreebank();
-        FileFilter trainTreeBankFilter = new NumberRangeFileFilter(startRange, endRange, true);
-        trainTreeBank.loadPath(trainDirPath, trainTreeBankFilter);
+    public static String getCoNLLXString(Collection<TypedDependency> deps, List<CoreLabel> tokens) {
+        StringBuilder bf = new StringBuilder();
 
-        SemanticHeadFinder headFinder = new SemanticHeadFinder(!makeCopulaVerbHead); // keep copula verbs as head
-        trainTreeBank.stream().forEach(x -> new EnglishGrammaticalStructure(x, string -> true, headFinder, true));
+        Map<Integer, TypedDependency> indexedDeps = new HashMap<>(deps.size());
+        for (TypedDependency dep : deps) {
+            indexedDeps.put(dep.dep().index(), dep);
+        }
 
+        int idx = 1;
 
-        //                egs.buildCoNLLXGrammaticalStructure(List < List >)
+        if (tokens.get(0).lemma() == null) {
+            StanfordNNDepParser.tagLemma(tokens);
+        }
+
+        for (CoreLabel token : tokens) {
+            String word = token.word();
+            String pos = token.tag();
+            String cPos = (token.get(CoreAnnotations.CoarseTagAnnotation.class) != null) ?
+                    token.get(CoreAnnotations.CoarseTagAnnotation.class) : LangTools.getCPOSTag(pos);
+            String lemma = token.lemma();
+            Integer gov = indexedDeps.containsKey(idx) ? indexedDeps.get(idx).gov().index() : 0;
+            String reln = indexedDeps.containsKey(idx) ? indexedDeps.get(idx).reln().toString() : "erased";
+            String out = String.format("%d\t%s\t%s\t%s\t%s\t_\t%d\t%s\t_\t_\n", idx, word, lemma, cPos, pos, gov, reln);
+            bf.append(out);
+            idx++;
+        }
+        bf.append("\n");
+        return bf.toString();
     }
-
-    public static void main(String[] args) {
-        //        List<String> a = Lists.newArrayList("-treeFile", "/Users/Maochen/Desktop/tree.txt", "−basic", "−keepPunct", "−conllx");
-
-
-//        StanfordNNDepParser depParser = new StanfordNNDepParser();
-
-        String sentence = "Bill should went over the river and went through the woods.";
-        sentence = "They can almost (always) tell when movies use fake dinosaurs and make changes.";
-        sentence="What a nice day.";
-//                GrammaticalStructure egs = depParser.getGrammaticalStructure(sentence);
-//                System.out.println(egs.typedDependenciesCollapsed());
-
-        StanfordPCFGParser pcfgParser = new StanfordPCFGParser("", false);
-        Tree tree = pcfgParser.getLexicalizedParser().parse(sentence);
-
-        SemanticHeadFinder headFinder = new SemanticHeadFinder(false); // keep copula verbs as head
-        // string -> true return all tokens including punctuations.
-        GrammaticalStructure egs = new EnglishGrammaticalStructure(tree, string -> true, headFinder, true);
-
-        System.out.println(egs.typedDependenciesCCprocessed());
-
-        String conllx = EnglishGrammaticalStructure.dependenciesToString(egs, egs.typedDependenciesCCprocessed(), tree, true, true);
-        System.out.println(conllx);
-        DTree dtree = LangTools.getDTreeFromCoNLLXString(conllx, true);
-//        System.out.println(dtree);
-    }
-
 }
