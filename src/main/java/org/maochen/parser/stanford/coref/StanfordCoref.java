@@ -38,7 +38,9 @@ public class StanfordCoref {
             }
             mentions.stream().filter(x -> x.mentionType.equals(Dictionaries.MentionType.PRONOMINAL)).forEach(mention -> {
                 List<CoreLabel> sentence = sentences.get(mention.sentNum - 1).get(CoreAnnotations.TokensAnnotation.class);
-                // Handling plural coreferencing. "They"
+                // XXX: Handling plural coreferencing. "They", seems Stanford Plural doesn't work well. For example of the following, both of three entities are in 3 groups.
+                // List<String> texts = Lists.newArrayList("Tom is nice.", "Mary is hard.", "They are all good.");
+
                 // String replacedName = true ? realEntities.stream().reduce((s1, s2) -> s1 + ", " + s2).get() : realEntities.get(0);
                 sentence.get(mention.startIndex - 1).setWord(realEntities.get(0));
                 // Reset all possible trailing tokens.
