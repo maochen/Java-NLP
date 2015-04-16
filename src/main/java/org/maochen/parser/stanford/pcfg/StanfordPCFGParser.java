@@ -16,12 +16,12 @@ import edu.stanford.nlp.process.TokenizerFactory;
 import edu.stanford.nlp.semgraph.SemanticGraph;
 import edu.stanford.nlp.semgraph.SemanticGraphCoreAnnotations;
 import edu.stanford.nlp.semgraph.SemanticGraphFactory;
+import edu.stanford.nlp.tagger.maxent.MaxentTagger;
 import edu.stanford.nlp.trees.*;
 import edu.stanford.nlp.util.ArrayCoreMap;
 import edu.stanford.nlp.util.CoreMap;
 import edu.stanford.nlp.util.ScoredObject;
 import org.apache.commons.lang3.StringUtils;
-import org.maochen.datastructure.DNode;
 import org.maochen.datastructure.DTree;
 import org.maochen.datastructure.LangLib;
 import org.maochen.parser.IParser;
@@ -44,7 +44,7 @@ public class StanfordPCFGParser implements IParser {
 
     private List<NERClassifierCombiner> ners = new ArrayList<>();
 
-    //    private static MaxentTagger posTagger = new MaxentTagger(System.getProperty("pos.model", MaxentTagger.DEFAULT_JAR_PATH));
+    private static MaxentTagger posTagger = new MaxentTagger(System.getProperty("pos.model", MaxentTagger.DEFAULT_JAR_PATH));
 
     // This is for Lemma Tagger
     private static final Set<String> particles = ImmutableSet.of(
@@ -70,6 +70,7 @@ public class StanfordPCFGParser implements IParser {
             CoreLabel coreLabel = new CoreLabel();
             coreLabel.setWord(tokens.get(i).word());
             coreLabel.setOriginalText(originalTokens.get(i).word());
+            coreLabel.setValue(tokens.get(i).word());
             coreLabels.add(coreLabel);
         }
 
@@ -77,6 +78,16 @@ public class StanfordPCFGParser implements IParser {
     }
 
     // 2. POS Tagger
+    private void tagPOS(List<CoreLabel> tokens) {
+        List<TaggedWord> posList = posTagger.tagSentence(tokens);
+        for (int i = 0; i < tokens.size(); i++) {
+            String pos = posList.get(i).tag();
+            tokens.get(i).setTag(pos);
+        }
+    }
+
+    // This is for the backward compatibility
+    @Deprecated
     private void tagPOS(List<CoreLabel> tokens, Tree tree) {
         List<TaggedWord> posList = tree.getChild(0).taggedYield();
         for (int i = 0; i < tokens.size(); i++) {
@@ -112,10 +123,14 @@ public class StanfordPCFGParser implements IParser {
 
         for (CoreLabel token : tokens) {
             String lemma;
-            if (token.tag().length() > 0) {
-                String phrasalVerb = phrasalVerb(morpha, token.word(), token.tag());
+            String pos = token.tag();
+            if (pos.equals(LangLib.POS_NNPS)){
+                pos = LangLib.POS_NNS;
+            }
+            if (pos.length() > 0) {
+                String phrasalVerb = phrasalVerb(morpha, token.word(), pos);
                 if (phrasalVerb == null) {
-                    lemma = morpha.lemma(token.word(), token.tag());
+                    lemma = morpha.lemma(token.word(), pos);
                 } else {
                     lemma = phrasalVerb;
                 }
@@ -147,39 +162,26 @@ public class StanfordPCFGParser implements IParser {
         SemanticHeadFinder headFinder = new SemanticHeadFinder(!makeCopulaVerbHead); // keep copula verbs as head
         // string -> true return all tokens including punctuations.
         GrammaticalStructure gs = new EnglishGrammaticalStructure(tree, string -> true, headFinder, true);
-        gs.typedDependencies().forEach(x -> {
-            x.gov().setValue(x.gov().word());
-            x.dep().setValue(x.dep().word());
-        });
         return gs;
     }
 
-    public void loadModel(String modelFileLoc) {
-        if (!modelFileLoc.isEmpty()) {
-            parser = LexicalizedParser.loadModel(modelFileLoc, new ArrayList<>());
-        }
-    }
-
-    public LexicalizedParser getLexicalizedParser() {
-        if (parser == null) {
-            LOG.info("Use default PCFG model.");
-            parser = LexicalizedParser.loadModel();
-        }
-
-        return parser;
+    // Exclusive for w2v IR using.
+    public String getLemmaizedSentence(String sentence) {
+        List<CoreLabel> tokens = stanfordTokenize(sentence);
+        tagPOS(tokens);
+        tagLemma(tokens);
+        return tokens.stream().map(CoreLabel::lemma).reduce((l1, l2) -> l1 + StringUtils.SPACE + l2).get();
     }
 
     // This is for coref using.
     public CoreMap parseForCoref(String sentence) {
-        getLexicalizedParser();// Make sure parser get init.
-
         List<CoreLabel> tokens = stanfordTokenize(sentence);
         Tree tree = parser.parse(tokens);
 
-        tagPOS(tokens, tree);
+        tagPOS(tokens);
         tagLemma(tokens);
         tagNamedEntity(tokens);
-        GrammaticalStructure gs = new EnglishGrammaticalStructure(tree, string -> true, new SemanticHeadFinder(), true);
+        GrammaticalStructure gs = new edu.stanford.nlp.trees.EnglishGrammaticalStructure(tree, string -> true, new SemanticHeadFinder(), true);
         gs.typedDependencies().forEach(x -> {
             x.gov().setValue(x.gov().word());
             x.dep().setValue(x.dep().word());
@@ -199,10 +201,14 @@ public class StanfordPCFGParser implements IParser {
         return result;
     }
 
+    public void loadModel(String modelFileLoc) {
+        if (!modelFileLoc.isEmpty()) {
+            parser = LexicalizedParser.loadModel(modelFileLoc, new ArrayList<>());
+        }
+    }
+
     @Override
     public DTree parse(String sentence) {
-        getLexicalizedParser();// Make sure parser get init.
-
         List<CoreLabel> tokens = stanfordTokenize(sentence);
         // Parse right after get through tokenizer.
         Tree tree = parser.parse(tokens);
@@ -255,6 +261,9 @@ public class StanfordPCFGParser implements IParser {
     }
 
     public StanfordPCFGParser(String modelPath, boolean initNER) {
+        if (modelPath == null || modelPath.trim().isEmpty()) {
+            modelPath = "edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz"; // Default PCFG model.
+        }
         loadModel(modelPath);
 
         if (initNER) {
@@ -264,29 +273,6 @@ public class StanfordPCFGParser implements IParser {
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
-        }
-    }
-
-    private static String print(boolean useForRecordErr, DTree tree) {
-        if (useForRecordErr) {
-            StringBuilder builder = new StringBuilder();
-
-            for (DNode node : tree) {
-                if (node.equals(tree.getPaddingNode())) {
-                    continue;
-                }
-                builder.append(node.getId()).append(StringUtils.SPACE);
-                builder.append(node.getForm()).append(StringUtils.SPACE);
-                builder.append(node.getLemma()).append(StringUtils.SPACE);
-                builder.append(node.getPOS()).append(StringUtils.SPACE);
-                builder.append(node.getHead().getId()).append(StringUtils.SPACE);
-                builder.append(node.getDepLabel());
-                builder.append(System.lineSeparator());
-            }
-
-            return builder.toString();
-        } else {
-            return tree.toString();
         }
     }
 
@@ -302,22 +288,20 @@ public class StanfordPCFGParser implements IParser {
             System.out.println("Please enter sentence:");
             input = scan.nextLine();
             if (!input.trim().isEmpty() && !input.matches(quitRegex)) {
-                System.out.println(print(false, parser.parse(input)));
+                //                System.out.println(print(false, parser.parse(input)));
 
 
-                //                Table<DTree, Tree, Double> trees = parser.getKBestParse(input, 3);
-                //
-                //                List<Table.Cell<DTree, Tree, Double>> results = trees.cellSet().parallelStream().collect(Collectors.toList());
-                //                Collections.sort(results, (o1, o2) -> Double.compare(o2.getValue(), o1.getValue()));
-                //                for (Table.Cell<DTree, Tree, Double> entry : results) {
-                //                    System.out.println("--------------------------");
-                //                    System.out.println(entry.getValue());
-                //                    System.out.println(entry.getColumnKey().pennString());
-                //                    System.out.println("");
-                //                    System.out.println(print(false, entry.getRowKey()));
-                //                }
+                Table<DTree, Tree, Double> trees = parser.getKBestParse(input, 3);
 
-
+                List<Table.Cell<DTree, Tree, Double>> results = trees.cellSet().parallelStream().collect(Collectors.toList());
+                Collections.sort(results, (o1, o2) -> Double.compare(o2.getValue(), o1.getValue()));
+                for (Table.Cell<DTree, Tree, Double> entry : results) {
+                    System.out.println("--------------------------");
+                    System.out.println(entry.getValue());
+                    System.out.println(entry.getColumnKey().pennString());
+                    System.out.println("");
+                    System.out.println(entry.getRowKey());
+                }
             }
         }
 

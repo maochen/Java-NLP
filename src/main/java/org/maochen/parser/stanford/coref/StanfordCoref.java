@@ -18,11 +18,11 @@ import java.util.stream.Collectors;
  */
 public class StanfordCoref {
 
-    public StanfordPCFGParser parser = new StanfordPCFGParser();
-    public CorefAnnotator corefAnnotator = new CorefAnnotator();
+    private static CorefAnnotator corefAnnotator = new CorefAnnotator();
+    private static StanfordPCFGParser parser;
 
     public List<String> getCoref(List<String> texts) {
-        List<CoreMap> sentences = texts.stream().map(parser::parseForCoref).collect(Collectors.toList());
+        List<CoreMap> sentences = texts.stream().filter(x -> !x.trim().isEmpty()).map(parser::parseForCoref).collect(Collectors.toList());
 
         // Plural Coref gonna have multiple clusters ...
         Map<Integer, CorefChain> corefChainMap = corefAnnotator.annotate(sentences);
@@ -53,10 +53,15 @@ public class StanfordCoref {
         return sentences.stream().map(sentence -> sentence.get(CoreAnnotations.TokensAnnotation.class).stream().map(CoreLabel::word).reduce((w1, w2) -> w1 + StringUtils.SPACE + w2).get()).collect(Collectors.toList());
     }
 
-    public static void main(String[] args) {
-        StanfordCoref coref = new StanfordCoref();
+    public StanfordCoref(StanfordPCFGParser parser) {
+        StanfordCoref.parser = parser;
+    }
 
-        List<String> texts = Lists.newArrayList("Tom is nice.", "Mary is hard.", "They are all good.");
+    public static void main(String[] args) {
+        StanfordPCFGParser parser = new StanfordPCFGParser();
+        StanfordCoref coref = new StanfordCoref(parser);
+
+        List<String> texts = Lists.newArrayList("Tom is nice.", "He is awesome.");
         coref.getCoref(texts).forEach(System.out::println);
     }
 }
