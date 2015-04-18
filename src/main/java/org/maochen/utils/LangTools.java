@@ -64,7 +64,7 @@ public class LangTools {
             return LangLib.CPOSTAG_NUM;
         } else if (pos.equals(LangLib.POS_DT) || pos.equals(LangLib.POS_WDT)) {
             return LangLib.CPOSTAG_DET;
-        } else if (pos.equals(LangLib.POS_POS)) {
+        } else if (pos.equals(LangLib.POS_POS) || pos.equals(LangLib.POS_RP)) {
             return LangLib.CPOSTAG_PART;
         } else if (pos.startsWith(LangLib.POS_PRP) || pos.startsWith(LangLib.POS_WP)) {
             return LangLib.CPOSTAG_PRON;
