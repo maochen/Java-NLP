@@ -44,7 +44,7 @@ public class StanfordPCFGParser implements IParser {
 
     private List<NERClassifierCombiner> ners = new ArrayList<>();
 
-    private static MaxentTagger posTagger = new MaxentTagger(System.getProperty("pos.model", MaxentTagger.DEFAULT_JAR_PATH));
+    private static MaxentTagger posTagger = null;
 
     // This is for Lemma Tagger
     private static final Set<String> particles = ImmutableSet.of(
@@ -124,7 +124,7 @@ public class StanfordPCFGParser implements IParser {
         for (CoreLabel token : tokens) {
             String lemma;
             String pos = token.tag();
-            if (pos.equals(LangLib.POS_NNPS)){
+            if (pos.equals(LangLib.POS_NNPS)) {
                 pos = LangLib.POS_NNS;
             }
             if (pos.length() > 0) {
@@ -201,9 +201,13 @@ public class StanfordPCFGParser implements IParser {
         return result;
     }
 
-    public void loadModel(String modelFileLoc) {
+    public void loadModel(String modelFileLoc, String posTaggerModel) {
         if (!modelFileLoc.isEmpty()) {
             parser = LexicalizedParser.loadModel(modelFileLoc, new ArrayList<>());
+        }
+
+        if (!posTaggerModel.isEmpty()) {
+            posTagger = new MaxentTagger(posTaggerModel);
         }
     }
 
@@ -214,7 +218,7 @@ public class StanfordPCFGParser implements IParser {
         Tree tree = parser.parse(tokens);
         GrammaticalStructure gs = getDependencies(tree, true);
 
-        tagPOS(tokens, tree);
+        tagPOS(tokens);
         tagLemma(tokens);
         tagNamedEntity(tokens);
 
@@ -241,7 +245,7 @@ public class StanfordPCFGParser implements IParser {
         Table<DTree, Tree, Double> result = HashBasedTable.create();
         for (ScoredObject<Tree> scoredTuple : scoredTrees) {
             Tree tree = scoredTuple.object();
-            tagPOS(tokens, tree);
+            tagPOS(tokens);
             tagLemma(tokens);
 
             GrammaticalStructure gs = getDependencies(tree, true);
@@ -257,14 +261,14 @@ public class StanfordPCFGParser implements IParser {
     }
 
     public StanfordPCFGParser() {
-        this(StringUtils.EMPTY, true);
+        this(StringUtils.EMPTY, StringUtils.EMPTY, true);
     }
 
-    public StanfordPCFGParser(String modelPath, boolean initNER) {
+    public StanfordPCFGParser(String modelPath, String posTaggerModel, boolean initNER) {
         if (modelPath == null || modelPath.trim().isEmpty()) {
             modelPath = "edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz"; // Default PCFG model.
         }
-        loadModel(modelPath);
+        loadModel(modelPath, posTaggerModel);
 
         if (initNER) {
             // STUPID NER, Throw IOException in the constructor ... : (
@@ -277,9 +281,11 @@ public class StanfordPCFGParser implements IParser {
     }
 
     public static void main(String[] args) {
-        StanfordPCFGParser parser = new StanfordPCFGParser("", false);
+        String modelFile = "/Users/Maochen/workspace/nlpservice/nlp-service-remote/src/main/resources/classifierData/englishPCFG.ser.gz";
+        String posTaggerModel = "/Users/Maochen/workspace/nlpservice/nlp-service-remote/src/main/resources/classifierData/english-left3words-distsim.tagger";
 
-        parser.loadModel("/Users/Maochen/workspace/nlpservice/nlp-service-remote/src/main/resources/classifierData/englishPCFG.ser.gz");
+        StanfordPCFGParser parser = new StanfordPCFGParser(modelFile, posTaggerModel, false);
+
         Scanner scan = new Scanner(System.in);
         String input = StringUtils.EMPTY;
 
