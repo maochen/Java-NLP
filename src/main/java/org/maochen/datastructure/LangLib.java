@@ -85,6 +85,7 @@ public class LangLib {
     public static final String POS_WP = "WP"; //Wh-pronoun
     public static final String POS_WPS = "WP$"; //Possessive wh-pronoun
     public static final String POS_WRB = "WRB"; //Wh-adverb
+    public static final String POS_HYPH = "HYPH";// - (This is not in the standard PennPOS, it is from Stanford annotated trees)
 
     /**
      * Named Entity Tags.

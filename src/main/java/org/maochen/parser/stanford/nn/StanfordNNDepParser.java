@@ -172,7 +172,7 @@ public class StanfordNNDepParser implements IParser {
 
     public static void main(String[] args) {
         StanfordNNDepParser parser = new StanfordNNDepParser(DependencyParser.DEFAULT_MODEL, false);
-        String text = "Mary can almost (always) tell when movies use fake dinosaurs and make changes.";
+        String text = "``Are you happy?''";
         System.out.println(parser.parse(text));
     }
 }

@@ -62,7 +62,7 @@ public class LangTools {
             return LangLib.CPOSTAG_CONJ;
         } else if (pos.equals(LangLib.POS_CD)) {
             return LangLib.CPOSTAG_NUM;
-        } else if (pos.equals(LangLib.POS_DT) || pos.equals(LangLib.POS_WDT)) {
+        } else if (pos.equals(LangLib.POS_DT) || pos.equals(LangLib.POS_WDT) || pos.equals(LangLib.POS_PDT) || pos.equals(LangLib.POS_EX)) {
             return LangLib.CPOSTAG_DET;
         } else if (pos.equals(LangLib.POS_POS) || pos.equals(LangLib.POS_RP)) {
             return LangLib.CPOSTAG_PART;
@@ -72,9 +72,9 @@ public class LangTools {
             return LangLib.CPOSTAG_INTJ;
         } else if (pos.equals(LangLib.POS_WRB)) {
             return LangLib.CPOSTAG_X;
-        } else if (pos.equals(LangLib.POS_SYM)) {
+        } else if (pos.equals(LangLib.POS_SYM) || pos.equals("$") || pos.equals("#")) {
             return LangLib.CPOSTAG_SYM;
-        } else if (pos.equals(".") || pos.equals(",") || pos.matches("-.*B-")) {
+        } else if (pos.equals(".") || pos.equals(",") || pos.equals(":") || pos.equals("``") || pos.equals("''") || pos.equals(LangLib.POS_HYPH) || pos.matches("-.*B-")) {
             return LangLib.CPOSTAG_PUNCT;
         } else { // FW
             return LangLib.CPOSTAG_X;
