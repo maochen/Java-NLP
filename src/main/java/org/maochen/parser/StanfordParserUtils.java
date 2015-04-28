@@ -2,10 +2,13 @@ package org.maochen.parser;
 
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
-import edu.stanford.nlp.trees.TypedDependency;
+import edu.stanford.nlp.trees.*;
 import org.maochen.parser.stanford.nn.StanfordNNDepParser;
 import org.maochen.utils.LangTools;
 
+import java.io.FileFilter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -44,5 +47,40 @@ public class StanfordParserUtils {
         }
         bf.append("\n");
         return bf.toString();
+    }
+
+    private static void count(int counter, Treebank trainTreeBank) {
+        counter++;
+        if (counter % 1000 == 0) {
+            System.out.println("Processing " + counter + " of " + trainTreeBank.size());
+        }
+    }
+
+    public static void convertTreebankToCoNLLX(String trainDirPath, FileFilter trainTreeBankFilter, boolean makeCopulaVerbHead, String outputFileName) {
+        int counter = 0;
+        DiskTreebank trainTreeBank = new DiskTreebank();
+        trainTreeBank.loadPath(trainDirPath, trainTreeBankFilter);
+
+        SemanticHeadFinder headFinder = new SemanticHeadFinder(!makeCopulaVerbHead); // keep copula verbs as head
+
+        try {
+            FileWriter fw = new FileWriter(outputFileName);
+
+            trainTreeBank.parallelStream().forEach(tree -> {
+                count(counter, trainTreeBank);
+                Collection<TypedDependency> tdep = new EnglishGrammaticalStructure(tree, string -> true, headFinder, true).typedDependencies();
+                String conllxString = StanfordParserUtils.getCoNLLXString(tdep, tree.taggedLabeledYield());
+                try {
+                    fw.write(conllxString);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+
+            fw.flush();
+            fw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
