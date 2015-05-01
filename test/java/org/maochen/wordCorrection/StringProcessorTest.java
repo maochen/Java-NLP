@@ -30,8 +30,8 @@ public class StringProcessorTest {
 
     @Test
     public void tokenizeTest() {
-        String str = " http://wWw.castor....im!   ";
-        tokenizeEval(str, "http www castor im");
+        String str = " http://wWw.maoChen....org!   ";
+        tokenizeEval(str, "http www maochen org");
     }
 
     @Test
@@ -48,8 +48,6 @@ public class StringProcessorTest {
     @Test
     public void tokenizeTestAppS2() {
         String str = "file('the_adventures_of_sherlock_holmes.txt').read()";
-        tokenizeEval(str, "file big txt read");
-
+        tokenizeEval(str, "file the adventures of sherlock holmes txt read");
     }
-
 }
