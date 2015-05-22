@@ -2,15 +2,13 @@ package org.maochen.utils;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 /**
@@ -22,11 +20,93 @@ public class StopwordsGenerator {
 
     private Map<String, Double> wordCount = new ConcurrentHashMap<>();
 
-    private AtomicInteger docCount = new AtomicInteger(0);
+    private AtomicLong totalCount = new AtomicLong(0);
 
-    public void addCount(String sentence) {
-        sentence = sentence.trim()
-                .replaceAll("\"", StringUtils.EMPTY) // double quotes
+    // This is based on documents/sentences.
+    static class DocumentCount {
+        private static void addCount(String sentence, StopwordsGenerator stopwordsGenerator) {
+            sentence = stopwordsGenerator.stringNormalize(sentence);
+
+            if (sentence.isEmpty()) { // invalid sentence.
+                return;
+            }
+
+            stopwordsGenerator.totalCount.addAndGet(1); // increase the total doc count.
+
+            Set<String> tokens = Arrays.stream(sentence.split("\\s")).parallel().collect(Collectors.toSet());
+
+            tokens.parallelStream().forEach(token -> {
+                Double tokenCount = stopwordsGenerator.wordCount.containsKey(token) ? stopwordsGenerator.wordCount.get(token) : 0.0D;
+                tokenCount++;
+                stopwordsGenerator.wordCount.put(token, tokenCount);
+            });
+        }
+
+
+        public static void generateFromFile(File file, StopwordsGenerator stopwordsGenerator) {
+            try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+                StringBuilder sb = new StringBuilder();
+                String line = br.readLine();
+
+                while (line != null) {
+                    if (line.trim().isEmpty()) {
+                        String[] sentences = sb.toString().split("\\."); // Split sentences.
+                        Arrays.stream(sentences).forEach(s -> DocumentCount.addCount(s, stopwordsGenerator)); // TODO: not parallelled. wordCount will miss. Need investigate
+                        sb.setLength(0);
+                    } else {
+                        sb.append(line);
+                        sb.append(StringUtils.SPACE);
+                    }
+
+                    line = br.readLine();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+    // This is based on single tokens.
+    static class WikiSingleWordCount {
+        public static void generateFromFile(File file, StopwordsGenerator stopwordsGenerator) {
+            int maxThreshold = -1;
+            StringBuilder wordBuilder = new StringBuilder();
+
+            try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+                int c = br.read();
+
+                while (c != -1) {
+                    if (maxThreshold > 0 && stopwordsGenerator.totalCount.get() > maxThreshold) {
+                        break;
+                    }
+
+                    if (c != ' ') {
+                        wordBuilder.append(((char) c));
+                    } else {
+                        String token = stopwordsGenerator.stringNormalize(wordBuilder.toString());
+                        wordBuilder.setLength(0);
+                        Double count = stopwordsGenerator.wordCount.containsKey(token) ? stopwordsGenerator.wordCount.get(token) : 0.0D;
+                        stopwordsGenerator.wordCount.put(token, ++count);
+                        stopwordsGenerator.totalCount.addAndGet(1);
+                        if (stopwordsGenerator.totalCount.get() % 10000000 == 0) {
+                            if (maxThreshold > 0) {
+                                System.out.println("Processed tokens: " + stopwordsGenerator.totalCount.get() / (double) maxThreshold * 100 + "%");
+                            } else {
+                                System.out.println("Processed tokens: " + stopwordsGenerator.totalCount.get());
+                            }
+                        }
+                    }
+                    c = br.read();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public String stringNormalize(String str) {
+        str = str.replaceAll("\"", StringUtils.EMPTY) // double quotes
                 .replaceAll(",", StringUtils.SPACE) // remove ,
                 .replaceAll("\\p{Punct}+$", StringUtils.EMPTY) // remove punct at the end
                 .replaceAll("[?:;!]", StringUtils.EMPTY) // remove char
@@ -37,26 +117,13 @@ public class StopwordsGenerator {
                 .replaceAll("'", StringUtils.SPACE)
                 .replaceAll("\\s+", StringUtils.SPACE) // extra spacer
                 .toLowerCase().trim();
-
-        if (sentence.isEmpty()) { // invalid sentence.
-            return;
-        }
-
-        docCount.addAndGet(1); // increase the total doc count.
-
-        Set<String> tokens = Arrays.stream(sentence.split("\\s")).parallel().collect(Collectors.toSet());
-
-        tokens.parallelStream().forEach(token -> {
-            Double tokenCount = wordCount.containsKey(token) ? wordCount.get(token) : 0.0D;
-            tokenCount++;
-            wordCount.put(token, tokenCount);
-        });
+        return str;
     }
 
     public void normalize() {
         for (String token : wordCount.keySet()) {
             Double count = wordCount.get(token);
-            count /= docCount.doubleValue();
+            count /= totalCount.doubleValue();
             wordCount.put(token, count);
         }
     }
@@ -65,23 +132,19 @@ public class StopwordsGenerator {
         return wordCount;
     }
 
-    public void generateFromFile(File file) {
-        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-            StringBuilder sb = new StringBuilder();
-            String line = br.readLine();
-
-            while (line != null) {
-                if (line.trim().isEmpty()) {
-                    String[] sentences = sb.toString().split("\\."); // Split sentences.
-                    Arrays.stream(sentences).forEach(this::addCount); // TODO: not parallelled. wordCount will miss. Need investigate
-                    sb.setLength(0);
-                } else {
-                    sb.append(line);
-                    sb.append(StringUtils.SPACE);
-                }
-
-                line = br.readLine();
-            }
+    public void writeFile(String fileName, List<Map.Entry<String, Double>> result) {
+        try {
+            File file = new File(fileName);
+            BufferedWriter output = new BufferedWriter(new FileWriter(file));
+            result.stream().forEach(entry -> {
+                        try {
+                            output.write(entry.toString() + System.lineSeparator());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+            );
+            output.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -89,8 +152,8 @@ public class StopwordsGenerator {
 
     // Give args[0] as the root folder (or just single file) that contains all documents.
     public static void main(String[] args) {
-        if (args.length != 1) {
-            System.err.println("Please specify dir or filename");
+        if (args.length != 2) {
+            System.err.println("Please specify dir or filename | output file location");
             return;
         }
 
@@ -99,14 +162,15 @@ public class StopwordsGenerator {
         File file = new File(args[0]);
 
         if (file.isFile()) {
-            g.generateFromFile(file);
+            WikiSingleWordCount.generateFromFile(file, g);
         } else {
             File[] files = file.listFiles();
-            Arrays.stream(files).parallel().filter(File::isFile).forEach(g::generateFromFile);
+            Arrays.stream(files).parallel().filter(File::isFile).forEach(f -> WikiSingleWordCount.generateFromFile(f, g));
         }
 
         g.normalize();
-        g.getProbability().entrySet().stream().sorted((o1, o2) -> o2.getValue().compareTo(o1.getValue())).forEach(System.out::println);
+        List<Map.Entry<String, Double>> result = g.getProbability().entrySet().stream().sorted((o1, o2) -> o2.getValue().compareTo(o1.getValue())).collect(Collectors.toList());
+        g.writeFile(args[1], result);
     }
 
 

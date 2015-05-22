@@ -1,7 +1,6 @@
 package org.maochen.utils;
 
 import java.util.Arrays;
-import java.util.function.BinaryOperator;
 import java.util.stream.IntStream;
 
 /**
@@ -28,9 +27,38 @@ import java.util.stream.IntStream;
  */
 public class VectorUtils {
 
-    public static double[] zip(double[] a, double[] b, BinaryOperator<Double> op) {
-        if (a.length != b.length) throw new IllegalArgumentException("not same length");
-        return IntStream.range(0, a.length).parallel().mapToDouble(i -> op.apply(a[i], b[i])).toArray();
+    public static double[] zip(final double[] vec1, final double[] vec2, BiFunctionDoublePrimitive op) {
+        if (vec1 == null || vec2 == null) return new double[0];
+        if (vec1.length != vec2.length) {
+            throw new IllegalArgumentException("Two Vectors must has equal length.");
+        }
+
+        double[] result = new double[vec1.length];
+        IntStream.range(0, vec1.length).parallel().forEach(i -> result[i] = op.apply(vec1[i], vec2[i]));
+        return result;
+    }
+
+    public static double[] addition(final double[]... vectors) {
+        return Arrays.stream(vectors).reduce((vec1, vec2) -> zip(vec1, vec2, (f1, f2) -> f1 + f2)).orElse(null);
+    }
+
+    private static double dotProduct(final double[] vec1, final double[] vec2) {
+        double[] result = zip(vec1, vec2, (f1, f2) -> f1 * f2);
+        return Arrays.stream(result).parallel().sum();
+    }
+
+    private static double vectorLen(double[] vector) {
+        double len = Arrays.stream(vector).parallel().map(x -> x * x).sum();
+        return Math.sqrt(len);
+    }
+
+    // cos(theta) = A . B / ||A|| ||B||
+    public static double getCosinValue(double[] vector1, double[] vector2) {
+        if (vector1 == null || vector2 == null) return 0;
+        double dotProduct = VectorUtils.dotProduct(vector1, vector2);
+        double euclideanDistance = VectorUtils.vectorLen(vector1) * VectorUtils.vectorLen(vector2);
+        double cosineValue = Math.abs(dotProduct / euclideanDistance);
+        return cosineValue > 1.0D ? 1.0D : cosineValue;  // because of the precision error
     }
 
     public static double[] scale(final double[] a, double scale) {
