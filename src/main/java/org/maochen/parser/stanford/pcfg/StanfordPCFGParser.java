@@ -89,10 +89,14 @@ public class StanfordPCFGParser implements IParser {
     // This is for the backward compatibility
     @Deprecated
     private void tagPOS(List<CoreLabel> tokens, Tree tree) {
-        List<TaggedWord> posList = tree.getChild(0).taggedYield();
-        for (int i = 0; i < tokens.size(); i++) {
-            String pos = posList.get(i).tag();
-            tokens.get(i).setTag(pos);
+        try {
+            List<TaggedWord> posList = tree.getChild(0).taggedYield();
+            for (int i = 0; i < tokens.size(); i++) {
+                String pos = posList.get(i).tag();
+                tokens.get(i).setTag(pos);
+            }
+        } catch (Exception e) {
+            LOG.warn("POS Failed:\n" + tree.pennString());
         }
     }
 
@@ -218,7 +222,7 @@ public class StanfordPCFGParser implements IParser {
         Tree tree = parser.parse(tokens);
         GrammaticalStructure gs = getDependencies(tree, true);
 
-        tagPOS(tokens);
+        tagPOS(tokens, tree);
         tagLemma(tokens);
         tagNamedEntity(tokens);
 
@@ -245,7 +249,7 @@ public class StanfordPCFGParser implements IParser {
         Table<DTree, Tree, Double> result = HashBasedTable.create();
         for (ScoredObject<Tree> scoredTuple : scoredTrees) {
             Tree tree = scoredTuple.object();
-            tagPOS(tokens);
+            tagPOS(tokens, tree);
             tagLemma(tokens);
 
             GrammaticalStructure gs = getDependencies(tree, true);
