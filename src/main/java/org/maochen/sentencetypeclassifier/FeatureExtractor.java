@@ -40,7 +40,6 @@ public class FeatureExtractor {
     Map<String, Integer> triGramDepMap = new HashMap<>();
 
     private void addFeats(StringBuilder builder, String key, Object value, int weight) {
-        //        builder.append(key).append("=").append(value).append(delimiter);
         if ((Boolean) value) {
             for (int i = 0; i < weight; i++) {
                 builder.append(key).append(delimiter);
@@ -60,9 +59,7 @@ public class FeatureExtractor {
                 continue;
             }
             builder.append(currentNode.getDepLabel()).append("_");
-            for (DNode child : currentNode.getChildren()) {
-                q.add(child);
-            }
+            q.addAll(currentNode.getChildren());
         }
 
         builder.append("</DEP>_");
@@ -81,7 +78,7 @@ public class FeatureExtractor {
         // Remove Punct at the end for NGram
         inputWithTag = inputWithTag.replaceAll("\\p{Punct}*$", "");
         inputWithTag = " <sentence> " + inputWithTag + " </sentence> ";
-        inputWithTag = inputWithTag.replaceAll(" ", "_");
+        inputWithTag = inputWithTag.replaceAll("\\s", "_");
         // Bigram
         for (String str : biGramWordMap.keySet()) {
             // Make sure is the whole word match instead of partial word+"_"+partial word.
@@ -176,18 +173,14 @@ public class FeatureExtractor {
 
     public String getFeats(String entry, DTree tree) {
         String[] tokens = entry.split(delimiter);
-        if (tokens.length != 2) return "";
+        if (tokens.length != 2) return StringUtils.EMPTY;
 
-        StringBuilder builder = new StringBuilder();
-        // Sentence
-        builder.append(tokens[0]).append(delimiter);
-        builder.append(generateFeats(tokens[0], tree)).append(delimiter);
-        // Label
-        builder.append(tokens[1]);
-
-        return builder.toString().trim();
+        // token[0] - Sentence
+        // token[1] - Label
+        return (tokens[0] + delimiter + generateFeats(tokens[0], tree) + delimiter + tokens[1]).trim();
     }
 
+    @SuppressWarnings("unchecked")
     private Map<String, Integer> deserialize(String filePath) {
         try {
             File serializedFile = new File(filePath);
@@ -205,7 +198,7 @@ public class FeatureExtractor {
     public FeatureExtractor(String filepathPrefix, String delimiter) {
         this.delimiter = delimiter;
 
-        parser = new StanfordPCFGParser();
+        this.parser = new StanfordPCFGParser();
         this.filepathPrefix = filepathPrefix;
 
         biGramWordMap = deserialize(filepathPrefix + "/bigram_word");

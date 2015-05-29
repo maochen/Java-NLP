@@ -7,6 +7,7 @@ import org.maochen.utils.VectorUtils;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.IntStream;
 
 /**
  * Created by Maochen on 12/10/14.
@@ -18,8 +19,9 @@ public class TupleEventStream implements EventStream {
     @Override
     public Event next() {
         Tuple tuple = dataIter.next();
+        String[] featureName = IntStream.range(0, tuple.featureVector.length).mapToObj(String::valueOf).toArray(String[]::new);
         // Label, feature name, feature value
-        return new Event(tuple.label, VectorUtils.intToString(tuple.featureVectorIndex), VectorUtils.doubleToFloat(tuple.featureVector));
+        return new Event(tuple.label, featureName, VectorUtils.doubleToFloat(tuple.featureVector));
     }
 
     @Override

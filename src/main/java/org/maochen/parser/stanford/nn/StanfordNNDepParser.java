@@ -140,7 +140,7 @@ public class StanfordNNDepParser implements IParser {
         GrammaticalStructure gs = tagDependencies(tokenizedSentence);
         tagNamedEntity(tokenizedSentence);
         String conllXString = StanfordParserUtils.getCoNLLXString(gs.typedDependencies(), tokenizedSentence);
-        DTree depTree = LangTools.getDTreeFromCoNLLXString(conllXString, false);
+        DTree depTree = LangTools.getDTreeFromCoNLLXString(conllXString);
         return depTree;
     }
 
@@ -172,7 +172,7 @@ public class StanfordNNDepParser implements IParser {
 
     public static void main(String[] args) {
         StanfordNNDepParser parser = new StanfordNNDepParser(DependencyParser.DEFAULT_MODEL, false);
-        String text = "``Are you happy?''";
+        String text = "I went to the store and buy a car.";
         System.out.println(parser.parse(text));
     }
 }

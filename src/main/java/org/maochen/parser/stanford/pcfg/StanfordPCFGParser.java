@@ -96,6 +96,7 @@ public class StanfordPCFGParser implements IParser {
                 tokens.get(i).setTag(pos);
             }
         } catch (Exception e) {
+            tagPOS(tokens); // At least gives you something.
             LOG.warn("POS Failed:\n" + tree.pennString());
         }
     }

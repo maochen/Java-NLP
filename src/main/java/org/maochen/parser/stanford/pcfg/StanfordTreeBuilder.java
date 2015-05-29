@@ -25,7 +25,7 @@ import java.util.function.Predicate;
 public class StanfordTreeBuilder {
     private static final Logger LOG = LoggerFactory.getLogger(StanfordTreeBuilder.class);
 
-    // This is because of the difference of the stanford vs clearnlp standards. It is not err.
+    // This is due to the inconsistency of stanford parser.
     private static void patchTree(DNode node) {
         if (node.getLemma().equalsIgnoreCase("-LRB-")) {
             node.setForm("(");
@@ -33,7 +33,6 @@ public class StanfordTreeBuilder {
             node.setForm(")");
         }
 
-        // This is due to the inconsistency of stanford parser.
         if (node.getDepLabel().equals(LangLib.DEP_NUMBER)) {
             node.setDepLabel(LangLib.DEP_NUM);
         }
@@ -130,9 +129,9 @@ public class StanfordTreeBuilder {
             }
 
             patchTree(node);
-            StanfordTreeDirtyPatch.dirtyPatchNER(node);
-            //            StanfordTreeDirtyPatch.dirtyPatch(node);
-            LangTools.generateName(node);
+            // StanfordTreeDirtyPatch.dirtyPatchNER(node);
+            // StanfordTreeDirtyPatch.dirtyPatch(node);
+            LangTools.generateLemma(node);
         });
 
         // Dont put it before dirty patch.

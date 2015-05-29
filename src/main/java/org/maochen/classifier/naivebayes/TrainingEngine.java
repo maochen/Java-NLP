@@ -12,71 +12,67 @@ import java.util.List;
  */
 final class TrainingEngine {
 
-    LabelIndexer labelIndexer;
-    List<Tuple> trainingData;
+    private List<Tuple> trainingData;
 
-    // row=labelSize,col=featureLength
-    double[][] meanVectors;
-    double[][] varianceVectors;
-    int[] count;
-    int vectorLength;
-    int labelSize;
+    private NaiveBayesModel model;
+
+    private int[] count; // sum the training data by label
 
     // Step 1
     public void calculateMean() {
         for (Tuple t : trainingData) {
-            int index = labelIndexer.getIndex(t.label);
+            int index = model.labelIndexer.getIndex(t.label);
             count[index]++;
-            meanVectors[index] = VectorUtils.zip(meanVectors[index], t.featureVector, (x, y) -> x + y);
+            model.meanVectors[index] = VectorUtils.zip(model.meanVectors[index], t.featureVector, (x, y) -> x + y);
         }
 
-        for (int i = 0; i < meanVectors.length; i++) {
+        for (int i = 0; i < model.meanVectors.length; i++) {
             // Get each label and normalize
-            double[] meanVector = meanVectors[i]; // feat(label)
+            double[] meanVector = model.meanVectors[i]; // feat(label)
             meanVector = VectorUtils.scale(meanVector, 1.0 / count[i]);
-            meanVectors[i] = meanVector;
+            model.meanVectors[i] = meanVector;
         }
     }
 
     // Step 2
     public void calculateVariance() {
         for (Tuple t : trainingData) {
-            int index = labelIndexer.getIndex(t.label);
-            double[] diff = VectorUtils.zip(t.featureVector, meanVectors[index], (x, y) -> x - y);
+            int index = model.labelIndexer.getIndex(t.label);
+            double[] diff = VectorUtils.zip(t.featureVector, model.meanVectors[index], (x, y) -> x - y);
             diff = Arrays.stream(diff).map(x -> x * x).toArray();
 
-            double[] varianceVector = VectorUtils.zip(varianceVectors[index], diff, (x, y) -> x + y);
-            varianceVectors[index] = varianceVector;
+            double[] varianceVector = VectorUtils.zip(model.varianceVectors[index], diff, (x, y) -> x + y);
+            model.varianceVectors[index] = varianceVector;
         }
 
-        for (int i = 0; i < varianceVectors.length; i++) {
-            double[] varianceVector = varianceVectors[i];
+        for (int i = 0; i < model.varianceVectors.length; i++) {
+            double[] varianceVector = model.varianceVectors[i];
             // Denominator is Sample Var instead of Population Var
             varianceVector = VectorUtils.scale(varianceVector, 1.0 / (count[i] - 1));
-            varianceVectors[i] = varianceVector;
+            model.varianceVectors[i] = varianceVector;
         }
     }
 
-    public void init(List<Tuple> trainingData, LabelIndexer labelIndexer) {
-        this.labelIndexer = labelIndexer;
-        this.trainingData = trainingData;
-
-        this.trainingData.stream()
-                .filter(tuple -> !labelIndexer.hasLabel(tuple.label))
-                .forEach(tuple -> labelIndexer.putByLabel(tuple.label));
+    public NaiveBayesModel train() {
+        calculateMean();
+        calculateVariance();
+        return model;
     }
 
-    public TrainingEngine(int labelSize, int vectorLength) {
-        this.labelSize = labelSize;
-        this.vectorLength = vectorLength;
-        count = new int[labelSize];
+    public TrainingEngine(List<Tuple> trainingData) {
+        this.trainingData = trainingData;
+        this.model = new NaiveBayesModel();
+        this.model.labelIndexer = new LabelIndexer(trainingData);
 
-        meanVectors = new double[labelSize][vectorLength];
-        varianceVectors = new double[labelSize][vectorLength];
+        int vectorLength = trainingData.stream().findFirst().map(x -> x.featureVector.length).orElse(0);
+        count = new int[model.labelIndexer.getLabelSize()];
 
-        for (int i = 0; i < labelSize; i++) {
-            meanVectors[i] = new double[vectorLength];
-            varianceVectors[i] = new double[vectorLength];
+        model.meanVectors = new double[model.labelIndexer.getLabelSize()][vectorLength];
+        model.varianceVectors = new double[model.labelIndexer.getLabelSize()][vectorLength];
+
+        for (int i = 0; i < model.labelIndexer.getLabelSize(); i++) {
+            model.meanVectors[i] = new double[vectorLength];
+            model.varianceVectors[i] = new double[vectorLength];
         }
     }
 }
