@@ -1,11 +1,11 @@
 package org.maochen.classifier.naivebayes;
 
 import com.google.common.collect.Lists;
-import org.apache.commons.lang3.StringUtils;
 import org.maochen.datastructure.LabelIndexer;
 
 import java.io.*;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -18,34 +18,19 @@ public class NaiveBayesModel {
 
     LabelIndexer labelIndexer;
 
+    Map<Integer, Double> labelPrior;
+
     public void persist(String filename) {
         try (BufferedWriter output = new BufferedWriter(new FileWriter(new File(filename)))) {
-            output.write(meanVectors.length + StringUtils.SPACE + meanVectors[0].length);
+            output.write(ModelSerializeUtils.arraySerialize(meanVectors));
             output.write(System.lineSeparator());
-            for (int row = 0; row < meanVectors.length; row++) {
-                StringBuilder builder = new StringBuilder();
-                for (int col = 0; col < meanVectors[row].length; col++) {
-                    builder.append(meanVectors[row][col]).append(StringUtils.SPACE);
-                }
-                output.write(builder.toString().trim() + System.lineSeparator());
-            }
+            output.write(ModelSerializeUtils.arraySerialize(varianceVectors));
             output.write(System.lineSeparator());
 
-            output.write(varianceVectors.length + StringUtils.SPACE + varianceVectors[0].length);
-            output.write(System.lineSeparator());
-            for (int row = 0; row < varianceVectors.length; row++) {
-                StringBuilder builder = new StringBuilder();
-                for (int col = 0; col < varianceVectors[row].length; col++) {
-                    builder.append(varianceVectors[row][col]).append(StringUtils.SPACE);
-                }
-                output.write(builder.toString().trim() + System.lineSeparator());
-            }
+            output.write(ModelSerializeUtils.mapSerialize(labelIndexer.labelIndexer.entrySet()));
             output.write(System.lineSeparator());
 
-            for (Map.Entry<String, Integer> entry : labelIndexer.labelIndexer.entrySet()) {
-                output.write(entry.getKey() + StringUtils.SPACE + entry.getValue() + System.lineSeparator());
-            }
-
+            output.write(ModelSerializeUtils.mapSerialize(labelPrior.entrySet()));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -54,6 +39,7 @@ public class NaiveBayesModel {
 
     public void load(String filename) {
         labelIndexer = new LabelIndexer(Lists.newArrayList());
+        labelPrior = new HashMap<>();
 
         try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
             String line;
@@ -87,8 +73,10 @@ public class NaiveBayesModel {
                         varianceVectors[row] = Arrays.stream(values).map(Double::parseDouble).mapToDouble(x -> x).toArray();
                         row++;
                     }
-                } else {
+                } else if (newItemCount == 2) {
                     labelIndexer.labelIndexer.put(line.split("\\s")[0], Integer.parseInt(line.split("\\s")[1]));
+                } else if (newItemCount == 3) {
+                    labelPrior.put(Integer.parseInt(line.split("\\s")[0]), Double.parseDouble(line.split("\\s")[1]));
                 }
 
             }

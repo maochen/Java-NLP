@@ -32,7 +32,7 @@ public class NaiveBayesClassifier implements IClassifier {
     public Map<String, Double> predict(Tuple predict) {
         Map<Integer, Double> labelProb = new HashMap<>();
 
-        // P(male) -- P(C)
+        // TODO: P(male) -- P(C), this should be in model
         model.labelIndexer.getIndexSet().stream().forEach(index -> labelProb.put(index, 0.5)); // This is prior
 
         for (Integer labelIndex : model.labelIndexer.getIndexSet()) {
@@ -167,8 +167,26 @@ public class NaiveBayesClassifier implements IClassifier {
 
         NaiveBayesClassifier nbc = new NaiveBayesClassifier();
         List<Tuple> trainingData = readTrainingData(folder + "/training.all.nb.txt.aligned", "\\s");
-        nbc.train(trainingData);
-        nbc.persistModel(outputModelFolder + "/nb_model.dat");
+//        nbc.train(trainingData);
+//        nbc.persistModel(outputModelFolder + "/nb_model.dat");
+
+
+        nbc.loadModel(outputModelFolder+"/nb_model.dat");
+        Scanner scan = new Scanner(System.in);
+        String input = StringUtils.EMPTY;
+
+        String quitRegex = "q|quit|exit";
+        while (!input.matches(quitRegex)) {
+            System.out.println("Please enter feats:");
+            input = scan.nextLine();
+            if (!input.trim().isEmpty() && !input.matches(quitRegex)) {
+                double[] feats = Arrays.stream(input.split("\\s")).mapToDouble(Double::parseDouble).toArray();
+                Map<String, Double> results = nbc.predict(new Tuple(feats));
+                System.out.println(results);
+            }
+        }
+
+
     }
 
     //    public static void main(String[] args) {

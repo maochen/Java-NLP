@@ -5,6 +5,7 @@ import org.maochen.datastructure.Tuple;
 import org.maochen.utils.VectorUtils;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -19,7 +20,7 @@ final class TrainingEngine {
     private int[] count; // sum the training data by label
 
     // Step 1
-    public void calculateMean() {
+    private void calculateMean() {
         for (Tuple t : trainingData) {
             int index = model.labelIndexer.getIndex(t.label);
             count[index]++;
@@ -35,7 +36,7 @@ final class TrainingEngine {
     }
 
     // Step 2
-    public void calculateVariance() {
+    private void calculateVariance() {
         for (Tuple t : trainingData) {
             int index = model.labelIndexer.getIndex(t.label);
             double[] diff = VectorUtils.zip(t.featureVector, model.meanVectors[index], (x, y) -> x - y);
@@ -53,9 +54,17 @@ final class TrainingEngine {
         }
     }
 
+    // Step 3
+    // Assume labels have equal probability. Not depends on the training data size.
+    public void calculateLabelPrior() {
+        double prior = 1D / model.labelIndexer.getLabelSize();
+        model.labelIndexer.getIndexSet().forEach(labelIndex -> model.labelPrior.put(labelIndex, prior));
+    }
+
     public NaiveBayesModel train() {
         calculateMean();
         calculateVariance();
+        calculateLabelPrior();
         return model;
     }
 
@@ -69,6 +78,7 @@ final class TrainingEngine {
 
         model.meanVectors = new double[model.labelIndexer.getLabelSize()][vectorLength];
         model.varianceVectors = new double[model.labelIndexer.getLabelSize()][vectorLength];
+        model.labelPrior = new HashMap<>();
 
         for (int i = 0; i < model.labelIndexer.getLabelSize(); i++) {
             model.meanVectors[i] = new double[vectorLength];
