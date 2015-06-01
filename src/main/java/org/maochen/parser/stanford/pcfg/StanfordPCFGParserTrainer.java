@@ -91,6 +91,13 @@ public class StanfordPCFGParserTrainer {
         return modelPath;
     }
 
+    public static void verify(String sentence, String constituentTree) {
+        Treebank tree = new MemoryTreebank();
+        tree.add(Tree.valueOf(constituentTree));
+        LexicalizedParser newParser = LexicalizedParser.getParserFromTreebank(tree, null, 0, null, new Options(), null, null);
+        printParseTree(newParser, sentence);
+    }
+
     public static void main(String[] args) throws IOException {
         String modelPath = train();
         LexicalizedParser parser = LexicalizedParser.loadModel(modelPath, new ArrayList<>());
@@ -105,6 +112,22 @@ public class StanfordPCFGParserTrainer {
             }
         }
 
+    }
+
+    // This is for verify
+    public static void main1(String[] args) {
+        String tree = "( (S\n"
+                + "    (VP (VB Ask)\n"
+                + "        (NP (DT the) (NN user))\n"
+                + "        (SBAR\n"
+                + "          (WHNP (WP what))\n"
+                + "          (S\n"
+                + "            (NP\n"
+                + "              (NP (DT the) (NN user) (POS 's))\n"
+                + "              (NN invoice) (NN number))\n"
+                + "            (VP (VBZ is)))))\n"
+                + "    (. .)))";
+        verify("Ask the user what the user's invoice number is.", tree);
     }
 
 }

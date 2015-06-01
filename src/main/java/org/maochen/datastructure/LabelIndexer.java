@@ -15,7 +15,7 @@ import java.util.stream.IntStream;
  */
 public class LabelIndexer {
     // They are pairs
-    private BiMap<String, Integer> labelIndexer = HashBiMap.create();
+    public BiMap<String, Integer> labelIndexer = HashBiMap.create();
 
     public int getIndex(String label) {
         return labelIndexer.get(label);
