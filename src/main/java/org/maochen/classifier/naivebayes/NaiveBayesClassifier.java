@@ -31,10 +31,6 @@ public class NaiveBayesClassifier implements IClassifier {
     @Override
     public Map<String, Double> predict(Tuple predict) {
         Map<Integer, Double> labelProb = new HashMap<>();
-
-        // TODO: P(male) -- P(C), this should be in model
-        model.labelIndexer.getIndexSet().stream().forEach(index -> labelProb.put(index, 0.5)); // This is prior
-
         for (Integer labelIndex : model.labelIndexer.getIndexSet()) {
             double likelihood = 1.0D;
 
@@ -43,7 +39,7 @@ public class NaiveBayesClassifier implements IClassifier {
                 likelihood = likelihood * VectorUtils.gaussianPDF(model.meanVectors[labelIndex][i], model.varianceVectors[labelIndex][i], fi);
             }
 
-            double posterior = labelProb.get(labelIndex) * likelihood; // prior*likelihood, This is numerator of posterior
+            double posterior = model.labelPrior.get(labelIndex) * likelihood; // prior*likelihood, This is numerator of posterior
             labelProb.put(labelIndex, posterior);
         }
 
@@ -54,9 +50,7 @@ public class NaiveBayesClassifier implements IClassifier {
         }
 
         labelProb.entrySet().forEach(entry -> {
-            double posterior = entry.getValue() / evidence;
-            labelProb.put(entry.getKey(), posterior);
-
+            labelProb.put(entry.getKey(), entry.getValue() / evidence);
         }); // This is denominator of posterior
 
         Map<String, Double> result = model.labelIndexer.convertMapKey(labelProb);
@@ -160,18 +154,18 @@ public class NaiveBayesClassifier implements IClassifier {
         writeToFile(wrongData, originalTrainingDataFile + ".wrong");
     }
 
-    public static void main(String[] args) {
+    public static void main1(String[] args) {
         String folder = "/Users/Maochen/Desktop/w2v_weight_training/";
         String outputModelFolder = "/Users/Maochen/workspace/amelia/eliza-ir/src/main/resources/";
         //        splitData(folder + "training.all.nb.txt");
 
         NaiveBayesClassifier nbc = new NaiveBayesClassifier();
         List<Tuple> trainingData = readTrainingData(folder + "/training.all.nb.txt.aligned", "\\s");
-//        nbc.train(trainingData);
-//        nbc.persistModel(outputModelFolder + "/nb_model.dat");
+        //        nbc.train(trainingData);
+        //        nbc.persistModel(outputModelFolder + "/nb_model.dat");
 
 
-        nbc.loadModel(outputModelFolder+"/nb_model.dat");
+        nbc.loadModel(outputModelFolder + "/nb_model.dat");
         Scanner scan = new Scanner(System.in);
         String input = StringUtils.EMPTY;
 
@@ -189,36 +183,36 @@ public class NaiveBayesClassifier implements IClassifier {
 
     }
 
-    //    public static void main(String[] args) {
-    //        IClassifier nbc = new NaiveBayesClassifier();
-    //
-    //        List<Tuple> trainingData;
-    //
-    //        trainingData = new ArrayList<>();
-    //        trainingData.add(new Tuple(1, new double[]{6, 180, 12}, "male"));
-    //        trainingData.add(new Tuple(2, new double[]{5.92, 190, 11}, "male"));
-    //        trainingData.add(new Tuple(3, new double[]{5.58, 170, 12}, "male"));
-    //        trainingData.add(new Tuple(4, new double[]{5.92, 165, 10}, "male"));
-    //        trainingData.add(new Tuple(5, new double[]{5, 100, 6}, "female"));
-    //        trainingData.add(new Tuple(6, new double[]{5.5, 150, 8}, "female"));
-    //        trainingData.add(new Tuple(7, new double[]{5.42, 130, 7}, "female"));
-    //        trainingData.add(new Tuple(8, new double[]{5.75, 150, 9}, "female"));
-    //
-    //        Tuple predict = new Tuple(new double[]{6, 130, 8});
-    //
-    //        nbc.train(trainingData);
-    //        Map<String, Double> probs = nbc.predict(predict);
-    //
-    //
-    //        // male: 6.197071843878083E-9;
-    //        // female: 5.377909183630024E-4;
-    //
-    //        List<Entry<String, Double>> result = new ArrayList<>(); // Just for ordered display.
-    //        Comparator<Entry<String, Double>> reverseCmp = Collections.reverseOrder(Comparator.comparing(Entry::getValue));
-    //        probs.entrySet().stream().sorted(reverseCmp).forEach(result::add);
-    //
-    //        System.out.println("Result: " + predict);
-    //        result.forEach(e -> System.out.println(e.getKey() + "\t:\t" + e.getValue()));
-    //    }
+    public static void main(String[] args) {
+        IClassifier nbc = new NaiveBayesClassifier();
+
+        List<Tuple> trainingData;
+
+        trainingData = new ArrayList<>();
+        trainingData.add(new Tuple(1, new double[]{6, 180, 12}, "male"));
+        trainingData.add(new Tuple(2, new double[]{5.92, 190, 11}, "male"));
+        trainingData.add(new Tuple(3, new double[]{5.58, 170, 12}, "male"));
+        trainingData.add(new Tuple(4, new double[]{5.92, 165, 10}, "male"));
+        trainingData.add(new Tuple(5, new double[]{5, 100, 6}, "female"));
+        trainingData.add(new Tuple(6, new double[]{5.5, 150, 8}, "female"));
+        trainingData.add(new Tuple(7, new double[]{5.42, 130, 7}, "female"));
+        trainingData.add(new Tuple(8, new double[]{5.75, 150, 9}, "female"));
+
+        Tuple predict = new Tuple(new double[]{6, 130, 8});
+
+        nbc.train(trainingData);
+        Map<String, Double> probs = nbc.predict(predict);
+
+
+        // male: 6.197071843878083E-9;
+        // female: 5.377909183630024E-4;
+
+        List<Entry<String, Double>> result = new ArrayList<>(); // Just for ordered display.
+        Comparator<Entry<String, Double>> reverseCmp = Collections.reverseOrder(Comparator.comparing(Entry::getValue));
+        probs.entrySet().stream().sorted(reverseCmp).forEach(result::add);
+
+        System.out.println("Result: " + predict);
+        result.forEach(e -> System.out.println(e.getKey() + "\t:\t" + e.getValue()));
+    }
 
 }
