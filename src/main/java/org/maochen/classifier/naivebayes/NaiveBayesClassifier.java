@@ -143,9 +143,19 @@ public class NaiveBayesClassifier implements IClassifier {
             while (trainingDataIter.hasNext()) {
                 Tuple t = trainingDataIter.next();
                 String actual = nbc.predictLabel(t);
-                if (!t.label.equals(actual)) {
+                if (!t.label.equals(actual) && !t.label.equals("1")) { // preserve 1 since too few.
                     wrongData.add(t);
                     trainingDataIter.remove();
+                }
+            }
+
+            Iterator<Tuple> wrongDataIter = wrongData.iterator();
+            while (wrongDataIter.hasNext()) {
+                Tuple t = wrongDataIter.next();
+                String actual = nbc.predictLabel(t);
+                if (t.label.equals(actual)) {
+                    trainingData.add(t);
+                    wrongDataIter.remove();
                 }
             }
         } while (trainingData.size() != lastTrainingDataSize);
@@ -154,15 +164,16 @@ public class NaiveBayesClassifier implements IClassifier {
         writeToFile(wrongData, originalTrainingDataFile + ".wrong");
     }
 
-    public static void main1(String[] args) {
+    public static void main(String[] args) {
         String folder = "/Users/Maochen/Desktop/w2v_weight_training/";
         String outputModelFolder = "/Users/Maochen/workspace/amelia/eliza-ir/src/main/resources/";
-        //        splitData(folder + "training.all.nb.txt");
+//        splitData(folder + "training.all.txt");
+
 
         NaiveBayesClassifier nbc = new NaiveBayesClassifier();
-        List<Tuple> trainingData = readTrainingData(folder + "/training.all.nb.txt.aligned", "\\s");
-        //        nbc.train(trainingData);
-        //        nbc.persistModel(outputModelFolder + "/nb_model.dat");
+        List<Tuple> trainingData = readTrainingData(folder + "/training.all.txt.aligned", "\\s");
+        nbc.train(trainingData);
+        nbc.persistModel(outputModelFolder + "/nb_model.dat");
 
 
         nbc.loadModel(outputModelFolder + "/nb_model.dat");
@@ -183,7 +194,7 @@ public class NaiveBayesClassifier implements IClassifier {
 
     }
 
-    public static void main(String[] args) {
+    public static void main1(String[] args) {
         IClassifier nbc = new NaiveBayesClassifier();
 
         List<Tuple> trainingData;
