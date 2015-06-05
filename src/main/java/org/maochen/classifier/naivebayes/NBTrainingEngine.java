@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Created by Maochen on 12/3/14.
  */
-final class TrainingEngine {
+final class NBTrainingEngine {
 
     private List<Tuple> trainingData;
 
@@ -68,7 +68,7 @@ final class TrainingEngine {
         return model;
     }
 
-    public TrainingEngine(List<Tuple> trainingData) {
+    public NBTrainingEngine(List<Tuple> trainingData) {
         this.trainingData = trainingData;
         this.model = new NaiveBayesModel();
         this.model.labelIndexer = new LabelIndexer(trainingData);

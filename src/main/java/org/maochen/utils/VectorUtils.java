@@ -42,7 +42,7 @@ public class VectorUtils {
         return Arrays.stream(vectors).reduce((vec1, vec2) -> zip(vec1, vec2, (f1, f2) -> f1 + f2)).orElse(null);
     }
 
-    private static double dotProduct(final double[] vec1, final double[] vec2) {
+    public static double dotProduct(final double[] vec1, final double[] vec2) {
         double[] result = zip(vec1, vec2, (f1, f2) -> f1 * f2);
         return Arrays.stream(result).parallel().sum();
     }

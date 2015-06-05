@@ -68,7 +68,7 @@ public class NaiveBayesClassifier implements IClassifier {
 
     @Override
     public IClassifier train(List<Tuple> trainingData) {
-        model = new TrainingEngine(trainingData).train();
+        model = new NBTrainingEngine(trainingData).train();
         return this;
     }
 
