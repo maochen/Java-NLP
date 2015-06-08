@@ -4,9 +4,8 @@ import org.maochen.datastructure.DNode;
 import org.maochen.datastructure.DTree;
 import org.maochen.datastructure.LangLib;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by Maochen on 12/10/14.
@@ -72,6 +71,9 @@ public class LangTools {
         }
     }
 
+    /**
+     * feats string should following the pattern "k1=v1|k2=v2|k3=v3"
+     */
     public static DTree getDTreeFromCoNLLXString(final String input) {
         if (input == null || input.trim().isEmpty()) {
             return null;
@@ -89,12 +91,19 @@ public class LangTools {
                     String lemma = fields[currentIndex++];
                     String cPOSTag = fields[currentIndex++];
                     String pos = fields[currentIndex++];
-                    currentIndex++;
+                    String feats = fields[currentIndex++];
+                    Map<String, String> featsMap = null;
+                    if (!feats.equals("_")) {
+                        featsMap = Arrays.stream(feats.split("\\|"))
+                                .map(entry -> entry.split("="))
+                                .collect(Collectors.toMap(e -> e[0], e -> e.length > 1 ? e[1] : null));
+                    }
 
                     String headIndex = fields[currentIndex++];
                     String depLabel = fields[currentIndex];
 
                     DNode node = new DNode(id, form, lemma, cPOSTag, pos, depLabel);
+                    node.setFeats(featsMap);
                     node.addFeature("head", headIndex); // by the time head might not be generated!
                     tree.add(node);
                 });

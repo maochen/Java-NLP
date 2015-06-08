@@ -151,6 +151,12 @@ public class DNode {
         feats.remove(key);
     }
 
+    public void setFeats(Map<String, String> feats) {
+        if (feats != null) {
+            this.feats = feats;
+        }
+    }
+
     public List<DNode> getChildrenByDepLabels(final String... labels) {
         return children.values().stream().parallel().filter(x -> Arrays.asList(labels).contains(x.getDepLabel())).collect(Collectors.toList());
     }
@@ -194,24 +200,16 @@ public class DNode {
         builder.append(lemma).append("\t");
 
         // For now, cPOSTag is not differentiate with the POS.
-        if (cPOSTag.isEmpty()) {
-            builder.append(pos).append("\t");
-        } else {
-            builder.append(cPOSTag).append("\t");
-        }
+        String cPOSTagString = cPOSTag.isEmpty() ? pos : cPOSTag;
+        builder.append(cPOSTagString).append("\t");
 
         builder.append(pos).append("\t");
-        if (feats.isEmpty()) {
-            builder.append("_").append("\t");
-        } else {
-            builder.append(feats).append("\t");
-        }
 
-        if (head != null) {
-            builder.append(head.id).append("\t");
-        } else {
-            builder.append("NULL").append("\t");
-        }
+        String featsString = feats.entrySet().stream().map(e -> e.getKey() + "=" + e.getValue()).reduce((s1, s2) -> s1 + "|" + s2).orElse("_");
+        builder.append(featsString).append("\t");
+
+        String headString = head == null ? "NULL" : String.valueOf(head.id);
+        builder.append(headString).append("\t");
 
         builder.append(depLabel).append("\t");
 
