@@ -61,7 +61,7 @@ public class StanfordCoref {
         StanfordPCFGParser parser = new StanfordPCFGParser();
         StanfordCoref coref = new StanfordCoref(parser);
 
-        List<String> texts = Lists.newArrayList("Tom is nice.", "He is awesome.");
+        List<String> texts = Lists.newArrayList("Tom is nice.", "Mary is cool.", "They are awesome.");
         coref.getCoref(texts).forEach(System.out::println);
     }
 }

@@ -211,9 +211,10 @@ public class StanfordPCFGParser implements IParser {
             parser = LexicalizedParser.loadModel(modelFileLoc, new ArrayList<>());
         }
 
-        if (!posTaggerModel.isEmpty()) {
-            posTagger = new MaxentTagger(posTaggerModel);
+        if (posTaggerModel.isEmpty()) {
+            posTaggerModel = "edu/stanford/nlp/models/pos-tagger/english-left3words/english-left3words-distsim.tagger";
         }
+        posTagger = new MaxentTagger(posTaggerModel);
     }
 
     @Override
@@ -287,7 +288,6 @@ public class StanfordPCFGParser implements IParser {
 
     public static void main(String[] args) {
         String modelFile = "/Users/Maochen/workspace/nlpservice/nlp-service-remote/src/main/resources/classifierData/englishPCFG.ser.gz";
-        // "edu/stanford/nlp/models/pos-tagger/english-left3words/english-left3words-distsim.tagger";
         String posTaggerModel = "/Users/Maochen/workspace/nlpservice/nlp-service-remote/src/main/resources/classifierData/english-left3words-distsim.tagger";
         StanfordPCFGParser parser = new StanfordPCFGParser(modelFile, posTaggerModel, false);
 
