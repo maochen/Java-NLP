@@ -1,6 +1,7 @@
 package org.maochen.classifier.naivebayes;
 
 import com.google.common.collect.Lists;
+import org.maochen.classifier.ModelSerializeUtils;
 import org.maochen.datastructure.LabelIndexer;
 
 import java.io.*;
@@ -22,9 +23,9 @@ public class NaiveBayesModel {
 
     public void persist(String filename) {
         try (BufferedWriter output = new BufferedWriter(new FileWriter(new File(filename)))) {
-            output.write(ModelSerializeUtils.arraySerialize(meanVectors));
+            output.write(ModelSerializeUtils.twoDimensionalArraySerialize(meanVectors));
             output.write(System.lineSeparator());
-            output.write(ModelSerializeUtils.arraySerialize(varianceVectors));
+            output.write(ModelSerializeUtils.twoDimensionalArraySerialize(varianceVectors));
             output.write(System.lineSeparator());
 
             output.write(ModelSerializeUtils.mapSerialize(labelIndexer.labelIndexer.entrySet()));

@@ -1,4 +1,4 @@
-package org.maochen.classifier.naivebayes;
+package org.maochen.classifier;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -9,7 +9,19 @@ import java.util.Set;
  * Created by Maochen on 6/1/15.
  */
 public class ModelSerializeUtils {
-    public static String arraySerialize(double[][] data) {
+
+    public static String oneDimensionArraySerialize(double[] data) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(data.length);
+        builder.append(System.lineSeparator());
+
+        for (int row = 0; row < data.length; row++) {
+            builder.append(data[row]).append(StringUtils.SPACE);
+        }
+        return builder.toString();
+    }
+
+    public static String twoDimensionalArraySerialize(double[][] data) {
         StringBuilder builder = new StringBuilder();
         builder.append(data.length).append(StringUtils.SPACE).append(data[0].length);
         builder.append(System.lineSeparator());

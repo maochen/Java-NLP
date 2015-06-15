@@ -1,12 +1,10 @@
 package org.maochen.classifier.perceptron;
 
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
+import org.maochen.datastructure.Tuple;
 import org.maochen.utils.VectorUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -20,16 +18,11 @@ import java.util.stream.IntStream;
 public class PerceptronTrainingEngine {
 
     private static final Logger LOG = LoggerFactory.getLogger(PerceptronTrainingEngine.class);
+    private static final int MAX_ITERATION = Integer.MAX_VALUE;
 
-    private PerceptronModel model;
-
-    private int maxIteration = Integer.MAX_VALUE;
-
-    private double offlineLearningErrThreshold = 0.001;
-
-    public void train(List<Pair<double[], Integer>> data) {
-        model = new PerceptronModel();
-        model.weights = new double[data.get(0).getLeft().length];
+    public static PerceptronModel train(List<Tuple> data) {
+        PerceptronModel model = new PerceptronModel();
+        model.weights = new double[data.get(0).featureVector.length];
 
         int errCount;
         int iter = 0;
@@ -37,14 +30,16 @@ public class PerceptronTrainingEngine {
         do {
             LOG.debug("Iteration " + (++iter));
             errCount = data.size();
-            for (Pair<double[], Integer> entry : data) {
-                double error = onlineTrain(entry.getLeft(), entry.getRight(), model); // for Xi
+            for (Tuple entry : data) {
+                double error = onlineTrain(entry.featureVector, Integer.valueOf(entry.label), model); // for Xi
                 if (error == 0) {
                     errCount--;
                 }
             }
 
-        } while (errCount != 0 && iter < maxIteration);
+        } while (errCount != 0 && iter < MAX_ITERATION);
+
+        return model;
     }
 
 
@@ -62,17 +57,5 @@ public class PerceptronTrainingEngine {
 
         LOG.debug("New weights: " + Arrays.toString(model.weights));
         return error;
-    }
-
-    public static void main(String[] args) {
-        PerceptronTrainingEngine te = new PerceptronTrainingEngine();
-
-        List<Pair<double[], Integer>> data = new ArrayList<>();
-        data.add(new ImmutablePair<>(new double[]{1, 0, 0}, 1));
-        data.add(new ImmutablePair<>(new double[]{1, 0, 1}, 1));
-        data.add(new ImmutablePair<>(new double[]{1, 1, 0}, 1));
-        data.add(new ImmutablePair<>(new double[]{1, 1, 1}, 0));
-        te.train(data);
-
     }
 }

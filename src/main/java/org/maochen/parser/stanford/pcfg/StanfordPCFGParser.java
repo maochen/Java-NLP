@@ -79,6 +79,11 @@ public class StanfordPCFGParser implements IParser {
 
     // 2. POS Tagger
     private void tagPOS(List<CoreLabel> tokens) {
+        if (posTagger == null) {
+            LOG.warn("POS Tagger not initialized, will use default POS Tagger model!");
+            String posTaggerModel = "edu/stanford/nlp/models/pos-tagger/english-left3words/english-left3words-distsim.tagger";
+            posTagger = new MaxentTagger(posTaggerModel);
+        }
         List<TaggedWord> posList = posTagger.tagSentence(tokens);
         for (int i = 0; i < tokens.size(); i++) {
             String pos = posList.get(i).tag();
@@ -207,14 +212,13 @@ public class StanfordPCFGParser implements IParser {
     }
 
     public void loadModel(String modelFileLoc, String posTaggerModel) {
-        if (!modelFileLoc.isEmpty()) {
+        if (modelFileLoc != null && !modelFileLoc.isEmpty()) {
             parser = LexicalizedParser.loadModel(modelFileLoc, new ArrayList<>());
         }
 
-        if (posTaggerModel.isEmpty()) {
-            posTaggerModel = "edu/stanford/nlp/models/pos-tagger/english-left3words/english-left3words-distsim.tagger";
+        if (posTaggerModel != null && !posTaggerModel.isEmpty()) {
+            posTagger = new MaxentTagger(posTaggerModel);
         }
-        posTagger = new MaxentTagger(posTaggerModel);
     }
 
     @Override
@@ -251,7 +255,7 @@ public class StanfordPCFGParser implements IParser {
         Table<DTree, Tree, Double> result = HashBasedTable.create();
         for (ScoredObject<Tree> scoredTuple : scoredTrees) {
             Tree tree = scoredTuple.object();
-            tagPOS(tokens, tree);
+            tagPOS(tokens);
             tagLemma(tokens);
 
             GrammaticalStructure gs = getDependencies(tree, true);
@@ -274,6 +278,7 @@ public class StanfordPCFGParser implements IParser {
         if (modelPath == null || modelPath.trim().isEmpty()) {
             modelPath = "edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz"; // Default PCFG model.
         }
+
         loadModel(modelPath, posTaggerModel);
 
         if (initNER) {
@@ -288,7 +293,7 @@ public class StanfordPCFGParser implements IParser {
 
     public static void main(String[] args) {
         String modelFile = "/Users/Maochen/workspace/nlpservice/nlp-service-remote/src/main/resources/classifierData/englishPCFG.ser.gz";
-        String posTaggerModel = "/Users/Maochen/workspace/nlpservice/nlp-service-remote/src/main/resources/classifierData/english-left3words-distsim.tagger";
+        String posTaggerModel = null;//"/Users/Maochen/workspace/nlpservice/nlp-service-remote/src/main/resources/classifierData/english-left3words-distsim.tagger";
         StanfordPCFGParser parser = new StanfordPCFGParser(modelFile, posTaggerModel, false);
 
         Scanner scan = new Scanner(System.in);
@@ -300,7 +305,6 @@ public class StanfordPCFGParser implements IParser {
             input = scan.nextLine();
             if (!input.trim().isEmpty() && !input.matches(quitRegex)) {
                 //                System.out.println(print(false, parser.parse(input)));
-
 
                 Table<DTree, Tree, Double> trees = parser.getKBestParse(input, 3);
 
