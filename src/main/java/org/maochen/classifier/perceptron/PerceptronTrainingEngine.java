@@ -1,5 +1,7 @@
 package org.maochen.classifier.perceptron;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.maochen.datastructure.Tuple;
 import org.maochen.utils.VectorUtils;
 import org.slf4j.Logger;
@@ -18,25 +20,24 @@ import java.util.stream.IntStream;
 public class PerceptronTrainingEngine {
 
     private static final Logger LOG = LoggerFactory.getLogger(PerceptronTrainingEngine.class);
-    private static final int MAX_ITERATION = Integer.MAX_VALUE;
+    private static final int MAX_ITERATION = 2000;
 
-    public static PerceptronModel train(List<Tuple> data) {
+    public static PerceptronModel train(List<Tuple> trainingData) {
         PerceptronModel model = new PerceptronModel();
-        model.weights = new double[data.get(0).featureVector.length];
+        model.weights = new double[trainingData.stream().findFirst().orElse(null).featureVector.length];
 
         int errCount;
         int iter = 0;
-
         do {
             LOG.debug("Iteration " + (++iter));
-            errCount = data.size();
-            for (Tuple entry : data) {
-                double error = onlineTrain(entry.featureVector, Integer.valueOf(entry.label), model); // for Xi
-                if (error == 0) {
+            errCount = trainingData.size();
+            for (Tuple entry : trainingData) {
+                Pair<Integer, PerceptronModel> result = onlineTrain(entry.featureVector, Integer.valueOf(entry.label), model); // for Xi
+                model = result.getRight();
+                if (result.getLeft() == 0) {
                     errCount--;
                 }
             }
-
         } while (errCount != 0 && iter < MAX_ITERATION);
 
         return model;
@@ -44,8 +45,14 @@ public class PerceptronTrainingEngine {
 
 
     // public use for doing one training sample.
-    // return error
-    public static double onlineTrain(double[] x, int labelIndex, PerceptronModel model) {
+    // instead of directly change a model, we will do a copy of a model and change the copy.
+    // return error and copy of perceptron model
+    public static Pair<Integer, PerceptronModel> onlineTrain(final double[] x, final int labelIndex, final PerceptronModel originalModel) {
+        PerceptronModel model = new PerceptronModel();
+        model.learningRate = originalModel.learningRate;
+        model.threshold = originalModel.threshold;
+        model.weights = originalModel.weights;
+
         double sum = VectorUtils.dotProduct(x, model.weights);
         int network = sum > model.threshold ? 1 : 0;
         int error = labelIndex - network; // might be negative.
@@ -56,6 +63,6 @@ public class PerceptronTrainingEngine {
         }
 
         LOG.debug("New weights: " + Arrays.toString(model.weights));
-        return error;
+        return new ImmutablePair<>(error, model);
     }
 }

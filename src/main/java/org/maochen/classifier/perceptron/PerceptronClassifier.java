@@ -4,7 +4,6 @@ import org.maochen.classifier.IClassifier;
 import org.maochen.datastructure.Tuple;
 import org.maochen.utils.VectorUtils;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -58,6 +57,7 @@ public class PerceptronClassifier implements IClassifier {
 
 
     public static void main(String[] args) throws FileNotFoundException {
+        //        String modelPath = "/Users/Maochen/Desktop/perceptron_model.dat";
         PerceptronClassifier perceptronClassifier = new PerceptronClassifier();
 
         List<Tuple> data = new ArrayList<>();
@@ -66,11 +66,11 @@ public class PerceptronClassifier implements IClassifier {
         data.add(new Tuple(3, new double[]{1, 1, 0}, String.valueOf(1)));
         data.add(new Tuple(4, new double[]{1, 1, 1}, String.valueOf(0)));
         perceptronClassifier.train(data);
-        perceptronClassifier.model.persist("/Users/Maochen/Desktop/perceptron_model.dat");
+        //        perceptronClassifier.model.persist(modelPath);
 
-        perceptronClassifier = new PerceptronClassifier();
-        perceptronClassifier.model.load(new FileInputStream("/Users/Maochen/Desktop/perceptron_model.dat"));
-        Tuple test = new Tuple(5, new double[]{0, 0, 1}, null);
-        System.out.println(perceptronClassifier.train(data).predict(test));
+        //        perceptronClassifier = new PerceptronClassifier();
+        //        perceptronClassifier.model.load(new FileInputStream(modelPath));
+        //        Tuple test = new Tuple(5, new double[]{0, 0, 1}, null);
+        //        System.out.println(perceptronClassifier.train(data).predict(test));
     }
 }
