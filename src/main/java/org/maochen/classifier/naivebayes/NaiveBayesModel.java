@@ -38,11 +38,11 @@ public class NaiveBayesModel {
     }
 
 
-    public void load(String filename) {
+    public void load(InputStream is) {
         labelIndexer = new LabelIndexer(Lists.newArrayList());
         labelPrior = new HashMap<>();
 
-        try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
             String line;
 
             int newItemCount = 0;

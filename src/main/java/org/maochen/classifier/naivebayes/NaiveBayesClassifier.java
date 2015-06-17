@@ -22,6 +22,15 @@ public class NaiveBayesClassifier implements IClassifier {
 
     private NaiveBayesModel model;
 
+    public NaiveBayesClassifier(InputStream modelInputStream) {
+        model = new NaiveBayesModel();
+        model.load(modelInputStream);
+    }
+
+    public NaiveBayesClassifier() {
+
+    }
+
     @Override
     public void setParameter(Map<String, String> paraMap) {
         throw new NotImplementedException("not implemented");
@@ -80,7 +89,11 @@ public class NaiveBayesClassifier implements IClassifier {
 
     public void loadModel(String filename) {
         model = new NaiveBayesModel();
-        model.load(filename);
+        try {
+            model.load(new FileInputStream(filename));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     public static List<Tuple> readTrainingData(String filename, String delimiter) {
@@ -167,14 +180,13 @@ public class NaiveBayesClassifier implements IClassifier {
     public static void main(String[] args) {
         String folder = "/Users/Maochen/Desktop/w2v_weight_training/";
         String outputModelFolder = "/Users/Maochen/workspace/amelia/eliza-ir/src/main/resources/";
-//        splitData(folder + "training.all.txt");
+        //        splitData(folder + "training.all.txt");
 
 
         NaiveBayesClassifier nbc = new NaiveBayesClassifier();
         List<Tuple> trainingData = readTrainingData(folder + "/training.all.txt.aligned", "\\s");
         nbc.train(trainingData);
         nbc.persistModel(outputModelFolder + "/nb_model.dat");
-
 
         nbc.loadModel(outputModelFolder + "/nb_model.dat");
         Scanner scan = new Scanner(System.in);

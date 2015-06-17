@@ -9,11 +9,11 @@ import java.util.Arrays;
  * Created by Maochen on 6/5/15.
  */
 public class PerceptronModel {
-    double[] weights=null;
+    double[] weights = null;
     double threshold = 0.5;
     double learningRate = 0.1;
 
-    public void persist(String filename) {
+    public void persist(final String filename) {
         try (BufferedWriter output = new BufferedWriter(new FileWriter(new File(filename)))) {
             output.write(String.valueOf(this.threshold));
             output.write(System.lineSeparator());
@@ -27,8 +27,8 @@ public class PerceptronModel {
         }
     }
 
-    public void load(String filename) {
-        try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
+    public void load(final InputStream is) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
             String line;
             int lineCount = 0;
             while ((line = br.readLine()) != null) {

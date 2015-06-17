@@ -4,6 +4,9 @@ import org.maochen.classifier.IClassifier;
 import org.maochen.datastructure.Tuple;
 import org.maochen.utils.VectorUtils;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,7 +15,7 @@ import java.util.Map;
 /**
  * Created by Maochen on 6/5/15.
  */
-public class Perceptron implements IClassifier {
+public class PerceptronClassifier implements IClassifier {
 
     private PerceptronModel model = null;
 
@@ -44,25 +47,30 @@ public class Perceptron implements IClassifier {
 
     }
 
-    public Perceptron() {
+    public PerceptronClassifier() {
         this.model = new PerceptronModel();
     }
 
+    public PerceptronClassifier(InputStream modelIs) {
+        this();
+        this.model.load(modelIs);
+    }
 
-    public static void main(String[] args) {
-        Perceptron perceptron = new Perceptron();
+
+    public static void main(String[] args) throws FileNotFoundException {
+        PerceptronClassifier perceptronClassifier = new PerceptronClassifier();
 
         List<Tuple> data = new ArrayList<>();
         data.add(new Tuple(1, new double[]{1, 0, 0}, String.valueOf(1)));
         data.add(new Tuple(2, new double[]{1, 0, 1}, String.valueOf(1)));
         data.add(new Tuple(3, new double[]{1, 1, 0}, String.valueOf(1)));
         data.add(new Tuple(4, new double[]{1, 1, 1}, String.valueOf(0)));
-        perceptron.train(data);
-        perceptron.model.persist("/Users/Maochen/Desktop/perceptron_model.dat");
+        perceptronClassifier.train(data);
+        perceptronClassifier.model.persist("/Users/Maochen/Desktop/perceptron_model.dat");
 
-        perceptron = new Perceptron();
-        perceptron.model.load("/Users/Maochen/Desktop/perceptron_model.dat");
+        perceptronClassifier = new PerceptronClassifier();
+        perceptronClassifier.model.load(new FileInputStream("/Users/Maochen/Desktop/perceptron_model.dat"));
         Tuple test = new Tuple(5, new double[]{0, 0, 1}, null);
-        System.out.println(perceptron.train(data).predict(test));
+        System.out.println(perceptronClassifier.train(data).predict(test));
     }
 }

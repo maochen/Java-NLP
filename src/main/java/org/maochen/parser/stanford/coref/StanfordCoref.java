@@ -58,10 +58,13 @@ public class StanfordCoref {
     }
 
     public static void main(String[] args) {
-        StanfordPCFGParser parser = new StanfordPCFGParser();
+        String modelFile = "/Users/Maochen/workspace/nlpservice/nlp-service-remote/src/main/resources/classifierData/englishPCFG.ser.gz";
+        String posTaggerModel = "/Users/Maochen/workspace/nlpservice/nlp-service-remote/src/main/resources/classifierData/english-left3words-distsim.tagger";
+        StanfordPCFGParser parser = new StanfordPCFGParser(modelFile, posTaggerModel, true);
+
         StanfordCoref coref = new StanfordCoref(parser);
 
-        List<String> texts = Lists.newArrayList("Tom is nice.", "Mary is cool.", "They are awesome.");
+        List<String> texts = Lists.newArrayList("Google invests in companies since they have more choices");
         coref.getCoref(texts).forEach(System.out::println);
     }
 }
