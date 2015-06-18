@@ -159,6 +159,10 @@ public class StanfordPCFGParser implements IParser {
 
     // 4. NER
     private void tagNamedEntity(List<CoreLabel> tokens) {
+        boolean isPOSTagged = tokens.parallelStream().filter(x -> x.tag() == null).count() == 0;
+        if (!isPOSTagged) {
+            throw new RuntimeException("Please Run POS Tagger before Named Entity tagger.");
+        }
         ners.stream().forEach(ner -> ner.classify(tokens));
     }
 
@@ -250,6 +254,7 @@ public class StanfordPCFGParser implements IParser {
         pq.parse(tokens);
         List<ScoredObject<Tree>> scoredTrees = pq.getKBestPCFGParses(k);
 
+        tagPOS(tokens);
         tagNamedEntity(tokens);
 
         Table<DTree, Tree, Double> result = HashBasedTable.create();
@@ -285,6 +290,7 @@ public class StanfordPCFGParser implements IParser {
             // STUPID NER, Throw IOException in the constructor ... : (
             try {
                 ners.add(new NERClassifierCombiner("edu/stanford/nlp/models/ner/english.all.3class.distsim.crf.ser.gz"));
+                ners.add(new NERClassifierCombiner("edu/stanford/nlp/models/ner/english.muc.7class.distsim.crf.ser.gz"));
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
@@ -294,7 +300,7 @@ public class StanfordPCFGParser implements IParser {
     public static void main(String[] args) {
         String modelFile = "/Users/Maochen/workspace/nlpservice/nlp-service-remote/src/main/resources/classifierData/englishPCFG.ser.gz";
         String posTaggerModel = null;//"/Users/Maochen/workspace/nlpservice/nlp-service-remote/src/main/resources/classifierData/english-left3words-distsim.tagger";
-        StanfordPCFGParser parser = new StanfordPCFGParser(modelFile, posTaggerModel, false);
+        StanfordPCFGParser parser = new StanfordPCFGParser(modelFile, posTaggerModel, true);
 
         Scanner scan = new Scanner(System.in);
         String input = StringUtils.EMPTY;
