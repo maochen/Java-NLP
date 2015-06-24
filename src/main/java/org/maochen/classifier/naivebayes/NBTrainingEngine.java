@@ -3,6 +3,8 @@ package org.maochen.classifier.naivebayes;
 import org.maochen.datastructure.LabelIndexer;
 import org.maochen.datastructure.Tuple;
 import org.maochen.utils.VectorUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -12,6 +14,7 @@ import java.util.List;
  * Created by Maochen on 12/3/14.
  */
 final class NBTrainingEngine {
+    private static final Logger LOG = LoggerFactory.getLogger(NBTrainingEngine.class);
 
     private List<Tuple> trainingData;
 
@@ -33,6 +36,15 @@ final class NBTrainingEngine {
             meanVector = VectorUtils.scale(meanVector, 1.0 / count[i]);
             model.meanVectors[i] = meanVector;
         }
+
+        for (int i = 0; i < model.meanVectors.length; i++) {
+            for (int j = 0; j < model.meanVectors[i].length; j++) {
+                if (model.meanVectors[i][j] == 0) {
+                    LOG.warn("mean is 0 for label " + model.labelIndexer.labelIndexer.inverse().get(i) + " at dimension " + j);
+                    model.meanVectors[i][j] = Double.MIN_VALUE;
+                }
+            }
+        }
     }
 
     // Step 2
@@ -51,6 +63,15 @@ final class NBTrainingEngine {
             // Denominator is Sample Var instead of Population Var
             varianceVector = VectorUtils.scale(varianceVector, 1.0 / (count[i] - 1));
             model.varianceVectors[i] = varianceVector;
+        }
+
+        for (int i = 0; i < model.varianceVectors.length; i++) {
+            for (int j = 0; j < model.varianceVectors[i].length; j++) {
+                if (model.varianceVectors[i][j] == 0) {
+                    LOG.warn("variance is 0 for label " + model.labelIndexer.labelIndexer.inverse().get(i) + " at dimension " + j);
+                    model.varianceVectors[i][j] = Double.MIN_VALUE;
+                }
+            }
         }
     }
 

@@ -1,6 +1,7 @@
 package org.maochen.utils;
 
 import java.util.Arrays;
+import java.util.function.Function;
 import java.util.stream.IntStream;
 
 /**
@@ -72,6 +73,13 @@ public class VectorUtils {
 
         return probability;
     }
+
+    public static Function<Double, Double> stochasticBinary = z -> 1 / (1 + Math.pow(Math.E, -z));   // This is for p(s=1)
+
+    public static Function<Double, Double> tanh = z -> {
+        double e2z = Math.pow(Math.E, 2 * z);
+        return (e2z - 1) / (e2z + 1);
+    };
 
     public static float[] doubleToFloat(double[] vector) {
         float[] result = new float[vector.length];
