@@ -1,10 +1,13 @@
 package org.maochen.utils;
 
+import org.apache.commons.lang3.StringUtils;
 import org.maochen.datastructure.DNode;
 import org.maochen.datastructure.DTree;
 import org.maochen.datastructure.LangLib;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -96,7 +99,7 @@ public class LangTools {
                     if (!feats.equals("_")) {
                         featsMap = Arrays.stream(feats.split("\\|"))
                                 .map(entry -> entry.split("="))
-                                .collect(Collectors.toMap(e -> e[0], e -> e.length > 1 ? e[1] : null));
+                                .collect(Collectors.toMap(e -> e[0], e -> e.length > 1 ? e[1] : StringUtils.EMPTY));
                     }
 
                     String headIndex = fields[currentIndex++];
@@ -105,6 +108,7 @@ public class LangTools {
                     DNode node = new DNode(id, form, lemma, cPOSTag, pos, depLabel);
                     node.setFeats(featsMap);
                     node.addFeature("head", headIndex); // by the time head might not be generated!
+
                     tree.add(node);
                 });
 

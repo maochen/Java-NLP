@@ -18,6 +18,7 @@ public class ModelSerializeUtils {
         for (int row = 0; row < data.length; row++) {
             builder.append(data[row]).append(StringUtils.SPACE);
         }
+        builder.append(System.lineSeparator());
         return builder.toString();
     }
 

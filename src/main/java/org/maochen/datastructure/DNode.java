@@ -216,6 +216,11 @@ public class DNode {
         // These two corresponds to the 9 and 10 in the standard.
         builder.append("_").append("\t");
         builder.append("_").append("\t");
+
+        // Add semantic role label in the last column semantichead=srl, e.g. 3=A0
+        String semanticHeadsString = semanticHeads.entrySet().stream().map(e -> e.getKey() + "=" + e.getValue()).reduce((s1, s2) -> s1 + "|" + s2).orElse("_");
+        builder.append(semanticHeadsString).append("\t");
+
         return builder.toString().trim();
     }
 }
