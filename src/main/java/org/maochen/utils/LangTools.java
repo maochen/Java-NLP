@@ -82,6 +82,7 @@ public class LangTools {
             return null;
         }
 
+        Map<Integer, Map<Integer, String>> semanticHeadsMap = new HashMap<>();
         String[] dNodesString = input.split(System.lineSeparator());
         DTree tree = new DTree();
 
@@ -103,12 +104,23 @@ public class LangTools {
                     }
 
                     String headIndex = fields[currentIndex++];
-                    String depLabel = fields[currentIndex];
+                    String depLabel = fields[currentIndex++];
+
+                    String dump1 = fields[currentIndex++];
+                    String dump2 = fields[currentIndex++];
+
+                    String semanticHeadsString = currentIndex >= fields.length ? "_" : fields[currentIndex];
+
+                    if (!semanticHeadsString.equals("_")) {
+                        Map<Integer, String> semanticHeads = Arrays.stream(semanticHeadsString.split("\\|"))
+                                .map(entry -> entry.split("="))
+                                .collect(Collectors.toMap(e -> Integer.parseInt(e[0]), e -> (e.length > 1) ? e[1] : StringUtils.EMPTY));
+                        semanticHeadsMap.put(id, semanticHeads);
+                    }
 
                     DNode node = new DNode(id, form, lemma, cPOSTag, pos, depLabel);
                     node.setFeats(featsMap);
                     node.addFeature("head", headIndex); // by the time head might not be generated!
-
                     tree.add(node);
                 });
 
@@ -120,6 +132,17 @@ public class LangTools {
             node.removeFeature("head");
             node.setHead(head);
         }
+
+
+        // Recover semantic heads.
+        semanticHeadsMap.entrySet().parallelStream().map(e -> {
+            DNode node = tree.get(e.getKey());
+            Map<Integer, String> nodeSemanticInfo = e.getValue();
+            for (Integer id : nodeSemanticInfo.keySet()) {
+                node.addSemanticHead(tree.get(id), nodeSemanticInfo.get(id));
+            }
+            return null;
+        }).collect(Collectors.toList());
         return tree;
     }
 }
