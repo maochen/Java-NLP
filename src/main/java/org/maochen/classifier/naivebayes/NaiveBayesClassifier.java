@@ -59,7 +59,13 @@ public class NaiveBayesClassifier implements IClassifier {
         }
 
         labelProb.entrySet().forEach(entry -> {
-            labelProb.put(entry.getKey(), entry.getValue() / evidence);
+            double prob = entry.getValue() / evidence;
+            if (prob > 0.999) {
+                prob = 1D;
+            } else if (prob < 0.001) {
+                prob = 0D;
+            }
+            labelProb.put(entry.getKey(), prob);
         }); // This is denominator of posterior
 
         Map<String, Double> result = model.labelIndexer.convertMapKey(labelProb);

@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.*;
-import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
@@ -23,19 +23,7 @@ public class PerceptronClassifier implements IClassifier {
 
     protected PerceptronModel model = null;
 
-    private static final int MAX_ITERATION = 2000;
-
-    private static Predicate<Object[]> shouldTerminate = x -> {
-        if ((int) x[0] == 0) {
-            return true;
-        }
-
-        if ((int) x[1] > MAX_ITERATION) {
-            return true;
-        }
-
-        return false;
-    };
+    private static final int MAX_ITERATION = 200;
 
     // Key is LabelIndex.
     private Map<Integer, Double> predict(final double[] x) {
@@ -43,8 +31,6 @@ public class PerceptronClassifier implements IClassifier {
         for (int i = 0; i < model.weights.length; i++) {
             double y = VectorUtils.dotProduct(x, model.weights[i]);
             y += model.bias[i];
-            y = VectorUtils.stochasticBinary.apply(y);// Logistic Function
-
             result.put(i, y);
         }
 
@@ -78,12 +64,11 @@ public class PerceptronClassifier implements IClassifier {
             double w_correction_d = -1;
             model.weights[maxResult.getKey()] = reweight(x, model.weights[maxResult.getKey()], w_correction_d);
             model.bias[maxResult.getKey()] = w_correction_d;
+        }
 
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("New bias: " + Arrays.toString(model.bias));
-                LOG.debug("New weight: ");
-                LOG.debug(Arrays.stream(model.weights).map(Arrays::toString).reduce((wi, wii) -> wi + System.lineSeparator() + wii).get());
-            }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("New bias: " + Arrays.toString(model.bias));
+            LOG.debug("New weight: " + Arrays.stream(model.weights).map(Arrays::toString).reduce((wi, wii) -> wi + ", " + wii).get());
         }
     }
 
@@ -94,27 +79,26 @@ public class PerceptronClassifier implements IClassifier {
         int errCount;
         int iter = 0;
         do {
-            LOG.debug("Iteration " + (++iter));
-            errCount = trainingData.size();
+            LOG.info("Iteration " + (++iter));
+            Collections.shuffle(trainingData);
+
             for (Tuple entry : trainingData) {
                 onlineTrain(entry.featureVector, model.labelIndexer.getIndex(entry.label)); // for Xi
-
-                if (predictMax(entry.featureVector).getLeft() == model.labelIndexer.getIndex(entry.label)) {
-                    errCount--;
-                }
             }
-        } while (!shouldTerminate.test(new Object[]{errCount, iter}));
 
+            errCount = (int) trainingData.stream().filter(entry -> predictMax(entry.featureVector).getLeft() != model.labelIndexer.getIndex(entry.label)).count();
+        } while (errCount != 0 && iter < MAX_ITERATION);
+
+        LOG.debug("Err size: " + errCount);
         return this;
     }
 
     @Override
     public Map<String, Double> predict(Tuple predict) {
         Map<Integer, Double> indexResult = predict(predict.featureVector);
-        Map<String, Double> result = new HashMap<>();
-        for (Integer index : indexResult.keySet()) {
-            result.put(model.labelIndexer.getLabel(index), indexResult.get(index));
-        }
+        Map<String, Double> result = indexResult.entrySet().stream()
+                .map(e -> new ImmutablePair<>(model.labelIndexer.getLabel(e.getKey()), VectorUtils.sigmoid.apply(e.getValue()))) // Only do sigmoid here!
+                .collect(Collectors.toMap(ImmutablePair::getLeft, ImmutablePair::getRight));
         return result;
     }
 
@@ -128,7 +112,8 @@ public class PerceptronClassifier implements IClassifier {
     }
 
     public static void main(String[] args) throws FileNotFoundException {
-        String modelPath = "/Users/Maochen/Desktop/perceptron_model.dat";
+        String modelPath = PerceptronClassifier.class.getResource("/").getPath() + "/perceptron_model.dat";
+        System.out.println(modelPath);
         PerceptronClassifier perceptronClassifier = new PerceptronClassifier();
 
         List<Tuple> data = new ArrayList<>();

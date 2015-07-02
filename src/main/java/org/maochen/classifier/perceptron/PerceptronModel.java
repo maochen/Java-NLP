@@ -25,13 +25,31 @@ public class PerceptronModel {
 
     }
 
+    public PerceptronModel(PerceptronModel model) {
+        this.learningRate = model.learningRate;
+        this.threshold = model.threshold;
+        this.bias = Arrays.copyOf(model.bias, model.bias.length);
+        this.labelIndexer = model.labelIndexer;
+
+        this.weights = new double[model.weights.length][];
+        for (int i = 0; i < model.weights.length; i++) {
+            double[] aMatrix = model.weights[i];
+            this.weights[i] = new double[aMatrix.length];
+            System.arraycopy(aMatrix, 0, this.weights[i], 0, aMatrix.length);
+        }
+    }
+
     public PerceptronModel(List<Tuple> trainingData) {
         labelIndexer = new LabelIndexer(trainingData);
         int featurelength = trainingData.stream().findFirst().orElse(null).featureVector.length;
         weights = new double[labelIndexer.getLabelSize()][featurelength];
         bias = new double[labelIndexer.getLabelSize()];
-        Arrays.stream(weights).forEach(w -> Arrays.stream(w).parallel().forEach(wi -> Math.random())); //init weights
-        Arrays.stream(bias).forEach(bi -> Math.random());
+
+        for (int i = 0; i < weights.length; i++) {
+            for (int j = 0; j < weights[i].length; j++) {
+                weights[i][j] = Math.random();
+            }
+        }
     }
 
     public void persist(final String filename) {

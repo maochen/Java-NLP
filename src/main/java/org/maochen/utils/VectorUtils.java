@@ -74,7 +74,7 @@ public class VectorUtils {
         return probability;
     }
 
-    public static Function<Double, Double> stochasticBinary = z -> 1 / (1 + Math.exp(-z));   // This is for p(s=1)
+    public static Function<Double, Double> sigmoid = z -> 1 / (1 + Math.exp(-z));   // This is for p(s=1)
 
     public static Function<Double, Double> tanh = z -> {
         double e2z = Math.exp(2 * z);
