@@ -85,6 +85,7 @@ public class LangTools {
         Map<Integer, Map<Integer, String>> semanticHeadsMap = new HashMap<>();
         String[] dNodesString = input.split(System.lineSeparator());
         DTree tree = new DTree();
+        tree.setOriginalSentence(input);
 
         Arrays.stream(dNodesString).parallel()
                 .map(s -> s.split("\t"))
