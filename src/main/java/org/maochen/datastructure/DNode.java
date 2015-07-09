@@ -2,10 +2,7 @@ package org.maochen.datastructure;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -48,6 +45,7 @@ public class DNode {
     private Map<Integer, DNode> children = new HashMap<>();
     // Parent Node, Semantic Head Label
     private Map<DNode, String> semanticHeads = new HashMap<>();
+    private Set<DNode> semanticChildren = new HashSet<>();
     private DTree tree = null; // Refs to the whole dependency tree
     private static final String NAMED_ENTITY_KEY = "named_entity";
 
@@ -169,6 +167,14 @@ public class DNode {
         if (namedEntity != null) {
             feats.put(NAMED_ENTITY_KEY, namedEntity);
         }
+    }
+
+    public Set<DNode> getSemanticChildren() {
+        return semanticChildren;
+    }
+
+    public void setSemanticChildren(Set<DNode> semanticChildren) {
+        this.semanticChildren = semanticChildren;
     }
 
     public boolean isRoot() {

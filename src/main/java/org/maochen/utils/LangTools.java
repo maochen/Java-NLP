@@ -85,7 +85,6 @@ public class LangTools {
         Map<Integer, Map<Integer, String>> semanticHeadsMap = new HashMap<>();
         String[] dNodesString = input.split(System.lineSeparator());
         DTree tree = new DTree();
-        tree.setOriginalSentence(input);
 
         Arrays.stream(dNodesString).parallel()
                 .map(s -> s.split("\t"))
@@ -141,6 +140,7 @@ public class LangTools {
             Map<Integer, String> nodeSemanticInfo = e.getValue();
             for (Integer id : nodeSemanticInfo.keySet()) {
                 node.addSemanticHead(tree.get(id), nodeSemanticInfo.get(id));
+                tree.get(id).getSemanticChildren().add(node);
             }
             return null;
         }).collect(Collectors.toList());
