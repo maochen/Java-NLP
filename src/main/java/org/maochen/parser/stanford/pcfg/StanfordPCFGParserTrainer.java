@@ -98,7 +98,7 @@ public class StanfordPCFGParserTrainer {
         printParseTree(newParser, sentence);
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main1(String[] args) throws IOException {
         String modelPath = train();
         LexicalizedParser parser = LexicalizedParser.loadModel(modelPath, new ArrayList<>());
         Scanner scan = new Scanner(System.in);
@@ -115,19 +115,21 @@ public class StanfordPCFGParserTrainer {
     }
 
     // This is for verify
-    public static void main1(String[] args) {
-        String tree = "( (S\n"
-                + "    (VP (VB Ask)\n"
-                + "        (NP (DT the) (NN user))\n"
-                + "        (SBAR\n"
-                + "          (WHNP (WP what))\n"
-                + "          (S\n"
-                + "            (NP\n"
-                + "              (NP (DT the) (NN user) (POS 's))\n"
-                + "              (NN invoice) (NN number))\n"
-                + "            (VP (VBZ is)))))\n"
-                + "    (. .)))";
-        verify("Ask the user what the user's invoice number is.", tree);
+    public static void main(String[] args) {
+        String tree = "(ROOT (S\n"
+                + "  (NP (NNS Crickets))\n"
+                + "  (VP (VBP reach)\n"
+                + "   (NP\n"
+                + "    (NP (JJ sexual) (NN maturity))\n"
+                + "    (PP \n"
+                + "        (PP (IN between)\n"
+                + "            (NP (CD eight)\n"
+                + "                (CC and)\n"
+                + "                (CD twelve) (NNS weeks)))\n"
+                + "      (IN after)\n"
+                + "     (NP (NN birth)))))\n"
+                + "  (. .)))";
+        verify("Crickets reach sexual maturity between eight and twelve weeks after birth.", tree);
     }
 
 }

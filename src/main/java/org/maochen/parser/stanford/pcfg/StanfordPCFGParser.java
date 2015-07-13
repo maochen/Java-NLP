@@ -300,7 +300,7 @@ public class StanfordPCFGParser implements IParser {
     public static void main(String[] args) {
         String modelFile = "/Users/Maochen/workspace/nlpservice/nlp-service-remote/src/main/resources/classifierData/englishPCFG.ser.gz";
         String posTaggerModel = null;//"/Users/Maochen/workspace/nlpservice/nlp-service-remote/src/main/resources/classifierData/english-left3words-distsim.tagger";
-        StanfordPCFGParser parser = new StanfordPCFGParser(modelFile, posTaggerModel, true);
+        StanfordPCFGParser parser = new StanfordPCFGParser(modelFile, posTaggerModel, false);
 
         Scanner scan = new Scanner(System.in);
         String input = StringUtils.EMPTY;
