@@ -224,7 +224,7 @@ public class DNode {
         builder.append("_").append("\t");
 
         // Add semantic role label in the last column semantichead=srl, e.g. 3=A0
-        String semanticHeadsString = semanticHeads.entrySet().stream().map(e -> e.getKey() + "=" + e.getValue()).reduce((s1, s2) -> s1 + "|" + s2).orElse("_");
+        String semanticHeadsString = semanticHeads.entrySet().stream().map(e -> e.getKey().getId() + ":" + e.getValue()).reduce((s1, s2) -> s1 + "|" + s2).orElse("_");
         builder.append(semanticHeadsString).append("\t");
 
         return builder.toString().trim();

@@ -113,7 +113,7 @@ public class LangTools {
 
                     if (!semanticHeadsString.equals("_")) {
                         Map<Integer, String> semanticHeads = Arrays.stream(semanticHeadsString.split("\\|"))
-                                .map(entry -> entry.split("="))
+                                .map(entry -> entry.split(":"))
                                 .collect(Collectors.toMap(e -> Integer.parseInt(e[0]), e -> (e.length > 1) ? e[1] : StringUtils.EMPTY));
                         semanticHeadsMap.put(id, semanticHeads);
                     }
