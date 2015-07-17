@@ -4,7 +4,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Copyright 2014-2015 maochen.org
@@ -53,7 +52,7 @@ public class DTree extends ArrayList<DNode> {
     }
 
     public List<DNode> getRoots() {
-        return this.stream().parallel().filter(x -> x.getDepLabel().equals(LangLib.DEP_ROOT)).distinct().collect(Collectors.toList());
+        return padding.getChildren();
     }
 
     public DNode getPaddingNode() {
