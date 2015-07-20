@@ -4,7 +4,7 @@
     <groupId>org.maochen.nlp</groupId>
     <artifactId>NLPDataStructure</artifactId>
     <packaging>jar</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>NLP Data Structure Project</name>
     <url>https://github.com/maochen/NLP</url>
 
