@@ -86,7 +86,11 @@ public class StanfordTreeBuilder {
         for (int i = 0; i < tokens.size(); i++) {
             CoreLabel token = tokens.get(i);
             String cPOSTagValue = cPOSTag == null ? LangTools.getCPOSTag(token.tag()) : cPOSTag.get(i).value();
-            DNode node = new DNode(i + 1, token.originalText(), token.lemma(), cPOSTagValue, token.tag(), StringUtils.EMPTY);
+
+            String form = token.originalText() == null || token.originalText().trim().isEmpty() ? token.get(CoreAnnotations.TextAnnotation.class) : token.originalText();
+            String lemma = token.lemma() == null || token.lemma().trim().isEmpty() ? token.get(CoreAnnotations.TextAnnotation.class) : token.lemma();
+
+            DNode node = new DNode(i + 1, form, lemma, cPOSTagValue, token.tag(), StringUtils.EMPTY);
             depTree.add(node);
             setNamedEntity(node, token);
         }

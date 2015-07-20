@@ -116,20 +116,30 @@ public class StanfordPCFGParserTrainer {
 
     // This is for verify
     public static void main(String[] args) {
-        String tree = "(ROOT (S\n"
-                + "  (NP (NNS Crickets))\n"
-                + "  (VP (VBP reach)\n"
-                + "   (NP\n"
-                + "    (NP (JJ sexual) (NN maturity))\n"
-                + "    (PP \n"
-                + "        (PP (IN between)\n"
-                + "            (NP (CD eight)\n"
-                + "                (CC and)\n"
-                + "                (CD twelve) (NNS weeks)))\n"
-                + "      (IN after)\n"
-                + "     (NP (NN birth)))))\n"
-                + "  (. .)))";
-        verify("Crickets reach sexual maturity between eight and twelve weeks after birth.", tree);
+        String constituentTree = "(TOP (S (NP (DT That))\n"
+                + "            (VP (VBD was)\n"
+                + "                (NP (NP (DT the)\n"
+                + "                            (NN beginning))\n"
+                + "                        (PP (IN of)\n"
+                + "                            (NP (NP (PRP$ their)\n"
+                + "                                    (JJ long)\n"
+                + "                                    (NN friendship))\n"
+                + "                                (, ,)\n"
+                + "                                (SBAR (WHNP (WDT which))\n"
+                + "                                      (S \n"
+                + "                                         (VP (VBZ continues)\n"
+                + "                                             (NP (NN today)))))))))\n"
+                + "            (. .)))";
+
+        Tree tree = Tree.valueOf(constituentTree);
+
+        SemanticHeadFinder headFinder = new SemanticHeadFinder(false); // keep copula verbs as head
+        Collection<TypedDependency> dependencies = new EnglishGrammaticalStructure(tree, string -> true, headFinder).typedDependencies();
+        List<CoreLabel> tokens = tree.taggedLabeledYield();
+
+        DTree dtree = StanfordTreeBuilder.generate(tokens, dependencies, null);
+        System.out.println(dtree);
+        //        verify("Crickets reach sexual maturity between eight and twelve weeks after birth.", tree);
     }
 
 }
