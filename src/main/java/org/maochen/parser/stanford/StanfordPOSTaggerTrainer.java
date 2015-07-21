@@ -49,8 +49,8 @@ public class StanfordPOSTaggerTrainer {
         trainTreeBank.loadPath(path, filter);
 
         final TreeNormalizer tn = new BobChrisTreeNormalizer();
-        trainTreeBank.apply(tree -> {
-            Tree tPrime = tn.normalizeWholeTree(tree, tree.treeFactory());
+        trainTreeBank.apply(treeVisitor -> {
+            Tree tPrime = tn.normalizeWholeTree(treeVisitor, treeVisitor.treeFactory());
             data.add(Sentence.listToString(tPrime.taggedYield(), false, "_"));
         });
     }

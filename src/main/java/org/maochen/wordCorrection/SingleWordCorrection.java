@@ -1,13 +1,16 @@
 package org.maochen.wordcorrection;
 
+import edu.stanford.nlp.ling.CoreLabel;
 import org.apache.commons.lang3.StringUtils;
 import org.maochen.datastructure.DoubleKeyMap;
+import org.maochen.parser.stanford.StanfordParser;
 import org.maochen.parser.stanford.pcfg.StanfordPCFGParser;
 
 import java.io.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * This is for the single word correction. It doesn't count in the prev/following words to generate NGram.
@@ -139,12 +142,12 @@ public class SingleWordCorrection {
     }
 
     // Parser here is just for tokenize.
-    public void buildModel(String wordFileName, StanfordPCFGParser parser) throws IOException {
+    public void buildModel(String wordFileName) throws IOException {
         BufferedReader br = new BufferedReader(new FileReader(new File(wordFileName)));
 
         String str;
         while ((str = br.readLine()) != null) {
-            List<String> tokens = parser.tokenize(str);
+            List<String> tokens = StanfordParser.stanfordTokenize(str).stream().map(CoreLabel::originalText).collect(Collectors.toList());
             for (String word : tokens) {
                 double count = model.wordProbability.containsKey(word) ? model.wordProbability.get(word) : 0;
                 count++;
@@ -163,22 +166,25 @@ public class SingleWordCorrection {
 
         Map<String, Double> possibleCorrectWordMap = errWordgenerating(wrongWord);
 
-        for (String possibleCorrectWord : possibleCorrectWordMap.keySet()) {
-            // Only take these in the dict into consideration
-            if (model.wordProbability.containsKey(possibleCorrectWord)) {
-                // From possible word generate all err words.
-                Map<String, Double> errWordMap = errWordgenerating(possibleCorrectWord);
+        // Only take these in the dict into consideration
+        // From possible word generate all err words.
+        // Remove these non-err words.
+        // Dont use for-loop, far more slower.
+        possibleCorrectWordMap.keySet().stream()
+                .filter(model.wordProbability::containsKey)
+                .forEach(possibleCorrectWord -> {
+                    // From possible word generate all err words.
+                    Map<String, Double> errWordMap = errWordgenerating(possibleCorrectWord);
 
-                // Remove these non-err words.
-                // Dont use for-loop, far more slower.
-                errWordMap.keySet().removeAll(model.wordProbability.keySet());
+                    // Remove these non-err words.
+                    // Dont use for-loop, far more slower.
+                    errWordMap.keySet().removeAll(model.wordProbability.keySet());
 
-                for (String errWord : errWordMap.keySet()) {
-                    model.derivedWordProbability.put(possibleCorrectWord, errWord, errWordMap.get(errWord));
-                }
+                    for (String errWord : errWordMap.keySet()) {
+                        model.derivedWordProbability.put(possibleCorrectWord, errWord, errWordMap.get(errWord));
+                    }
 
-            }
-        }
+                });
 
         if (model.derivedWordProbability.size() == 0) {
             throw new RuntimeException("No Correction Suggestion");
@@ -217,11 +223,9 @@ public class SingleWordCorrection {
     }
 
     public static void main(String[] args) throws IOException {
-        StanfordPCFGParser parser = new StanfordPCFGParser();
-
         String path = SingleWordCorrection.class.getClassLoader().getResource("the_adventures_of_sherlock_holmes.txt").getFile();
         SingleWordCorrection swc = new SingleWordCorrection();
-        swc.buildModel(path, parser);
+        swc.buildModel(path);
         // swc.persistModel("model.dat");
         // swc.restoreModel("model.dat");
         String word = "prob";

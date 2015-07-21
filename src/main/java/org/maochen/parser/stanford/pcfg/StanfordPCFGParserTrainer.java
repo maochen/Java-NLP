@@ -91,14 +91,7 @@ public class StanfordPCFGParserTrainer {
         return modelPath;
     }
 
-    public static void verify(String sentence, String constituentTree) {
-        Treebank tree = new MemoryTreebank();
-        tree.add(Tree.valueOf(constituentTree));
-        LexicalizedParser newParser = LexicalizedParser.getParserFromTreebank(tree, null, 0, null, new Options(), null, null);
-        printParseTree(newParser, sentence);
-    }
-
-    public static void main1(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException {
         String modelPath = train();
         LexicalizedParser parser = LexicalizedParser.loadModel(modelPath, new ArrayList<>());
         Scanner scan = new Scanner(System.in);
@@ -111,35 +104,6 @@ public class StanfordPCFGParserTrainer {
                 printParseTree(parser, input);
             }
         }
-
-    }
-
-    // This is for verify
-    public static void main(String[] args) {
-        String constituentTree = "(TOP (S (NP (DT That))\n"
-                + "            (VP (VBD was)\n"
-                + "                (NP (NP (DT the)\n"
-                + "                            (NN beginning))\n"
-                + "                        (PP (IN of)\n"
-                + "                            (NP (NP (PRP$ their)\n"
-                + "                                    (JJ long)\n"
-                + "                                    (NN friendship))\n"
-                + "                                (, ,)\n"
-                + "                                (SBAR (WHNP (WDT which))\n"
-                + "                                      (S \n"
-                + "                                         (VP (VBZ continues)\n"
-                + "                                             (NP (NN today)))))))))\n"
-                + "            (. .)))";
-
-        Tree tree = Tree.valueOf(constituentTree);
-
-        SemanticHeadFinder headFinder = new SemanticHeadFinder(false); // keep copula verbs as head
-        Collection<TypedDependency> dependencies = new EnglishGrammaticalStructure(tree, string -> true, headFinder).typedDependencies();
-        List<CoreLabel> tokens = tree.taggedLabeledYield();
-
-        DTree dtree = StanfordTreeBuilder.generate(tokens, dependencies, null);
-        System.out.println(dtree);
-        //        verify("Crickets reach sexual maturity between eight and twelve weeks after birth.", tree);
     }
 
 }

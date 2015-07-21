@@ -4,15 +4,21 @@ import edu.stanford.nlp.dcoref.*;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.Annotation;
+import edu.stanford.nlp.semgraph.SemanticGraph;
+import edu.stanford.nlp.semgraph.SemanticGraphCoreAnnotations;
+import edu.stanford.nlp.semgraph.SemanticGraphFactory;
+import edu.stanford.nlp.trees.GrammaticalStructure;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.TreeCoreAnnotations;
 import edu.stanford.nlp.util.CoreMap;
 import edu.stanford.nlp.util.PropertiesUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 /**
  * Implements the Annotator for the new deterministic coreference resolution system.
@@ -21,7 +27,6 @@ import java.util.Properties;
  * Created by Maochen on 4/14/15.
  */
 public class CorefAnnotator {
-
 
     private static final boolean VERBOSE = false;
 
@@ -43,23 +48,19 @@ public class CorefAnnotator {
         }
     }
 
-    public static String signature(Properties props) {
-        return SieveCoreferenceSystem.signature(props);
-    }
-
-    public Map<Integer, CorefChain> annotate(List<CoreMap> annotatedSentences) {
+    public Map<Integer, CorefChain> annotate(List<Pair<CoreMap, GrammaticalStructure>> annotatedSentences) {
         Map<Integer, CorefChain> result = null;
-        List<Tree> trees = new ArrayList<Tree>();
-        List<List<CoreLabel>> sentences = new ArrayList<List<CoreLabel>>();
+        List<List<CoreLabel>> sentences = new ArrayList<>();
 
-        // extract trees and sentence words
         // we are only supporting the new annotation standard for this Annotator!
         boolean hasSpeakerAnnotations = false;
-        for (CoreMap sentence : annotatedSentences) {
-            List<CoreLabel> tokens = sentence.get(CoreAnnotations.TokensAnnotation.class);
+        for (Pair<CoreMap, GrammaticalStructure> sentence : annotatedSentences) {
+            List<CoreLabel> tokens = sentence.getLeft().get(CoreAnnotations.TokensAnnotation.class);
             sentences.add(tokens);
-            Tree tree = sentence.get(TreeCoreAnnotations.TreeAnnotation.class);
-            trees.add(tree);
+
+            GrammaticalStructure gs = sentence.getRight();
+            SemanticGraph dependencies = SemanticGraphFactory.makeFromTree(gs, SemanticGraphFactory.Mode.COLLAPSED, GrammaticalStructure.Extras.NONE, true, s -> true);
+            sentence.getLeft().set(SemanticGraphCoreAnnotations.AlternativeDependenciesAnnotation.class, dependencies);
 
             if (!hasSpeakerAnnotations) {
                 // check for speaker annotations
@@ -70,11 +71,10 @@ public class CorefAnnotator {
                     }
                 }
             }
-            MentionExtractor.mergeLabels(tree, tokens);
             MentionExtractor.initializeUtterance(tokens);
         }
 
-        Annotation annotation = new Annotation(annotatedSentences);
+        Annotation annotation = new Annotation(annotatedSentences.stream().map(Pair::getLeft).collect(Collectors.toList()));
         if (hasSpeakerAnnotations) {
             annotation.set(CoreAnnotations.UseMarkedDiscourseAnnotation.class, true);
         }
@@ -86,6 +86,8 @@ public class CorefAnnotator {
 
         try {
             // add the relevant info to mentions and order them for coref
+            // TODO: Evvvvvvil, Let Stanford Change mentionExtractor to GrammaticalStructure based.
+            List<Tree> trees = annotatedSentences.stream().map(x -> x.getLeft().get(TreeCoreAnnotations.TreeAnnotation.class)).collect(Collectors.toList());
             Document document = mentionExtractor.arrange(annotation, sentences, trees, allUnprocessedMentions);
             List<List<Mention>> orderedMentions = document.getOrderedMentions();
             if (VERBOSE) {

@@ -29,7 +29,7 @@ public class StanfordNNParserTrainer {
         // 1,2502
         //        StanfordParserUtils.convertTreebankToCoNLLX(WSJ, filter, true, conllXTrainFile);
         //        StanfordParserUtils.convertTreebankToCoNLLX(extra, filter, true, "/Users/Maochen/Desktop/extra.conllx.txt");
-        StanfordParserUtils.convertTreebankToCoNLLX("/Users/Maochen/Desktop/data.mrg", filter, true, conllXTrainFile);
+        StanfordParserUtils.convertTreebankToCoNLLX("/Users/Maochen/Desktop/extra/treebank_extra_data/maochen_hand_parsed/wsj_2502.mrg", filter, conllXTrainFile);
         // List<String> a = Lists.newArrayList("-treeFile", "/Users/Maochen/Desktop/tree.txt", "−basic", "−keepPunct", "−conllx");
 
     }

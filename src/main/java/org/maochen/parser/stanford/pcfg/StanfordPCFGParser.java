@@ -1,99 +1,45 @@
 package org.maochen.parser.stanford.pcfg;
 
 import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Table;
-import edu.stanford.nlp.ie.NERClassifierCombiner;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
-import edu.stanford.nlp.ling.HasWord;
 import edu.stanford.nlp.ling.TaggedWord;
 import edu.stanford.nlp.parser.common.ParserQuery;
 import edu.stanford.nlp.parser.lexparser.LexicalizedParser;
-import edu.stanford.nlp.process.Morphology;
-import edu.stanford.nlp.process.Tokenizer;
-import edu.stanford.nlp.process.TokenizerFactory;
 import edu.stanford.nlp.semgraph.SemanticGraph;
 import edu.stanford.nlp.semgraph.SemanticGraphCoreAnnotations;
 import edu.stanford.nlp.semgraph.SemanticGraphFactory;
-import edu.stanford.nlp.tagger.maxent.MaxentTagger;
 import edu.stanford.nlp.trees.*;
 import edu.stanford.nlp.util.ArrayCoreMap;
 import edu.stanford.nlp.util.CoreMap;
 import edu.stanford.nlp.util.ScoredObject;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.maochen.datastructure.DTree;
-import org.maochen.datastructure.LangLib;
-import org.maochen.parser.IParser;
+import org.maochen.parser.stanford.StanfordParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Scanner;
 import java.util.stream.Collectors;
 
 /**
  * Created by Maochen on 12/8/14.
  */
-public class StanfordPCFGParser implements IParser {
+public class StanfordPCFGParser extends StanfordParser {
 
     private static final Logger LOG = LoggerFactory.getLogger(StanfordPCFGParser.class);
 
     private LexicalizedParser parser = null;
 
-    private List<NERClassifierCombiner> ners = new ArrayList<>();
-
-    private static MaxentTagger posTagger = null;
-
-    // This is for Lemma Tagger
-    private static final Set<String> particles = ImmutableSet.of(
-            "abroad", "across", "after", "ahead", "along", "aside", "away", "around",
-            "back", "down", "forward", "in", "off", "on", "over", "out",
-            "round", "together", "through", "up"
-    );
-
-    // 1. Tokenize
-    private List<CoreLabel> stanfordTokenize(String str) {
-        TokenizerFactory<? extends HasWord> tf = parser.getOp().tlpParams.treebankLanguagePack().getTokenizerFactory();
-
-        // ptb3Escaping=false -> '(' not converted as '-LRB-', Dont use it, it will cause Dependency resolution err.
-        Tokenizer<? extends HasWord> originalWordTokenizer = tf.getTokenizer(new StringReader(str), "ptb3Escaping=false");
-        Tokenizer<? extends HasWord> tokenizer = tf.getTokenizer(new StringReader(str));
-
-        List<? extends HasWord> originalTokens = originalWordTokenizer.tokenize();
-        List<? extends HasWord> tokens = tokenizer.tokenize();
-        // Curse you Stanford!
-        List<CoreLabel> coreLabels = new ArrayList<>(tokens.size());
-
-        for (int i = 0; i < tokens.size(); i++) {
-            CoreLabel coreLabel = new CoreLabel();
-            coreLabel.setWord(tokens.get(i).word());
-            coreLabel.setOriginalText(originalTokens.get(i).word());
-            coreLabel.setValue(tokens.get(i).word());
-            coreLabels.add(coreLabel);
-        }
-
-        return coreLabels;
-    }
-
-    // 2. POS Tagger
-    private void tagPOS(List<CoreLabel> tokens) {
-        if (posTagger == null) {
-            LOG.warn("POS Tagger not initialized, will use default POS Tagger model!");
-            String posTaggerModel = "edu/stanford/nlp/models/pos-tagger/english-left3words/english-left3words-distsim.tagger";
-            posTagger = new MaxentTagger(posTaggerModel);
-        }
-        List<TaggedWord> posList = posTagger.tagSentence(tokens);
-        for (int i = 0; i < tokens.size(); i++) {
-            String pos = posList.get(i).tag();
-            tokens.get(i).setTag(pos);
-        }
-    }
-
     // This is for the backward compatibility
     @Deprecated
-    private void tagPOS(List<CoreLabel> tokens, Tree tree) {
+    public void tagPOS(List<CoreLabel> tokens, Tree tree) {
         try {
             List<TaggedWord> posList = tree.getChild(0).taggedYield();
             for (int i = 0; i < tokens.size(); i++) {
@@ -106,100 +52,15 @@ public class StanfordPCFGParser implements IParser {
         }
     }
 
-    // For Lemma
-    private String phrasalVerb(Morphology morpha, String word, String tag) {
-        // must be a verb and contain an underscore
-        assert (word != null);
-        assert (tag != null);
-        if (!tag.startsWith(LangLib.POS_VB) || !word.contains("_")) return null;
-
-        // check whether the last part is a particle
-        String[] verb = word.split("_");
-        if (verb.length != 2) return null;
-        String particle = verb[1];
-        if (particles.contains(particle)) {
-            String base = verb[0];
-            String lemma = morpha.lemma(base, tag);
-            return lemma + '_' + particle;
-        }
-
-        return null;
-    }
-
-    // 3. Lemma Tagger
-    private void tagLemma(List<CoreLabel> tokens) {
-        // Not sure if this can be static.
-        Morphology morpha = new Morphology();
-
-        for (CoreLabel token : tokens) {
-            String lemma;
-            String pos = token.tag();
-            if (pos.equals(LangLib.POS_NNPS)) {
-                pos = LangLib.POS_NNS;
-            }
-            if (pos.length() > 0) {
-                String phrasalVerb = phrasalVerb(morpha, token.word(), pos);
-                if (phrasalVerb == null) {
-                    lemma = morpha.lemma(token.word(), pos);
-                } else {
-                    lemma = phrasalVerb;
-                }
-            } else {
-                lemma = morpha.stem(token.word());
-            }
-
-            // LGLibEn.convertUnI only accept cap I.
-            if (lemma.equals("i")) {
-                lemma = "I";
-            }
-
-            token.setLemma(lemma);
-        }
-    }
-
-    // 4. NER
-    private void tagNamedEntity(List<CoreLabel> tokens) {
-        boolean isPOSTagged = tokens.parallelStream().filter(x -> x.tag() == null).count() == 0;
-        if (!isPOSTagged) {
-            throw new RuntimeException("Please Run POS Tagger before Named Entity tagger.");
-        }
-        ners.stream().forEach(ner -> ner.classify(tokens));
-    }
-
-    /**
-     * This is a piece of mystery code. It allows copula as head!!! Dont touch this unless you have full confidence.
-     * This code cannot be found in their Javadoc....
-     * By Maochen
-     */
-    // What is Mary happy about? -- copula
-    private GrammaticalStructure getDependencies(Tree tree, boolean makeCopulaVerbHead) {
-        SemanticHeadFinder headFinder = new SemanticHeadFinder(!makeCopulaVerbHead); // keep copula verbs as head
-        // string -> true return all tokens including punctuations.
-        GrammaticalStructure gs = new EnglishGrammaticalStructure(tree, string -> true, headFinder, true);
-        return gs;
-    }
-
-    // Exclusive for w2v IR using.
-    public String getLemmaizedSentence(String sentence) {
-        List<CoreLabel> tokens = stanfordTokenize(sentence);
-        tagPOS(tokens);
-        tagLemma(tokens);
-        return tokens.stream().map(CoreLabel::lemma).reduce((l1, l2) -> l1 + StringUtils.SPACE + l2).get();
-    }
-
     // This is for coref using.
-    public CoreMap parseForCoref(String sentence) {
+    public Pair<CoreMap, GrammaticalStructure> parseForCoref(String sentence) {
         List<CoreLabel> tokens = stanfordTokenize(sentence);
         Tree tree = parser.parse(tokens);
-
+        GrammaticalStructure gs = tagDependencies(tree, true);
         tagPOS(tokens);
         tagLemma(tokens);
         tagNamedEntity(tokens);
-        GrammaticalStructure gs = new edu.stanford.nlp.trees.EnglishGrammaticalStructure(tree, string -> true, new SemanticHeadFinder(), true);
-        gs.typedDependencies().forEach(x -> {
-            x.gov().setValue(x.gov().word());
-            x.dep().setValue(x.dep().word());
-        });
+
         CoreMap result = new ArrayCoreMap();
         result.set(CoreAnnotations.TokensAnnotation.class, tokens);
         result.set(TreeCoreAnnotations.TreeAnnotation.class, tree);
@@ -212,25 +73,28 @@ public class StanfordPCFGParser implements IParser {
         result.set(SemanticGraphCoreAnnotations.CollapsedDependenciesAnnotation.class, deps);
         result.set(SemanticGraphCoreAnnotations.BasicDependenciesAnnotation.class, uncollapsedDeps);
         result.set(SemanticGraphCoreAnnotations.CollapsedCCProcessedDependenciesAnnotation.class, ccDeps);
-        return result;
+        return new ImmutablePair<>(result, gs);
     }
 
-    public void loadModel(String modelFileLoc, String posTaggerModel) {
-        if (modelFileLoc != null && !modelFileLoc.isEmpty()) {
-            parser = LexicalizedParser.loadModel(modelFileLoc, new ArrayList<>());
-        }
-
-        if (posTaggerModel != null && !posTaggerModel.isEmpty()) {
-            posTagger = new MaxentTagger(posTaggerModel);
-        }
+    /**
+     * This is a piece of mystery code. It allows copula as head!!! Dont touch this unless you have full confidence.
+     * This code cannot be found in their Javadoc....
+     * By Maochen
+     */
+    // What is Mary happy about? -- copula
+    private GrammaticalStructure tagDependencies(Tree tree, boolean makeCopulaVerbHead) {
+        SemanticHeadFinder headFinder = new SemanticHeadFinder(!makeCopulaVerbHead); // keep copula verbs as head
+        // string -> true return all tokens including punctuations.
+        GrammaticalStructure gs = new EnglishGrammaticalStructure(tree, string -> true, headFinder, true);
+        return gs;
     }
 
     @Override
-    public DTree parse(String sentence) {
+    public DTree parse(final String sentence) {
         List<CoreLabel> tokens = stanfordTokenize(sentence);
         // Parse right after get through tokenizer.
         Tree tree = parser.parse(tokens);
-        GrammaticalStructure gs = getDependencies(tree, true);
+        GrammaticalStructure gs = tagDependencies(tree, true);
 
         tagPOS(tokens, tree);
         tagLemma(tokens);
@@ -263,20 +127,15 @@ public class StanfordPCFGParser implements IParser {
             tagPOS(tokens);
             tagLemma(tokens);
 
-            GrammaticalStructure gs = getDependencies(tree, true);
+            GrammaticalStructure gs = tagDependencies(tree, true);
             DTree depTree = StanfordTreeBuilder.generate(tokens, gs.typedDependencies(), null);
             result.put(depTree, tree, scoredTuple.score());
         }
         return result;
     }
 
-    public List<String> tokenize(String sentence) {
-        List<CoreLabel> tokens = stanfordTokenize(sentence);
-        return tokens.stream().parallel().map(CoreLabel::originalText).collect(Collectors.toList());
-    }
-
     public StanfordPCFGParser() {
-        this(StringUtils.EMPTY, StringUtils.EMPTY, true);
+        this(null, null, false);
     }
 
     public StanfordPCFGParser(String modelPath, String posTaggerModel, boolean initNER) {
@@ -284,17 +143,8 @@ public class StanfordPCFGParser implements IParser {
             modelPath = "edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz"; // Default PCFG model.
         }
 
-        loadModel(modelPath, posTaggerModel);
-
-        if (initNER) {
-            // STUPID NER, Throw IOException in the constructor ... : (
-            try {
-                ners.add(new NERClassifierCombiner("edu/stanford/nlp/models/ner/english.all.3class.distsim.crf.ser.gz"));
-                ners.add(new NERClassifierCombiner("edu/stanford/nlp/models/ner/english.muc.7class.distsim.crf.ser.gz"));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+        parser = LexicalizedParser.loadModel(modelPath, new ArrayList<>());
+        super.load(posTaggerModel, initNER);
     }
 
     public static void main(String[] args) {

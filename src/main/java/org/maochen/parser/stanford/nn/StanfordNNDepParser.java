@@ -1,135 +1,28 @@
 package org.maochen.parser.stanford.nn;
 
-import com.google.common.collect.ImmutableSet;
-import edu.stanford.nlp.ie.NERClassifierCombiner;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.ling.HasWord;
-import edu.stanford.nlp.ling.TaggedWord;
-import edu.stanford.nlp.ling.Word;
 import edu.stanford.nlp.parser.nndep.DependencyParser;
-import edu.stanford.nlp.process.Morphology;
-import edu.stanford.nlp.process.PTBTokenizer;
-import edu.stanford.nlp.process.Tokenizer;
-import edu.stanford.nlp.process.TokenizerFactory;
-import edu.stanford.nlp.tagger.maxent.MaxentTagger;
 import edu.stanford.nlp.trees.GrammaticalStructure;
 import org.maochen.datastructure.DTree;
-import org.maochen.datastructure.LangLib;
 import org.maochen.parser.IParser;
 import org.maochen.parser.StanfordParserUtils;
+import org.maochen.parser.stanford.StanfordParser;
 import org.maochen.utils.LangTools;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by Maochen on 4/6/15.
  */
-public class StanfordNNDepParser implements IParser {
+public class StanfordNNDepParser extends StanfordParser {
 
-    private static final TokenizerFactory<Word> tf = PTBTokenizer.PTBTokenizerFactory.newTokenizerFactory();
-    private static final MaxentTagger posTagger = new MaxentTagger("edu/stanford/nlp/models/pos-tagger/english-left3words/english-left3words-distsim.tagger");
     public static DependencyParser nndepParser = null;
-
-    private List<NERClassifierCombiner> ners = new ArrayList<>();
-
-    // This is for Lemma Tagger
-    private static final Set<String> particles = ImmutableSet.of(
-            "abroad", "across", "after", "ahead", "along", "aside", "away", "around",
-            "back", "down", "forward", "in", "off", "on", "over", "out",
-            "round", "together", "through", "up"
-    );
-
-    // 1. Tokenize
-    private static List<CoreLabel> stanfordTokenize(String str) {
-        Tokenizer<Word> originalWordTokenizer = tf.getTokenizer(new StringReader(str), "ptb3Escaping=false");
-        Tokenizer<Word> tokenizer = tf.getTokenizer(new StringReader(str));
-
-        List<Word> originalTokens = originalWordTokenizer.tokenize();
-        List<Word> tokens = tokenizer.tokenize();
-        // Curse you Stanford!
-        List<CoreLabel> coreLabels = new ArrayList<>(tokens.size());
-
-        for (int i = 0; i < tokens.size(); i++) {
-            CoreLabel coreLabel = new CoreLabel();
-            coreLabel.setWord(tokens.get(i).word());
-            coreLabel.setValue(originalTokens.get(i).word());
-            coreLabel.setOriginalText(originalTokens.get(i).word());
-            coreLabels.add(coreLabel);
-        }
-
-        return coreLabels;
-    }
-
-    // 2. POS Tagger
-    private static void tagPOS(List<CoreLabel> tokenizedSentence) {
-        List<TaggedWord> tokens = posTagger.tagSentence(tokenizedSentence);
-
-        for (int i = 0; i < tokens.size(); i++) {
-            String pos = tokens.get(i).tag();
-            tokenizedSentence.get(i).setTag(pos);
-        }
-    }
-
-    // 3. Lemma Tagger
-    public static void tagLemma(List<CoreLabel> tokens) {
-        // Not sure if this can be static.
-        Morphology morpha = new Morphology();
-
-        for (CoreLabel token : tokens) {
-            String lemma;
-            if (token.tag().length() > 0) {
-                String phrasalVerb = phrasalVerb(morpha, token.word(), token.tag());
-                if (phrasalVerb == null) {
-                    lemma = morpha.lemma(token.word(), token.tag());
-                } else {
-                    lemma = phrasalVerb;
-                }
-            } else {
-                lemma = morpha.stem(token.word());
-            }
-
-            // LGLibEn.convertUnI only accept cap I.
-            if (lemma.equals("i")) {
-                lemma = "I";
-            }
-
-            token.setLemma(lemma);
-        }
-    }
-
-    // For Lemma
-    private static String phrasalVerb(Morphology morpha, String word, String tag) {
-        // must be a verb and contain an underscore
-        assert (word != null);
-        assert (tag != null);
-        if (!tag.startsWith(LangLib.POS_VB) || !word.contains("_")) return null;
-
-        // check whether the last part is a particle
-        String[] verb = word.split("_");
-        if (verb.length != 2) return null;
-        String particle = verb[1];
-        if (particles.contains(particle)) {
-            String base = verb[0];
-            String lemma = morpha.lemma(base, tag);
-            return lemma + '_' + particle;
-        }
-
-        return null;
-    }
 
     // 4. Dependency Label
     private GrammaticalStructure tagDependencies(List<? extends HasWord> taggedWords) {
         GrammaticalStructure gs = nndepParser.predict(taggedWords);
         return gs;
-    }
-
-    // 5. Named Entity Tagger
-    private void tagNamedEntity(List<CoreLabel> tokens) {
-        ners.stream().forEach(ner -> ner.classify(tokens));
     }
 
     @Override
@@ -145,33 +38,17 @@ public class StanfordNNDepParser implements IParser {
     }
 
     public StanfordNNDepParser() {
-        this(null, true);
+        this(null, null, false);
     }
 
-    public StanfordNNDepParser(final String inputModelPath, boolean initNER) {
+    public StanfordNNDepParser(final String inputModelPath, final String posTaggerModel, final boolean initNER) {
         String modelPath = inputModelPath == null || inputModelPath.trim().isEmpty() ? DependencyParser.DEFAULT_MODEL : inputModelPath;
         nndepParser = DependencyParser.loadFromModelFile(modelPath);
-
-        if (initNER) {
-            // STUPID NER, Throw IOException in the constructor ... : (
-            try {
-                ners.add(new NERClassifierCombiner("edu/stanford/nlp/models/ner/english.all.3class.distsim.crf.ser.gz"));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    // This is just for debugging.
-    public GrammaticalStructure getGrammaticalStructure(String sentence) {
-        List<CoreLabel> tokenizedSentence = stanfordTokenize(sentence);
-        tagPOS(tokenizedSentence);
-        tagLemma(tokenizedSentence);
-        return tagDependencies(tokenizedSentence);
+        super.load(posTaggerModel, initNER);
     }
 
     public static void main(String[] args) {
-        StanfordNNDepParser parser = new StanfordNNDepParser(DependencyParser.DEFAULT_MODEL, false);
+        IParser parser = new StanfordNNDepParser(DependencyParser.DEFAULT_MODEL, null, false);
         String text = "I went to the store and buy a car.";
         System.out.println(parser.parse(text));
     }
