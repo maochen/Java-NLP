@@ -79,7 +79,6 @@ public class StanfordTreeBuilder {
         }
     }
 
-    // cPOSTag is not used here.
     public static DTree generate(List<CoreLabel> tokens, Collection<TypedDependency> dependencies, List<Label> cPOSTag) {
         DTree depTree = new DTree();
 
