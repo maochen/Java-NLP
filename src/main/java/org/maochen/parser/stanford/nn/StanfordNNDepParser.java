@@ -19,7 +19,7 @@ import org.maochen.parser.IParser;
 import org.maochen.parser.StanfordParserUtils;
 import org.maochen.utils.LangTools;
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -156,7 +156,7 @@ public class StanfordNNDepParser implements IParser {
             // STUPID NER, Throw IOException in the constructor ... : (
             try {
                 ners.add(new NERClassifierCombiner("edu/stanford/nlp/models/ner/english.all.3class.distsim.crf.ser.gz"));
-            } catch (FileNotFoundException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }

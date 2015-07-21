@@ -28,7 +28,7 @@ import org.maochen.parser.IParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -291,7 +291,7 @@ public class StanfordPCFGParser implements IParser {
             try {
                 ners.add(new NERClassifierCombiner("edu/stanford/nlp/models/ner/english.all.3class.distsim.crf.ser.gz"));
                 ners.add(new NERClassifierCombiner("edu/stanford/nlp/models/ner/english.muc.7class.distsim.crf.ser.gz"));
-            } catch (FileNotFoundException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
