@@ -5,10 +5,10 @@ import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.ling.Label;
 import edu.stanford.nlp.trees.TypedDependency;
 import org.apache.commons.lang3.StringUtils;
-import org.maochen.datastructure.DNode;
-import org.maochen.datastructure.DTree;
-import org.maochen.datastructure.LangLib;
-import org.maochen.utils.LangTools;
+import org.maochen.nlp.datastructure.DNode;
+import org.maochen.nlp.datastructure.DTree;
+import org.maochen.nlp.datastructure.LangLib;
+import org.maochen.nlp.datastructure.LangTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

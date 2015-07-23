@@ -8,22 +8,7 @@ import java.util.stream.Collectors;
 /**
  * Copyright 2014-2015 maochen.org
  * Author: Maochen.G   contact@maochen.org
- * For the detail information about license, check the LICENSE.txt
- * <p>
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
- * <p>
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * <p>
- * You should have received a copy of the GNU General Public License
- * along with this program ; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston,
- * MA  02111-1307 USA
+ * License: check the LICENSE file.
  * <p>
  * This follows CoNLL-U shared task: Multi-Lingual Dependency Parsing Format
  * http://universaldependencies.github.io/docs/format.html
@@ -59,7 +44,7 @@ public class DNode {
         depLabel = StringUtils.EMPTY;
     }
 
-    public DNode(int id, String form, String lemma,String cPOSTag, String pos, String depLabel) {
+    public DNode(int id, String form, String lemma, String cPOSTag, String pos, String depLabel) {
         this();
         this.id = id;
         this.form = form;
@@ -145,14 +130,14 @@ public class DNode {
         return feats.get(key);
     }
 
-    public void removeFeature(String key) {
-        feats.remove(key);
-    }
-
     public void setFeats(Map<String, String> feats) {
         if (feats != null) {
             this.feats = feats;
         }
+    }
+
+    public Map<String, String> getFeats() {
+        return feats;
     }
 
     public List<DNode> getChildrenByDepLabels(final String... labels) {

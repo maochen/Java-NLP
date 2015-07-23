@@ -17,7 +17,7 @@ import edu.stanford.nlp.util.ScoredObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.maochen.datastructure.DTree;
+import org.maochen.nlp.datastructure.DTree;
 import org.maochen.parser.stanford.StanfordParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

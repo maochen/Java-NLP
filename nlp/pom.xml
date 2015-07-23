@@ -4,14 +4,14 @@
     <groupId>org.maochen.nlp</groupId>
     <artifactId>nlp</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <name>NLP Project</name>
     <url>https://github.com/maochen/NLP</url>
 
     <licenses>
         <license>
-            <name>GPL, Version 3.0</name>
-            <url>http://www.gnu.org/licenses/gpl-3.0.txt</url>
+            <name>Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
             <distribution>repo</distribution>
         </license>
     </licenses>

@@ -8,6 +8,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
+ * Copyright 2014-2015 maochen.org
+ * Author: Maochen.G   contact@maochen.org
+ * License: check the LICENSE file.
+ * <p>
  * Created by Maochen on 12/10/14.
  */
 public class LangTools {
@@ -126,7 +130,7 @@ public class LangTools {
             int headIndex = Integer.parseInt(node.getFeature("head"));
             DNode head = tree.get(headIndex);
             head.addChild(node);
-            node.removeFeature("head");
+            node.getFeats().remove("head");
             node.setHead(head);
         }
 

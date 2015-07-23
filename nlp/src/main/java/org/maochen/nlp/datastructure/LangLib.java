@@ -3,22 +3,7 @@ package org.maochen.nlp.datastructure;
 /**
  * Copyright 2014-2015 maochen.org
  * Author: Maochen.G   contact@maochen.org
- * For the detail information about license, check the LICENSE.txt
- * <p>
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
- * <p>
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * <p>
- * You should have received a copy of the GNU General Public License
- * along with this program ; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston,
- * MA  02111-1307 USA
+ * License: check the LICENSE file.
  * <p>
  * Created by Maochen on 12/8/14.
  */
@@ -92,14 +77,15 @@ public class LangLib {
      * This is based on MUC-7.
      * http://www-nlpir.nist.gov/related_projects/muc/proceedings/ne_task.html
      */
-    public static final String NE_TIME = "TIME";
+    public static final String NE_DATE = "DATE";
+    public static final String NE_MISC = "MISC";
+    public static final String NE_MONEY = "MONEY";
     public static final String NE_LOC = "LOCATION";
     public static final String NE_ORG = "ORGANIZATION";
     public static final String NE_PERSON = "PERSON";
-    public static final String NE_MONEY = "MONEY";
     public static final String NE_PERCENT = "PERCENT";
-    public static final String NE_DATE = "DATE";
-    public static final String NE_MISC = "MISC";
+    public static final String NE_TIME = "TIME";
+
 
     /**
      * Dependency Labels are derived from Stanford Typed Dependencies.
@@ -165,4 +151,35 @@ public class LangLib {
     public static final String DEP_XCOMP = "xcomp"; // open clausal modifiers
     public static final String DEP_XSUBJ = "x" + DEP_SUBJ; // open clausal subjects
 
+    /**
+     * SRLs are derived from PROPBANK.
+     * http://verbs.colorado.edu/~mpalmer/projects/ace/PBguidelines.pdf
+     */
+    public final static String SRL_A0 = "A0"; // Agent of verb
+    public final static String SRL_A1 = "A1"; // Patient or theme of verb
+    public final static String SRL_A2 = "A2"; // Instrument, benefaction or attribute
+    public final static String SRL_A3 = "A3"; // Starting point
+    public final static String SRL_A4 = "A4"; // Ending point
+    public final static String SRL_AA = "AA"; // External causer
+    public final static String SRL_AM_ADJ = "AM-ADJ"; // Adjectival
+    public final static String SRL_AM_ADV = "AM-ADV"; // Adverbial
+    public final static String SRL_AM_CAU = "AM-CAU"; // Cause
+    public final static String SRL_AM_COM = "AM-COM";// Comitative
+    public final static String SRL_AM_DIR = "AM-DIR"; // Direction
+    public final static String SRL_AM_DIS = "AM-DIS"; // Discourse
+    public final static String SRL_AM_GOL = "AM-GOL"; // Goal
+    public final static String SRL_AM_EXT = "AM-EXT"; // Extent
+    public final static String SRL_AM_LOC = "AM-LOC"; // Location
+    public final static String SRL_AM_MNR = "AM-MNR"; // Manner
+    public final static String SRL_AM_MOD = "AM-MOD"; // Modal
+    public final static String SRL_AM_NEG = "AM-NEG"; // Negation
+    public final static String SRL_AM_PRD = "AM-PRD"; // Secondary Predication
+    public final static String SRL_AM_PRP = "AM-PRP"; // Purpose
+    /**
+     * Ex. make change to the data.
+     * "make" is a like verb and it is effectively allowing change to become a verb so "change" is "AM-PRR"
+     */
+    public final static String SRL_AM_PRR = "AM-PRR"; // Indicates a like verb construction.
+    public final static String SRL_AM_REC = "AM-REC"; // Reciprocal
+    public final static String SRL_AM_TMP = "AM-TMP"; // Temporal
 }

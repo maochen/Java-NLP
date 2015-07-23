@@ -3,11 +3,11 @@ package org.maochen.parser;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.trees.*;
-import org.maochen.datastructure.DTree;
+import org.maochen.nlp.datastructure.DTree;
+import org.maochen.nlp.datastructure.LangTools;
 import org.maochen.parser.stanford.StanfordParser;
 import org.maochen.parser.stanford.nn.StanfordNNDepParser;
 import org.maochen.parser.stanford.pcfg.StanfordTreeBuilder;
-import org.maochen.utils.LangTools;
 
 import java.io.FileFilter;
 import java.io.FileWriter;

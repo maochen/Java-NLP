@@ -3,7 +3,7 @@ package org.maochen.sentencetypeclassifier;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.apache.commons.lang3.StringUtils;
-import org.maochen.datastructure.DTree;
+import org.maochen.nlp.datastructure.DTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -117,13 +117,10 @@ public class TrainingFeatureExtractor extends FeatureExtractor {
 
         final String delimiter = super.delimiter;
         for (final String entry : trainEntries) {
-            Callable<String> entryCallable = new Callable<String>() {
-                @Override
-                public String call() throws Exception {
-                    String featVector = getFeats(entry, depTreeCache.get(entry.split(delimiter)[0]));
-                    vectorSet.add(featVector);
-                    return featVector;
-                }
+            Callable<String> entryCallable = () -> {
+                String featVector = getFeats(entry, depTreeCache.get(entry.split(delimiter)[0]));
+                vectorSet.add(featVector);
+                return featVector;
             };
 
             Future<String> future = executorService.submit(entryCallable);

@@ -4,11 +4,11 @@ import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.ling.HasWord;
 import edu.stanford.nlp.parser.nndep.DependencyParser;
 import edu.stanford.nlp.trees.GrammaticalStructure;
-import org.maochen.datastructure.DTree;
+import org.maochen.nlp.datastructure.DTree;
+import org.maochen.nlp.datastructure.LangTools;
 import org.maochen.parser.IParser;
 import org.maochen.parser.StanfordParserUtils;
 import org.maochen.parser.stanford.StanfordParser;
-import org.maochen.utils.LangTools;
 
 import java.util.List;
 
@@ -50,6 +50,7 @@ public class StanfordNNDepParser extends StanfordParser {
     public static void main(String[] args) {
         IParser parser = new StanfordNNDepParser(DependencyParser.DEFAULT_MODEL, null, false);
         String text = "I went to the store and buy a car.";
-        System.out.println(parser.parse(text));
+        DTree tree = parser.parse(text);
+        System.out.println(parser.parse(text).toString());
     }
 }
