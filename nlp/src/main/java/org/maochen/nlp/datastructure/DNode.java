@@ -32,7 +32,7 @@ public class DNode {
     private Map<DNode, String> semanticHeads = new HashMap<>();
     private Set<DNode> semanticChildren = new HashSet<>();
     private DTree tree = null; // Refs to the whole dependency tree
-    private static final String NAMED_ENTITY_KEY = "name_entity";
+    public static final String NAMED_ENTITY_KEY = "name_entity";
 
     public DNode() {
         id = 0;
