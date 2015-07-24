@@ -8,8 +8,8 @@
     <url>${project.parent.url}</url>
 
     <parent>
-        <groupId>org.maochen.nlp.maochen.nlp</groupId>
-        <artifactId>CoreNLP</artifactId>
+        <groupId>org.maochen.nlp</groupId>
+        <artifactId>NLP</artifactId>
         <version>1.0.3</version>
     </parent>
 

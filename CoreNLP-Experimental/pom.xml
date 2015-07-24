@@ -8,8 +8,8 @@
     <url>${project.parent.url}</url>
 
     <parent>
-        <groupId>org.maochen.nlp.maochen.nlp</groupId>
-        <artifactId>CoreNLP</artifactId>
+        <groupId>org.maochen.nlp</groupId>
+        <artifactId>NLP</artifactId>
         <version>1.0.3</version>
     </parent>
 
@@ -124,9 +124,14 @@
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.maochen.nlp.maochen.nlp</groupId>
+            <groupId>org.maochen.nlp</groupId>
             <artifactId>CoreNLP-NLP</artifactId>
             <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.opennlp</groupId>
+            <artifactId>opennlp-maxent</artifactId>
+            <version>3.0.3</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
