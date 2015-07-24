@@ -2,6 +2,7 @@ package org.maochen.utils;
 
 
 import org.junit.Test;
+import org.maochen.nlp.datastructure.LangTools;
 
 import static org.junit.Assert.fail;
 
