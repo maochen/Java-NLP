@@ -10,7 +10,7 @@
     <parent>
         <groupId>org.maochen.nlp</groupId>
         <artifactId>NLP</artifactId>
-        <version>1.0.3</version>
+        <version>1.0.4</version>
     </parent>
 
     <licenses>
@@ -132,11 +132,6 @@
             <groupId>org.apache.opennlp</groupId>
             <artifactId>opennlp-maxent</artifactId>
             <version>3.0.3</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.3.2</version>
         </dependency>
 
         <dependency>
