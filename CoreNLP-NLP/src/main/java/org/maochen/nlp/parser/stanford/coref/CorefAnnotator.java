@@ -11,7 +11,6 @@ import edu.stanford.nlp.trees.GrammaticalStructure;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.TreeCoreAnnotations;
 import edu.stanford.nlp.util.CoreMap;
-import edu.stanford.nlp.util.PropertiesUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
@@ -40,7 +39,7 @@ public class CorefAnnotator {
         try {
             corefSystem = new SieveCoreferenceSystem(props);
             mentionExtractor = new MentionExtractor(corefSystem.dictionaries(), corefSystem.semantics());
-            allowReparsing = PropertiesUtils.getBool(props, Constants.ALLOW_REPARSING_PROP, Constants.ALLOW_REPARSING);
+            allowReparsing = false;// PropertiesUtils.getBool(props, Constants.ALLOW_REPARSING_PROP, Constants.ALLOW_REPARSING);
         } catch (Exception e) {
             System.err.println("ERROR: cannot create CorefAnnotator!");
             e.printStackTrace();

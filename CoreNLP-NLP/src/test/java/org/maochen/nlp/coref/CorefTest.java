@@ -1,7 +1,7 @@
 package org.maochen.nlp.coref;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.maochen.nlp.parser.stanford.coref.StanfordCoref;
@@ -19,9 +19,12 @@ public class CorefTest {
         StanfordPCFGParser parser = new StanfordPCFGParser(null, null, true);
         StanfordCoref coref = new StanfordCoref(parser);
 
-        List<String> texts = Lists.newArrayList("Google invests in companies since they have more choices");
-        String actual = coref.getCoref(texts).stream().findFirst().orElse(StringUtils.EMPTY);
-        String expected = "Google invests in companies since companies have more choices";
-        Assert.assertEquals(expected, actual);
+        List<String> texts = Lists.newArrayList("Google invests in companies since they have more choices.", "They understand it is hard.");
+        List<String> actualList = coref.getCoref(texts);
+        List<String> expectedList = ImmutableList.of("Google invests in companies since companies have more choices .", "companies understand Google is hard .");
+
+        for (int i = 0; i < actualList.size(); i++) {
+            Assert.assertEquals(expectedList.get(i), actualList.get(i));
+        }
     }
 }
