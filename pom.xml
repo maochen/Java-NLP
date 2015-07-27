@@ -5,7 +5,7 @@
     <groupId>org.maochen.nlp</groupId>
     <artifactId>NLP</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.5</version>
+    <version>1.0.6</version>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Maochen.org Natural Lang Processing Suite</description>
     <url>http://maven.apache.org</url>
@@ -121,12 +121,6 @@
     </build>
 
     <dependencies>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>1.7.12</version>
-        </dependency>
-
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>

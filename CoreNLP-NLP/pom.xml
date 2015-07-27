@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.maochen.nlp</groupId>
         <artifactId>NLP</artifactId>
-        <version>1.0.5</version>
+        <version>1.0.6</version>
     </parent>
 
     <licenses>
@@ -127,6 +127,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.7.12</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>19.0-rc1</version>
@@ -151,5 +157,6 @@
             <version>4.12</version>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
 </project>
