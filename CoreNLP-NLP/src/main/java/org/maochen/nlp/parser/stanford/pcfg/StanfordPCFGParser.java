@@ -2,18 +2,7 @@ package org.maochen.nlp.parser.stanford.pcfg;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
-import edu.stanford.nlp.ling.CoreAnnotations;
-import edu.stanford.nlp.ling.CoreLabel;
-import edu.stanford.nlp.ling.TaggedWord;
-import edu.stanford.nlp.parser.common.ParserQuery;
-import edu.stanford.nlp.parser.lexparser.LexicalizedParser;
-import edu.stanford.nlp.semgraph.SemanticGraph;
-import edu.stanford.nlp.semgraph.SemanticGraphCoreAnnotations;
-import edu.stanford.nlp.semgraph.SemanticGraphFactory;
-import edu.stanford.nlp.trees.*;
-import edu.stanford.nlp.util.ArrayCoreMap;
-import edu.stanford.nlp.util.CoreMap;
-import edu.stanford.nlp.util.ScoredObject;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -23,10 +12,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
+
+import edu.stanford.nlp.ling.CoreAnnotations;
+import edu.stanford.nlp.ling.CoreLabel;
+import edu.stanford.nlp.ling.TaggedWord;
+import edu.stanford.nlp.parser.common.ParserQuery;
+import edu.stanford.nlp.parser.lexparser.LexicalizedParser;
+import edu.stanford.nlp.semgraph.SemanticGraph;
+import edu.stanford.nlp.semgraph.SemanticGraphCoreAnnotations;
+import edu.stanford.nlp.semgraph.SemanticGraphFactory;
+import edu.stanford.nlp.trees.EnglishGrammaticalStructure;
+import edu.stanford.nlp.trees.GrammaticalStructure;
+import edu.stanford.nlp.trees.SemanticHeadFinder;
+import edu.stanford.nlp.trees.Tree;
+import edu.stanford.nlp.trees.TreeCoreAnnotations;
+import edu.stanford.nlp.util.ArrayCoreMap;
+import edu.stanford.nlp.util.CoreMap;
+import edu.stanford.nlp.util.ScoredObject;
 
 /**
  * Created by Maochen on 12/8/14.
@@ -38,7 +43,6 @@ public class StanfordPCFGParser extends StanfordParser {
     private LexicalizedParser parser = null;
 
     // This is for the backward compatibility
-    @Deprecated
     public void tagPOS(List<CoreLabel> tokens, Tree tree) {
         try {
             List<TaggedWord> posList = tree.getChild(0).taggedYield();
@@ -77,9 +81,8 @@ public class StanfordPCFGParser extends StanfordParser {
     }
 
     /**
-     * This is a piece of mystery code. It allows copula as head!!! Dont touch this unless you have full confidence.
-     * This code cannot be found in their Javadoc....
-     * By Maochen
+     * This is a piece of mystery code. It allows copula as head!!! Dont touch this unless you have
+     * full confidence. This code cannot be found in their Javadoc.... By Maochen
      */
     // What is Mary happy about? -- copula
     private GrammaticalStructure tagDependencies(Tree tree, boolean makeCopulaVerbHead) {
@@ -118,13 +121,12 @@ public class StanfordPCFGParser extends StanfordParser {
         pq.parse(tokens);
         List<ScoredObject<Tree>> scoredTrees = pq.getKBestPCFGParses(k);
 
-        tagPOS(tokens);
+        tagPOS(tokens, scoredTrees.get(0).object());
         tagNamedEntity(tokens);
 
         Table<DTree, Tree, Double> result = HashBasedTable.create();
         for (ScoredObject<Tree> scoredTuple : scoredTrees) {
             Tree tree = scoredTuple.object();
-            tagPOS(tokens);
             tagLemma(tokens);
 
             GrammaticalStructure gs = tagDependencies(tree, true);
@@ -135,22 +137,22 @@ public class StanfordPCFGParser extends StanfordParser {
     }
 
     public StanfordPCFGParser() {
-        this(null, null, false);
+        this(null, null, null);
     }
 
-    public StanfordPCFGParser(String modelPath, String posTaggerModel, boolean initNER) {
+    public StanfordPCFGParser(String modelPath, String posTaggerModel, List<String> ners) {
         if (modelPath == null || modelPath.trim().isEmpty()) {
             modelPath = "edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz"; // Default PCFG model.
         }
 
         parser = LexicalizedParser.loadModel(modelPath, new ArrayList<>());
-        super.load(posTaggerModel, initNER);
+        super.load(posTaggerModel, ners);
     }
 
     public static void main(String[] args) {
         String modelFile = "/Users/Maochen/workspace/nlpservice/nlp-service-remote/src/main/resources/classifierData/englishPCFG.ser.gz";
         String posTaggerModel = null;//"/Users/Maochen/workspace/nlpservice/nlp-service-remote/src/main/resources/classifierData/english-left3words-distsim.tagger";
-        StanfordPCFGParser parser = new StanfordPCFGParser(modelFile, posTaggerModel, false);
+        StanfordPCFGParser parser = new StanfordPCFGParser(modelFile, posTaggerModel, null);
 
         Scanner scan = new Scanner(System.in);
         String input = StringUtils.EMPTY;
@@ -160,19 +162,19 @@ public class StanfordPCFGParser extends StanfordParser {
             System.out.println("Please enter sentence:");
             input = scan.nextLine();
             if (!input.trim().isEmpty() && !input.matches(quitRegex)) {
-                //                System.out.println(print(false, parser.parse(input)));
-
+                // System.out.println(parser.parse(input).toString());
                 Table<DTree, Tree, Double> trees = parser.getKBestParse(input, 3);
 
                 List<Table.Cell<DTree, Tree, Double>> results = trees.cellSet().parallelStream().collect(Collectors.toList());
-                Collections.sort(results, (o1, o2) -> Double.compare(o2.getValue(), o1.getValue()));
+                results.sort((o1, o2) -> Double.compare(o2.getValue(), o1.getValue()));
                 for (Table.Cell<DTree, Tree, Double> entry : results) {
                     System.out.println("--------------------------");
                     System.out.println(entry.getValue());
                     System.out.println(entry.getColumnKey().pennString());
-                    System.out.println("");
+                    System.out.println(StringUtils.EMPTY);
                     System.out.println(entry.getRowKey());
                 }
+
             }
         }
 

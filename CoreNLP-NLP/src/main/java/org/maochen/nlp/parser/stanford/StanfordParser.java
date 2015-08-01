@@ -1,15 +1,7 @@
 package org.maochen.nlp.parser.stanford;
 
 import com.google.common.collect.ImmutableSet;
-import edu.stanford.nlp.ie.NERClassifierCombiner;
-import edu.stanford.nlp.ling.CoreLabel;
-import edu.stanford.nlp.ling.HasWord;
-import edu.stanford.nlp.ling.TaggedWord;
-import edu.stanford.nlp.process.Morphology;
-import edu.stanford.nlp.process.PTBTokenizer;
-import edu.stanford.nlp.process.Tokenizer;
-import edu.stanford.nlp.process.TokenizerFactory;
-import edu.stanford.nlp.tagger.maxent.MaxentTagger;
+
 import org.maochen.nlp.datastructure.DTree;
 import org.maochen.nlp.datastructure.LangLib;
 import org.maochen.nlp.parser.IParser;
@@ -21,6 +13,17 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import edu.stanford.nlp.ie.NERClassifierCombiner;
+import edu.stanford.nlp.ling.CoreLabel;
+import edu.stanford.nlp.ling.HasWord;
+import edu.stanford.nlp.ling.TaggedWord;
+import edu.stanford.nlp.process.Morphology;
+import edu.stanford.nlp.process.PTBTokenizer;
+import edu.stanford.nlp.process.Tokenizer;
+import edu.stanford.nlp.process.TokenizerFactory;
+import edu.stanford.nlp.tagger.maxent.MaxentTagger;
 
 /**
  * Created by Maochen on 7/20/15.
@@ -31,7 +34,9 @@ public abstract class StanfordParser implements IParser {
 
     private static MaxentTagger posTagger = null;
 
-    private List<NERClassifierCombiner> ners = new ArrayList<>();
+    private static String posTaggerModelPath = null;
+
+    private List<NERClassifierCombiner> ners;
 
     // This is for Lemma Tagger
     private static final Set<String> particles = ImmutableSet.of(
@@ -67,9 +72,11 @@ public abstract class StanfordParser implements IParser {
     // 2. POS Tagger
     public void tagPOS(List<CoreLabel> tokens) {
         if (posTagger == null) {
-            LOG.warn("POS Tagger not initialized, will use default POS Tagger model!");
-            String posTaggerModel = "edu/stanford/nlp/models/pos-tagger/english-left3words/english-left3words-distsim.tagger";
-            posTagger = new MaxentTagger(posTaggerModel);
+            if (posTaggerModelPath == null) {
+                LOG.warn("Default POS Tagger model");
+                posTaggerModelPath = "edu/stanford/nlp/models/pos-tagger/english-left3words/english-left3words-distsim.tagger";
+            }
+            posTagger = new MaxentTagger(posTaggerModelPath);
         }
         List<TaggedWord> posList = posTagger.tagSentence(tokens);
         for (int i = 0; i < tokens.size(); i++) {
@@ -136,25 +143,33 @@ public abstract class StanfordParser implements IParser {
         if (!isPOSTagged) {
             throw new RuntimeException("Please Run POS Tagger before Named Entity tagger.");
         }
-        ners.stream().forEach(ner -> ner.classify(tokens));
+        if (ners != null) {
+            ners.stream().forEach(ner -> ner.classify(tokens));
+        }
     }
 
     @Override
     public abstract DTree parse(final String sentence);
 
-    protected void load(final String posTaggerModel, final boolean initNER) {
-        if (posTaggerModel != null && !posTaggerModel.isEmpty()) {
-            posTagger = new MaxentTagger(posTaggerModel);
-        }
+    protected void load(final String posTaggerModel, List<String> nerModels) {
+        posTaggerModelPath = posTaggerModel;
 
-        if (initNER) {
-            // STUPID NER, Throw IOException in the constructor ... : (
-            try {
-                ners.add(new NERClassifierCombiner("edu/stanford/nlp/models/ner/english.all.3class.distsim.crf.ser.gz"));
-                ners.add(new NERClassifierCombiner("edu/stanford/nlp/models/ner/english.muc.7class.distsim.crf.ser.gz"));
-            } catch (IOException e) {
-                e.printStackTrace();
+        if (nerModels != null) {
+            if (nerModels.isEmpty()) {
+                nerModels.add("edu/stanford/nlp/models/ner/english.all.3class.distsim.crf.ser.gz");
+                nerModels.add("edu/stanford/nlp/models/ner/english.muc.7class.distsim.crf.ser.gz");
             }
+
+            // STUPID NER, Throw IOException in the constructor ... : (
+            ners = nerModels.stream().map(path -> {
+                NERClassifierCombiner nerClassifierCombiner = null;
+                try {
+                    nerClassifierCombiner = new NERClassifierCombiner(path);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return nerClassifierCombiner;
+            }).collect(Collectors.toList());
         }
     }
 }

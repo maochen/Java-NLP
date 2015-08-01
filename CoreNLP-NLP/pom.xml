@@ -8,6 +8,7 @@
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Natural Language Tools</description>
     <url>${project.parent.url}</url>
+    <version>1.0.6.1</version>
 
     <parent>
         <groupId>org.maochen.nlp</groupId>
@@ -123,7 +124,7 @@
         <dependency>
             <groupId>org.maochen.nlp</groupId>
             <artifactId>CoreNLP-DataStructure</artifactId>
-            <version>${project.version}</version>
+            <version>${parent.version}</version>
         </dependency>
 
         <dependency>

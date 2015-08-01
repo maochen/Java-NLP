@@ -1,9 +1,5 @@
 package org.maochen.nlp.parser.stanford.pcfg;
 
-import edu.stanford.nlp.ling.CoreAnnotations;
-import edu.stanford.nlp.ling.CoreLabel;
-import edu.stanford.nlp.ling.Label;
-import edu.stanford.nlp.trees.TypedDependency;
 import org.apache.commons.lang3.StringUtils;
 import org.maochen.nlp.datastructure.DNode;
 import org.maochen.nlp.datastructure.DTree;
@@ -15,6 +11,11 @@ import org.slf4j.LoggerFactory;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
+
+import edu.stanford.nlp.ling.CoreAnnotations;
+import edu.stanford.nlp.ling.CoreLabel;
+import edu.stanford.nlp.ling.Label;
+import edu.stanford.nlp.trees.TypedDependency;
 
 /**
  * For the Stanford parse tree.
@@ -199,7 +200,7 @@ public class StanfordTreeBuilder {
             if (token.ner().equalsIgnoreCase(LangLib.NE_TIME) || token.ner().equalsIgnoreCase(LangLib.NE_DATE)) {
                 String normalizedTime = token.get(CoreAnnotations.NormalizedNamedEntityTagAnnotation.class);
                 if (normalizedTime != null) {
-                    node.setLemma(normalizedTime);
+                    node.addFeature("time", normalizedTime);
                 } else {
                     LOG.warn("Time NamedEntity but doesn't has proper parsed time. " + token.originalText());
                 }

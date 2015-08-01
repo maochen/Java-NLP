@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.maochen.nlp.parser.stanford.coref.StanfordCoref;
 import org.maochen.nlp.parser.stanford.pcfg.StanfordPCFGParser;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,7 +17,7 @@ public class CorefTest {
 
     @Test
     public void test() {
-        StanfordPCFGParser parser = new StanfordPCFGParser(null, null, true);
+        StanfordPCFGParser parser = new StanfordPCFGParser(null, null, new ArrayList<>());
         StanfordCoref coref = new StanfordCoref(parser);
 
         List<String> texts = Lists.newArrayList("Google invests in companies since they have more choices.", "They understand it is hard.");

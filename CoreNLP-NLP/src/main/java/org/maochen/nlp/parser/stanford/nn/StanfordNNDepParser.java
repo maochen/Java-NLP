@@ -1,9 +1,5 @@
 package org.maochen.nlp.parser.stanford.nn;
 
-import edu.stanford.nlp.ling.CoreLabel;
-import edu.stanford.nlp.ling.HasWord;
-import edu.stanford.nlp.parser.nndep.DependencyParser;
-import edu.stanford.nlp.trees.GrammaticalStructure;
 import org.maochen.nlp.datastructure.DTree;
 import org.maochen.nlp.datastructure.LangTools;
 import org.maochen.nlp.parser.IParser;
@@ -11,6 +7,11 @@ import org.maochen.nlp.parser.StanfordParserUtils;
 import org.maochen.nlp.parser.stanford.StanfordParser;
 
 import java.util.List;
+
+import edu.stanford.nlp.ling.CoreLabel;
+import edu.stanford.nlp.ling.HasWord;
+import edu.stanford.nlp.parser.nndep.DependencyParser;
+import edu.stanford.nlp.trees.GrammaticalStructure;
 
 /**
  * Created by Maochen on 4/6/15.
@@ -38,19 +39,19 @@ public class StanfordNNDepParser extends StanfordParser {
     }
 
     public StanfordNNDepParser() {
-        this(null, null, false);
+        this(null, null, null);
     }
 
-    public StanfordNNDepParser(final String inputModelPath, final String posTaggerModel, final boolean initNER) {
+    public StanfordNNDepParser(final String inputModelPath, final String posTaggerModel, List<String> nerModelPath) {
         String modelPath = inputModelPath == null || inputModelPath.trim().isEmpty() ? DependencyParser.DEFAULT_MODEL : inputModelPath;
         nndepParser = DependencyParser.loadFromModelFile(modelPath);
-        super.load(posTaggerModel, initNER);
+        super.load(posTaggerModel, nerModelPath);
     }
 
     public static void main(String[] args) {
-        IParser parser = new StanfordNNDepParser(DependencyParser.DEFAULT_MODEL, null, false);
+        IParser parser = new StanfordNNDepParser(DependencyParser.DEFAULT_MODEL, null, null);
         String text = "I went to the store and buy a car.";
         DTree tree = parser.parse(text);
-        System.out.println(parser.parse(text).toString());
+        System.out.println(tree);
     }
 }
