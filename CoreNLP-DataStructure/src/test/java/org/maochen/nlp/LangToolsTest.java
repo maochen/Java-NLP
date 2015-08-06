@@ -45,7 +45,7 @@ public class LangToolsTest {
 
         try {
             DTree dtree = LangTools.getDTreeFromCoNLLXString(tree);
-            System.out.println(dtree);
+//            System.out.println(dtree);
         } catch (Exception e) {
             Assert.fail(e.toString());
         }

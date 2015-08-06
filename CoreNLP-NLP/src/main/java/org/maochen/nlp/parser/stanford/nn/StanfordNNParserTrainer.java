@@ -1,13 +1,14 @@
 package org.maochen.nlp.parser.stanford.nn;
 
+import org.maochen.nlp.parser.StanfordParserUtils;
+
+import java.io.FileFilter;
+
 import edu.stanford.nlp.io.ExtensionFileFilter;
 import edu.stanford.nlp.trees.DiskTreebank;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.Treebank;
 import edu.stanford.nlp.trees.UniversalPOSMapper;
-import org.maochen.nlp.parser.StanfordParserUtils;
-
-import java.io.FileFilter;
 
 /**
  * WIP
