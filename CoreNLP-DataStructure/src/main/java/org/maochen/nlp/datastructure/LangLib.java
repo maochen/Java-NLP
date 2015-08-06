@@ -1,13 +1,17 @@
 package org.maochen.nlp.datastructure;
 
 /**
- * Copyright 2014-2015 maochen.org
  * Author: Maochen.G   contact@maochen.org
  * License: check the LICENSE file.
  * <p>
  * Created by Maochen on 12/8/14.
  */
 public class LangLib {
+
+    public static final String SENTTYPE_DECLARATIVE = "DECL";
+    public static final String SENTTYPE_INTERROGATIVE = "INTERROG";
+    public static final String SENTTYPE_IMPERATIVE = "IMPERATIVE";
+
     /**
      * CPOSTAGs are derived from CoNLL-U Format
      * http://universaldependencies.github.io/docs/format.html
