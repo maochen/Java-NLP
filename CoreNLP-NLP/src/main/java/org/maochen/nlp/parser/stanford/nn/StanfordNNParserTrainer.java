@@ -1,10 +1,5 @@
 package org.maochen.nlp.parser.stanford.nn;
 
-import org.maochen.nlp.parser.StanfordParserUtils;
-
-import java.io.FileFilter;
-
-import edu.stanford.nlp.io.ExtensionFileFilter;
 import edu.stanford.nlp.trees.DiskTreebank;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.Treebank;
@@ -22,17 +17,9 @@ public class StanfordNNParserTrainer {
     public static final String WSJ = "/Users/Maochen/Desktop/treebank_3/parsed/mrg/wsj";
     public static final String extra = "/Users/Maochen/Desktop/extra/treebank_extra_data/";
 
-    public static void train() {
-
-        FileFilter filter = new ExtensionFileFilter(".mrg", true);
-        // FileFilter trainTreeBankFilter = new NumberRangeFileFilter(1, 2502, true);
-
-        // 1,2502
-        //        StanfordParserUtils.convertTreebankToCoNLLX(WSJ, filter, true, conllXTrainFile);
-        //        StanfordParserUtils.convertTreebankToCoNLLX(extra, filter, true, "/Users/Maochen/Desktop/extra.conllx.txt");
-        StanfordParserUtils.convertTreebankToCoNLLX("/Users/Maochen/Desktop/extra/treebank_extra_data/maochen_hand_parsed/wsj_2502.mrg", filter, conllXTrainFile);
-        // List<String> a = Lists.newArrayList("-treeFile", "/Users/Maochen/Desktop/tree.txt", "−basic", "−keepPunct", "−conllx");
-
+    public static void train(final String conllXTrainFile, final String outputFilePath) {
+        StanfordNNDepParser stanfordNNDepParser = new StanfordNNDepParser();
+//        stanfordNNDepParser.nndepParser.
     }
 
     public static void getCPosTag() {
@@ -45,9 +32,4 @@ public class StanfordNNParserTrainer {
 
         System.out.println(uposTree.pennString());
     }
-
-    public static void main(String[] args) {
-        train();
-    }
-
 }
