@@ -4,8 +4,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Scanner;
 import java.util.stream.Collectors;
 
 /**
@@ -108,35 +108,6 @@ public class HMM {
 
     public static void eval(HMMModel model, String testFile, String delimiter, int wordColIndex, int tagColIndex) {
         List<HMMTuple> testData = readFile(testFile, delimiter, wordColIndex, tagColIndex);
-        int errcount = 0;
-        for (HMMTuple tuple : testData) {
-            List<String> result = viterbi(model, tuple.words);
-
-            boolean isEqual = result.size() == tuple.tag.size();
-
-            if (isEqual) {
-                for (int i = 0; i < result.size(); i++) {
-                    if (!result.get(i).equals(tuple.tag.get(i))) {
-                        isEqual = false;
-                        break;
-                    }
-                }
-            }
-
-            if (!isEqual) {
-                errcount++;
-                System.out.println(tuple.words);
-                System.out.println("expected: " + tuple.tag);
-                System.out.println("actual: " + result);
-            }
-        }
-
-        double accurancy = (1 - errcount / (double) testData.size()) * 100;
-        System.out.println("accurancy: " + errcount + "/" + testData.size() + " -> " + String.format("%.2f", accurancy) + "%");
-    }
-
-    public static void eval2(HMMModel model, String testFile, String delimiter, int wordColIndex, int tagColIndex) {
-        List<HMMTuple> testData = readFile(testFile, delimiter, wordColIndex, tagColIndex);
         int totalcount = 0;
         int errcount = 0;
 
@@ -162,21 +133,18 @@ public class HMM {
     public static void main(String[] args) throws InterruptedException {
 //        Thread.sleep(5000);
 
-//        List<HMMTuple> data = HMM.readFile("/Users/Maochen/Desktop/POS/training.pos", "\t", 0, 1);
         List<HMMTuple> data = HMM.readFile("/Users/Maochen/Desktop/POS/penntreebank.txt", "\t", 1, 4);
         List<HMMTuple> data2 = HMM.readFile("/Users/Maochen/Desktop/POS/extra.txt", "\t", 1, 4);
-        List<HMMTuple> data3 = HMM.readFile("/Users/Maochen/Desktop/POS/test.pos", "\t", 0, 1);
+        List<HMMTuple> data3 = HMM.readFile("/Users/Maochen/Desktop/POS/training.pos", "\t", 0, 1);
 
         data.addAll(data2);
         data.addAll(data3);
 
         HMMModel model = train(data);
-        eval2(model, "/Users/Maochen/Desktop/POS/test.pos", "\t", 0, 1);
-        Scanner scanner = new Scanner(System.in);
-//        scanner.next();
+//        eval(model, "/Users/Maochen/Desktop/POS/test.pos", "\t", 0, 1);
 
-//        String str = "I have a car .";
-//        List<String> result = viterbi(model, Arrays.asList(str.split("\\s")));
-//        System.out.println(result);
+        String str = "The quick brown fox jumped over the lazy dog";
+        List<String> result = viterbi(model, Arrays.asList(str.split("\\s")));
+        System.out.println(result);
     }
 }
