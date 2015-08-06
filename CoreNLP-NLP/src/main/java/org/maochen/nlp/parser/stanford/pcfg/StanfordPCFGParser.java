@@ -121,13 +121,12 @@ public class StanfordPCFGParser extends StanfordParser {
         pq.parse(tokens);
         List<ScoredObject<Tree>> scoredTrees = pq.getKBestPCFGParses(k);
 
-        tagPOS(tokens, scoredTrees.get(0).object());
-        tagNamedEntity(tokens);
-
         Table<DTree, Tree, Double> result = HashBasedTable.create();
         for (ScoredObject<Tree> scoredTuple : scoredTrees) {
             Tree tree = scoredTuple.object();
+            tagPOS(tokens, tree);
             tagLemma(tokens);
+            tagNamedEntity(tokens);
 
             GrammaticalStructure gs = tagDependencies(tree, true);
             DTree depTree = StanfordTreeBuilder.generate(tokens, gs.typedDependencies(), null);

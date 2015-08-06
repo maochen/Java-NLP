@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * This is for the single word correction. It doesn't count in the prev/following words to generate NGram.
+ * This is for the single words correction. It doesn't count in the prev/following words to generate NGram.
  */
 public class SingleWordCorrection {
     static class Model implements Serializable {
@@ -79,7 +79,7 @@ public class SingleWordCorrection {
     // An edit can be a deletion (remove one letter), a transposition (swap adjacent letters), an
     // alteration (change one letter to another) or an insertion (add a letter).
     private Map<String, Double> distance1Generation(String word) {
-        if (word == null || word.length() < 1) throw new RuntimeException("Input word Error: " + word);
+        if (word == null || word.length() < 1) throw new RuntimeException("Input words Error: " + word);
 
         Map<String, Double> result = new HashMap<String, Double>();
 
@@ -166,13 +166,13 @@ public class SingleWordCorrection {
         Map<String, Double> possibleCorrectWordMap = errWordgenerating(wrongWord);
 
         // Only take these in the dict into consideration
-        // From possible word generate all err words.
+        // From possible words generate all err words.
         // Remove these non-err words.
         // Dont use for-loop, far more slower.
         possibleCorrectWordMap.keySet().stream()
                 .filter(model.wordProbability::containsKey)
                 .forEach(possibleCorrectWord -> {
-                    // From possible word generate all err words.
+                    // From possible words generate all err words.
                     Map<String, Double> errWordMap = errWordgenerating(possibleCorrectWord);
 
                     // Remove these non-err words.

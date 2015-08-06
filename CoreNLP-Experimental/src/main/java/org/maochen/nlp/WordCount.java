@@ -7,7 +7,7 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 
 /**
- * Unigram word freq count
+ * Unigram words freq count
  *
  * @author maochen
  */

@@ -81,13 +81,13 @@ public class FeatureExtractor {
         inputWithTag = inputWithTag.replaceAll("\\s", "_");
         // Bigram
         for (String str : biGramWordMap.keySet()) {
-            // Make sure is the whole word match instead of partial word+"_"+partial word.
+            // Make sure is the whole words match instead of partial words+"_"+partial words.
             addFeats(builder, "biGramWord_" + str, inputWithTag.contains("_" + str + "_"), 1);
         }
 
         // Trigram
         for (String str : triGramWordMap.keySet()) {
-            // Make sure is the whole word match instead of partial word+"_"+partial word.
+            // Make sure is the whole words match instead of partial words+"_"+partial words.
             addFeats(builder, "triGramWord_" + str, inputWithTag.contains("_" + str + "_"), 1);
         }
 
@@ -101,23 +101,23 @@ public class FeatureExtractor {
         }
 
         Set<String> whPrefixPos = Sets.newHashSet(LangLib.POS_WRB, LangLib.POS_WDT, LangLib.POS_WP, LangLib.POS_WPS);
-        // 1st word is WH
+        // 1st words is WH
         String firstPOS = tree.get(1).getPOS();
         addFeats(builder, "first_word_pos", whPrefixPos.contains(firstPOS), 1);
 
-        // last word is WH
+        // last words is WH
         int lastPOSIndex = sentence.matches(".*\\p{Punct}$") ? tree.size() - 2 : tree.size() - 1;
         String lastPOS = tree.get(lastPOSIndex).getPOS();
         addFeats(builder, "last_word_pos", whPrefixPos.contains(lastPOS), 1);
 
-        // is 1st word rootVerb.
+        // is 1st words rootVerb.
         addFeats(builder, "first_word_root_verb", firstPOS.startsWith(LangLib.POS_VB) && tree.get(1).isRoot(), weight);
 
         // Have aux in the sentence.
         int auxCount = (int) tree.stream().parallel().filter(x -> LangLib.DEP_AUX.equals(x.getDepLabel())).distinct().count();
         addFeats(builder, "has_aux", auxCount > 0, 1);
 
-        // Start with question word.
+        // Start with question words.
         Set<String> bagOfQuestionPrefix = Sets.newHashSet("tell me", "let me know", "clarify for me", "name");
         boolean isStartPrefixMatch = false;
         for (String prefix : bagOfQuestionPrefix) {

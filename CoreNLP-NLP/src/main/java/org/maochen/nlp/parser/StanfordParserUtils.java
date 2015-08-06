@@ -1,8 +1,5 @@
 package org.maochen.nlp.parser;
 
-import edu.stanford.nlp.ling.CoreAnnotations;
-import edu.stanford.nlp.ling.CoreLabel;
-import edu.stanford.nlp.trees.*;
 import org.maochen.nlp.datastructure.DTree;
 import org.maochen.nlp.datastructure.LangTools;
 import org.maochen.nlp.parser.stanford.StanfordParser;
@@ -17,6 +14,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import edu.stanford.nlp.ling.CoreAnnotations;
+import edu.stanford.nlp.ling.CoreLabel;
+import edu.stanford.nlp.trees.DiskTreebank;
+import edu.stanford.nlp.trees.EnglishGrammaticalStructure;
+import edu.stanford.nlp.trees.SemanticHeadFinder;
+import edu.stanford.nlp.trees.Tree;
+import edu.stanford.nlp.trees.TypedDependency;
 
 /**
  * Created by Maochen on 4/6/15.
