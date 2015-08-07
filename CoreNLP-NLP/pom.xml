@@ -8,12 +8,11 @@
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Natural Language Tools</description>
     <url>${project.parent.url}</url>
-    <version>1.0.6.1</version>
 
     <parent>
         <groupId>org.maochen.nlp</groupId>
         <artifactId>NLP</artifactId>
-        <version>1.0.6</version>
+        <version>1.0.7</version>
     </parent>
 
     <licenses>
@@ -137,6 +136,12 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>19.0-rc1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.opennlp</groupId>
+            <artifactId>opennlp-maxent</artifactId>
+            <version>3.0.3</version>
         </dependency>
 
         <dependency>

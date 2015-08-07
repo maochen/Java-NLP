@@ -2,7 +2,6 @@ package org.maochen.nlp.parser.stanford.nn;
 
 import org.maochen.nlp.datastructure.DTree;
 import org.maochen.nlp.datastructure.LangTools;
-import org.maochen.nlp.parser.IParser;
 import org.maochen.nlp.parser.StanfordParserUtils;
 import org.maochen.nlp.parser.stanford.StanfordParser;
 
@@ -18,7 +17,7 @@ import edu.stanford.nlp.trees.GrammaticalStructure;
  */
 public class StanfordNNDepParser extends StanfordParser {
 
-    public static DependencyParser nndepParser = null;
+    public DependencyParser nndepParser;
 
     // 4. Dependency Label
     private GrammaticalStructure tagDependencies(List<? extends HasWord> taggedWords) {
@@ -47,12 +46,5 @@ public class StanfordNNDepParser extends StanfordParser {
         String modelPath = inputModelPath == null || inputModelPath.trim().isEmpty() ? DependencyParser.DEFAULT_MODEL : inputModelPath;
         nndepParser = DependencyParser.loadFromModelFile(modelPath);
         super.load(posTaggerModel, nerModelPath);
-    }
-
-    public static void main(String[] args) {
-        IParser parser = new StanfordNNDepParser(DependencyParser.DEFAULT_MODEL, null, null);
-        String text = "I went to the store and buy a car.";
-        DTree tree = parser.parse(text);
-        System.out.println(tree);
     }
 }
