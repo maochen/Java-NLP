@@ -6,12 +6,11 @@
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Data Structure for CoNLL-X Dependency Tree</description>
     <url>${project.parent.url}</url>
-    <version>1.0.6.1</version>
 
     <parent>
         <groupId>org.maochen.nlp</groupId>
         <artifactId>NLP</artifactId>
-        <version>1.0.7</version>
+        <version>1.0.8</version>
     </parent>
 
     <licenses>
