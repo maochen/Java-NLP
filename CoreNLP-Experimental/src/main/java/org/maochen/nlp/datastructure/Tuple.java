@@ -2,14 +2,20 @@ package org.maochen.nlp.datastructure;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by Maochen on 12/3/14.
  */
 public class Tuple {
     public int id;
     public String label;
+
     public String[] featureName = null; //Optional
     public double[] featureVector;
+
+    private Map<String, Object> extra = null;
 
     // This is for predict
     public Tuple(double[] featureVector) {
@@ -29,6 +35,17 @@ public class Tuple {
         this.featureName = featureName;
         this.featureVector = featureVector;
         this.label = label;
+    }
+
+    public Map<String, Object> getExtra() {
+        return extra;
+    }
+
+    public void addExtra(String key, Object val) {
+        if (extra == null) {
+            extra = new HashMap<>();
+        }
+        extra.put(key, val);
     }
 
 

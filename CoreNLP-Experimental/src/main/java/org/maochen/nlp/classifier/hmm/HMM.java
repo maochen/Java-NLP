@@ -1,5 +1,6 @@
 package org.maochen.nlp.classifier.hmm;
 
+import org.maochen.nlp.datastructure.SequenceTuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,8 +25,8 @@ public class HMM {
     protected static final String START = "<START>";
     protected static final String END = "<END>";
 
-    public static List<HMMTuple> readTrainFile(String filename, String delimiter, int wordColIndex, int tagColIndex) {
-        List<HMMTuple> data = new ArrayList<>();
+    public static List<SequenceTuple> readTrainFile(String filename, String delimiter, int wordColIndex, int tagColIndex) {
+        List<SequenceTuple> data = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
             String line = br.readLine();
             List<String> words = new ArrayList<>();
@@ -34,7 +35,7 @@ public class HMM {
             while (line != null) {
                 if (line.trim().isEmpty()) {
                     if (!words.isEmpty() && !pos.isEmpty()) {
-                        HMMTuple tuple = new HMMTuple(words, pos);
+                        SequenceTuple tuple = new SequenceTuple(words, pos);
                         data.add(tuple);
                         words = new ArrayList<>();
                         pos = new ArrayList<>();
@@ -83,10 +84,10 @@ public class HMM {
         ).collect(Collectors.toSet());
     }
 
-    public static HMMModel train(List<HMMTuple> data) {
+    public static HMMModel train(List<SequenceTuple> data) {
         HMMModel model = new HMMModel();
 
-        for (HMMTuple tuple : data) {
+        for (SequenceTuple tuple : data) {
             tuple.words.add(0, START);
             tuple.words.add(END);
             tuple.tag.add(0, START);
@@ -115,11 +116,11 @@ public class HMM {
     }
 
     public static void eval(HMMModel model, String testFile, String delimiter, int wordColIndex, int tagColIndex) {
-        List<HMMTuple> testData = readTrainFile(testFile, delimiter, wordColIndex, tagColIndex);
+        List<SequenceTuple> testData = readTrainFile(testFile, delimiter, wordColIndex, tagColIndex);
         int totalcount = 0;
         int errcount = 0;
 
-        for (HMMTuple tuple : testData) {
+        for (SequenceTuple tuple : testData) {
             List<String> result = viterbi(model, tuple.words);
 
             for (int i = 0; i < result.size(); i++) {
@@ -158,9 +159,9 @@ public class HMM {
     public static void main(String[] args) throws InterruptedException {
 //        Thread.sleep(5000);
 
-        List<HMMTuple> data = HMM.readTrainFile("/Users/Maochen/Desktop/POS/penntreebank.txt", "\t", 1, 4);
-        List<HMMTuple> data2 = HMM.readTrainFile("/Users/Maochen/Desktop/POS/extra.txt", "\t", 1, 4);
-        List<HMMTuple> data3 = HMM.readTrainFile("/Users/Maochen/Desktop/POS/training.pos", "\t", 0, 1);
+        List<SequenceTuple> data = HMM.readTrainFile("/Users/Maochen/Desktop/POS/penntreebank.txt", "\t", 1, 4);
+        List<SequenceTuple> data2 = HMM.readTrainFile("/Users/Maochen/Desktop/POS/extra.txt", "\t", 1, 4);
+        List<SequenceTuple> data3 = HMM.readTrainFile("/Users/Maochen/Desktop/POS/training.pos", "\t", 0, 1);
 
         data.addAll(data2);
         data.addAll(data3);

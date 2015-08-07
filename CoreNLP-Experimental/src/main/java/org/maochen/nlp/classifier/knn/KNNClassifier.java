@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 /**
  * Simple Wrapper, Id is based on the input sequence.
@@ -16,8 +15,9 @@ import java.util.stream.Collectors;
  * @author Maochen
  */
 public class KNNClassifier implements IClassifier {
+    public static final String DISTANCE = "distance";
 
-    private List<KNNTuple> trainingData;
+    private List<Tuple> trainingData;
 
     private int k = 1;
     private int mode = 0;
@@ -46,7 +46,7 @@ public class KNNClassifier implements IClassifier {
      */
     @Override
     public IClassifier train(List<Tuple> trainingData) {
-        this.trainingData = trainingData.stream().map(KNNTuple::new).collect(Collectors.toList());
+        this.trainingData = trainingData;
         return this;
     }
 
@@ -57,9 +57,7 @@ public class KNNClassifier implements IClassifier {
      */
     @Override
     public Map<String, Double> predict(Tuple predict) {
-        KNNTuple predictKNNTuple = new KNNTuple(predict);
-
-        KNNEngine engine = new KNNEngine(predictKNNTuple, trainingData, k);
+        KNNEngine engine = new KNNEngine(predict, trainingData, k);
 
         if (mode == 1) {
             engine.getDistance(engine.chebyshevDistance);
@@ -72,7 +70,7 @@ public class KNNClassifier implements IClassifier {
         predict.label = engine.getResult();
 
         Map<String, Double> outputMap = new ConcurrentHashMap<>();
-        trainingData.parallelStream().forEach(x -> outputMap.put(String.valueOf(x.id), x.distance));
+        trainingData.parallelStream().forEach(x -> outputMap.put(String.valueOf(x.id), (Double) x.getExtra().get(DISTANCE)));
 
         return outputMap;
     }

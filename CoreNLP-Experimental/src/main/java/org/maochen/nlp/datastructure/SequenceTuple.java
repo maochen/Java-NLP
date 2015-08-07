@@ -1,15 +1,16 @@
-package org.maochen.nlp.classifier.hmm;
+package org.maochen.nlp.datastructure;
 
 import java.util.List;
 
 /**
  * Created by Maochen on 8/5/15.
  */
-public class HMMTuple {
+public class SequenceTuple {
+    public int id;
     public List<String> words;
     public List<String> tag;
 
-    public HMMTuple(List<String> words, List<String> tags) {
+    public SequenceTuple(List<String> words, List<String> tags) {
         if (words == null || tags == null || words.size() != tags.size()) {
             throw new RuntimeException("words and tags are invalid (Size mismatch).");
         }
@@ -17,7 +18,7 @@ public class HMMTuple {
         this.tag = tags;
     }
 
-    public HMMTuple() {
+    public SequenceTuple() {
 
     }
 }
