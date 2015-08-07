@@ -34,8 +34,9 @@ public class StanfordNNDepParser extends StanfordParser {
         GrammaticalStructure gs = tagDependencies(tokenizedSentence);
         tagNamedEntity(tokenizedSentence);
         String conllXString = StanfordParserUtils.getCoNLLXString(gs.typedDependencies(), tokenizedSentence);
-        DTree depTree = LangTools.getDTreeFromCoNLLXString(conllXString);
-        return depTree;
+        DTree dTree = LangTools.getDTreeFromCoNLLXString(conllXString);
+        dTree.setOriginalSentence(sentence);
+        return dTree;
     }
 
     public StanfordNNDepParser() {

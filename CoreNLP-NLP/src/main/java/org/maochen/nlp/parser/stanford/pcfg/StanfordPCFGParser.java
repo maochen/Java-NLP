@@ -103,8 +103,9 @@ public class StanfordPCFGParser extends StanfordParser {
         tagLemma(tokens);
         tagNamedEntity(tokens);
 
-        DTree depTree = StanfordTreeBuilder.generate(tokens, gs.typedDependencies(), null);
-        return depTree;
+        DTree dTree = StanfordTreeBuilder.generate(tokens, gs.typedDependencies(), null);
+        dTree.setOriginalSentence(sentence);
+        return dTree;
     }
 
 

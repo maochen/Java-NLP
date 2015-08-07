@@ -1,12 +1,11 @@
 package org.maochen.nlp.sentencetypeclassifier;
 
 import com.google.common.collect.Sets;
+
 import org.apache.commons.lang3.StringUtils;
 import org.maochen.nlp.datastructure.DNode;
 import org.maochen.nlp.datastructure.DTree;
 import org.maochen.nlp.datastructure.LangLib;
-import org.maochen.nlp.parser.IParser;
-import org.maochen.nlp.parser.stanford.pcfg.StanfordPCFGParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +13,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
 
 /**
  * Created by Maochen on 8/5/14.
@@ -25,11 +28,7 @@ public class FeatureExtractor {
 
     final String filepathPrefix;
 
-    IParser parser;
-
     String delimiter;
-
-    boolean isRealFeature = false;
 
     // chunk, count
     Map<String, Integer> biGramWordMap = new HashMap<>();
@@ -67,7 +66,7 @@ public class FeatureExtractor {
     }
 
     // Bossssssss.... currently all binary features.
-    private String generateFeats(String sentence, DTree tree) {
+    public String generateFeats(String sentence, DTree tree) {
         StringBuilder builder = new StringBuilder();
         sentence = sentence.trim();
         sentence = sentence.replaceAll("_", StringUtils.SPACE);
@@ -166,20 +165,6 @@ public class FeatureExtractor {
         return builder.toString().trim();
     }
 
-    public String getFeats(String entry) {
-        DTree tree = parser.parse(entry.split(delimiter)[0].replaceAll("_", StringUtils.SPACE));
-        return getFeats(entry, tree);
-    }
-
-    public String getFeats(String entry, DTree tree) {
-        String[] tokens = entry.split(delimiter);
-        if (tokens.length != 2) return StringUtils.EMPTY;
-
-        // token[0] - Sentence
-        // token[1] - Label
-        return (tokens[0] + delimiter + generateFeats(tokens[0], tree) + delimiter + tokens[1]).trim();
-    }
-
     @SuppressWarnings("unchecked")
     private Map<String, Integer> deserialize(String filePath) {
         try {
@@ -197,8 +182,6 @@ public class FeatureExtractor {
 
     public FeatureExtractor(String filepathPrefix, String delimiter) {
         this.delimiter = delimiter;
-
-        this.parser = new StanfordPCFGParser();
         this.filepathPrefix = filepathPrefix;
 
         biGramWordMap = deserialize(filepathPrefix + "/bigram_word");
