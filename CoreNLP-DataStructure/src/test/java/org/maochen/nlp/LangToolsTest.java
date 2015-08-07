@@ -2,6 +2,7 @@ package org.maochen.nlp;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.maochen.nlp.datastructure.DTree;
 import org.maochen.nlp.datastructure.LangTools;
 
 /**
@@ -11,7 +12,9 @@ public class LangToolsTest {
 
     @Test
     public void testgetDTreeFromCoNLLXString() {
-        String tree = "1\tThe\tthe\tDT\tDT\t_\t2\tdet\t_\t_\t_\n"
+        String tree =
+                  "0\t^  \t^  \t^ \t^ \tsentence_type=declarative|original_sentence=test\t0\troot\t_\t_\t_\n"
+                + "1\tThe\tthe\tDT\tDT\t_\t2\tdet\t_\t_\t_\n"
                 + "2\trelative\trelative\tNN\tNN\t_\t3\tnsubj\t_\t_\t_\n"
                 + "3\tpositions\tposition\tVBZ\tVBZ\tpb=position.01|vncls:9.1\t0\troot\t_\t_\t19:A1|6:A1\n"
                 + "4\tto\tto\tTO\tTO\t_\t6\taux\t_\t_\t_\n"
@@ -41,7 +44,8 @@ public class LangToolsTest {
                 + "28\t\t\tSYM\tSYM\tname=\t3\tdep\t_\t_\t_\n";
 
         try {
-            LangTools.getDTreeFromCoNLLXString(tree);
+            DTree dtree = LangTools.getDTreeFromCoNLLXString(tree);
+//            System.out.println(dtree);
         } catch (Exception e) {
             Assert.fail(e.toString());
         }

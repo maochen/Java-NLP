@@ -6,7 +6,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Copyright 2014-2015 maochen.org
  * Author: Maochen.G   contact@maochen.org
  * License: check the LICENSE file.
  * <p>

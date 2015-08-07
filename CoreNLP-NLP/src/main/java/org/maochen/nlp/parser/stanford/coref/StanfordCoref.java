@@ -1,18 +1,20 @@
 package org.maochen.nlp.parser.stanford.coref;
 
-import edu.stanford.nlp.dcoref.CorefChain;
-import edu.stanford.nlp.dcoref.Dictionaries;
-import edu.stanford.nlp.ling.CoreAnnotations;
-import edu.stanford.nlp.ling.CoreLabel;
-import edu.stanford.nlp.trees.GrammaticalStructure;
-import edu.stanford.nlp.util.CoreMap;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.maochen.nlp.parser.stanford.pcfg.StanfordPCFGParser;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import edu.stanford.nlp.dcoref.CorefChain;
+import edu.stanford.nlp.dcoref.Dictionaries;
+import edu.stanford.nlp.ling.CoreAnnotations;
+import edu.stanford.nlp.ling.CoreLabel;
+import edu.stanford.nlp.trees.GrammaticalStructure;
+import edu.stanford.nlp.util.CoreMap;
 
 /**
  * Created by Maochen on 4/14/15.
@@ -22,11 +24,22 @@ public class StanfordCoref {
     private static CorefAnnotator corefAnnotator = new CorefAnnotator();
     private static StanfordPCFGParser parser;
 
-    public List<String> getCoref(List<String> texts) {
-        List<Pair<CoreMap, GrammaticalStructure>> sentences = texts.stream().filter(x -> !x.trim().isEmpty()).map(parser::parseForCoref).collect(Collectors.toList());
+    public Pair<List<CoreMap>, Map<Integer, CorefChain>> getCorefChain(List<String> texts) {
+        List<Pair<CoreMap, GrammaticalStructure>> sentencesWithGS = texts.stream().filter(x -> !x.trim().isEmpty()).map(parser::parseForCoref).collect(Collectors.toList());
 
         // Plural Coref gonna have multiple clusters ...
-        Map<Integer, CorefChain> corefChainMap = corefAnnotator.annotate(sentences);
+        Map<Integer, CorefChain> corefChainMap = corefAnnotator.annotate(sentencesWithGS);
+
+        List<CoreMap> sentences = sentencesWithGS.stream().map(Pair::getLeft).collect(Collectors.toList());
+
+        return new ImmutablePair<>(sentences, corefChainMap);
+    }
+
+    public List<String> getCoref(List<String> texts) {
+        Pair<List<CoreMap>, Map<Integer, CorefChain>> result = getCorefChain(texts);
+        List<CoreMap> sentences = result.getLeft();
+        Map<Integer, CorefChain> corefChainMap = result.getRight();
+
         for (Integer clusterID : corefChainMap.keySet()) {
             List<CorefChain.CorefMention> mentions = corefChainMap.get(clusterID).getMentionsInTextualOrder();
             if (mentions.size() < 2) {
@@ -38,7 +51,7 @@ public class StanfordCoref {
                 continue;
             }
             mentions.stream().filter(x -> x.mentionType.equals(Dictionaries.MentionType.PRONOMINAL)).forEach(mention -> {
-                List<CoreLabel> sentence = sentences.get(mention.sentNum - 1).getLeft().get(CoreAnnotations.TokensAnnotation.class);
+                List<CoreLabel> sentence = sentences.get(mention.sentNum - 1).get(CoreAnnotations.TokensAnnotation.class);
                 // XXX: Handling plural coreferencing. "They", seems Stanford Plural doesn't work well. For example of the following, both of three entities are in 3 groups.
                 // List<String> texts = Lists.newArrayList("Tom is nice.", "Mary is hard.", "They are all good.");
 
@@ -51,7 +64,7 @@ public class StanfordCoref {
             });
         }
 
-        return sentences.stream().map(sentence -> sentence.getLeft().get(CoreAnnotations.TokensAnnotation.class).stream().map(CoreLabel::word).reduce((w1, w2) -> w1 + StringUtils.SPACE + w2).get()).collect(Collectors.toList());
+        return sentences.stream().map(sentence -> sentence.get(CoreAnnotations.TokensAnnotation.class).stream().map(CoreLabel::word).reduce((w1, w2) -> w1 + StringUtils.SPACE + w2).get()).collect(Collectors.toList());
     }
 
     public StanfordCoref(StanfordPCFGParser parser) {

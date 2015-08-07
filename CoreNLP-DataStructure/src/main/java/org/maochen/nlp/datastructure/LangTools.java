@@ -8,11 +8,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Copyright 2014-2015 maochen.org
- * Author: Maochen.G   contact@maochen.org
- * License: check the LICENSE file.
- * <p>
- * Created by Maochen on 12/10/14.
+ * Author: Maochen.G   contact@maochen.org License: check the LICENSE file. <p> Created by Maochen
+ * on 12/10/14.
  */
 public class LangTools {
 
@@ -102,6 +99,8 @@ public class LangTools {
                         featsMap = Arrays.stream(feats.split("\\|"))
                                 .map(entry -> entry.split("="))
                                 .collect(Collectors.toMap(e -> e[0], e -> e.length > 1 ? e[1] : StringUtils.EMPTY));
+                    } else {
+                        featsMap = new HashMap<>();
                     }
 
                     String headIndex = fields[currentIndex++];
@@ -119,7 +118,10 @@ public class LangTools {
                         semanticHeadsMap.put(id, semanticHeads);
                     }
 
-                    DNode node = new DNode(id, form, lemma, cPOSTag, pos, depLabel);
+                    DNode node = id == 0 ? tree.getPaddingNode() : new DNode(id, form, lemma, cPOSTag, pos, depLabel);
+                    if (id == 0) {
+                        featsMap.put("uuid", tree.getUUID().toString());
+                    }
                     node.setFeats(featsMap);
                     node.addFeature("head", headIndex); // by the time head might not be generated!
                     if (node.getId() == 0) {
@@ -129,6 +131,7 @@ public class LangTools {
                     }
                 });
 
+        tree.getPaddingNode().getFeats().remove("head");
         for (int i = 1; i < tree.size(); i++) {
             DNode node = tree.get(i);
             int headIndex = Integer.parseInt(node.getFeature("head"));
