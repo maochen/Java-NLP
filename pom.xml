@@ -50,7 +50,7 @@
     <modules>
         <module>CoreNLP-DataStructure</module>
         <module>CoreNLP-NLP</module>
-        <!--<module>CoreNLP-Experiment</module>-->
+        <module>CoreNLP-Experiment</module>
     </modules>
 
     <build>

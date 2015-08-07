@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -112,11 +112,21 @@ public class PerceptronClassifier implements IClassifier {
 
     }
 
+    @Override
+    public void persistModel(String modelFile) throws IOException {
+        model.persist(modelFile);
+    }
+
+    @Override
+    public void loadModel(String modelFile) throws IOException {
+        model.load(new FileInputStream(modelFile));
+    }
+
     public PerceptronClassifier() {
         this.model = new PerceptronModel();
     }
 
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) throws IOException {
         String modelPath = PerceptronClassifier.class.getResource("/").getPath() + "/perceptron_model.dat";
         System.out.println(modelPath);
         PerceptronClassifier perceptronClassifier = new PerceptronClassifier();
@@ -128,9 +138,9 @@ public class PerceptronClassifier implements IClassifier {
         data.add(new Tuple(4, new double[]{1, 1, 1}, String.valueOf(0)));
         perceptronClassifier.train(data);
 
-        perceptronClassifier.model.persist(modelPath);
+        perceptronClassifier.persistModel(modelPath);
         perceptronClassifier = new PerceptronClassifier();
-        perceptronClassifier.model.load(new FileInputStream(modelPath));
+        perceptronClassifier.loadModel(modelPath);
 
         Tuple test = new Tuple(5, new double[]{1, 1, 1}, null);
         System.out.println(perceptronClassifier.predict(test));

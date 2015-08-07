@@ -3,6 +3,7 @@ package org.maochen.nlp.ml.classifier.knn;
 import org.maochen.nlp.ml.classifier.IClassifier;
 import org.maochen.nlp.ml.datastructure.Tuple;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,6 +40,16 @@ public class KNNClassifier implements IClassifier {
         if (paraMap.containsKey("mode")) {
             this.mode = Integer.parseInt(paraMap.get("mode"));
         }
+    }
+
+    @Override
+    public void persistModel(String modelFile) throws IOException {
+        throw new IllegalArgumentException();
+    }
+
+    @Override
+    public void loadModel(String modelFile) throws IOException {
+        throw new IllegalArgumentException();
     }
 
     /**
