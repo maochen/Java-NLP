@@ -122,7 +122,11 @@ public class LangTools {
                     DNode node = new DNode(id, form, lemma, cPOSTag, pos, depLabel);
                     node.setFeats(featsMap);
                     node.addFeature("head", headIndex); // by the time head might not be generated!
-                    tree.add(node);
+                    if (node.getId() == 0) {
+                        tree.getPaddingNode().setFeats(node.getFeats());// Substitute padding with actual 0 node from CoNLLX
+                    } else {
+                        tree.add(node);
+                    }
                 });
 
         for (int i = 1; i < tree.size(); i++) {
