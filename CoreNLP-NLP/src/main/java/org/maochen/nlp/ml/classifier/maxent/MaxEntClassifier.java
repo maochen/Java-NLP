@@ -28,14 +28,13 @@ public class MaxEntClassifier implements IClassifier {
 
     private static final Logger LOG = LoggerFactory.getLogger(MaxEntClassifier.class);
 
-    private boolean USE_SMOOTHING = true;
-    private static final int ITERATIONS = 100;
-    private static final int CUTOFF = 0;
-    private static final int THREADS = Runtime.getRuntime().availableProcessors();
-    private static final double SMOOTHING_OBSERVATION = 0.1;
+    private boolean useSmoothing = true;
+    private int iterations = 100;
+    private int cutoff = 0;
+    private int nthreads = Runtime.getRuntime().availableProcessors();
+    private double smoothingObservation = 0.1;
 
     private GISModel model = null;
-    private String pathPrefix = MaxEntClassifier.class.getResource(".").getPath();
 
     public MaxEntClassifier trainString(List<String[]> trainingData) {
         EventStream es = new StringEventStream(trainingData);
@@ -44,12 +43,12 @@ public class MaxEntClassifier implements IClassifier {
 
     private MaxEntClassifier train(EventStream es) {
         Prior prior = new UniformPrior();
-        DataIndexer di = new OnePassRealValueDataIndexer(es, CUTOFF, true);
+        DataIndexer di = new OnePassRealValueDataIndexer(es, cutoff, true);
 
         GISTrainer gisTrainer = new GISTrainer();
-        gisTrainer.setSmoothing(USE_SMOOTHING);
-        gisTrainer.setSmoothingObservation(SMOOTHING_OBSERVATION);
-        model = gisTrainer.trainModel(ITERATIONS, di, prior, CUTOFF, THREADS);
+        gisTrainer.setSmoothing(useSmoothing);
+        gisTrainer.setSmoothingObservation(smoothingObservation);
+        model = gisTrainer.trainModel(iterations, di, prior, cutoff, nthreads);
         return this;
     }
 
@@ -89,15 +88,39 @@ public class MaxEntClassifier implements IClassifier {
 
     @Override
     public void setParameter(Map<String, String> paraMap) {
+        if (paraMap == null) {
+            return;
+        }
 
+        if (paraMap.containsKey("use_smoothing")) {
+            this.useSmoothing = Boolean.valueOf(paraMap.get("use_smoothing"));
+        }
+
+        if (paraMap.containsKey("iterations")) {
+            this.iterations = Integer.parseInt(paraMap.get("iterations"));
+        }
+
+        if (paraMap.containsKey("cutoff")) {
+            this.cutoff = Integer.parseInt(paraMap.get("cutoff"));
+        }
+
+        if (paraMap.containsKey("nthreads")) {
+            this.nthreads = Integer.parseInt(paraMap.get("nthreads"));
+        }
+
+        if (paraMap.containsKey("smoothing_observation")) {
+            this.smoothingObservation = Double.parseDouble(paraMap.get("smoothing_observation"));
+        }
     }
 
-    public void persist(String modelPath) throws IOException {
+    @Override
+    public void persistModel(String modelPath) throws IOException {
         File outputFile = new File(modelPath);
         GISModelWriter writer = new PlainTextGISModelWriter(model, outputFile);
         writer.persist();
     }
 
+    @Override
     public void loadModel(String modelPath) throws IOException {
         LOG.info("Loading MaxEnt model. ");
         GISModelReader modelReader = new GISModelReader(new File(modelPath));
@@ -105,7 +128,6 @@ public class MaxEntClassifier implements IClassifier {
         this.model = (GISModel) model;
     }
 
-    public MaxEntClassifier(boolean useSmoothing) {
-        this.USE_SMOOTHING = useSmoothing;
+    public MaxEntClassifier() {
     }
 }
