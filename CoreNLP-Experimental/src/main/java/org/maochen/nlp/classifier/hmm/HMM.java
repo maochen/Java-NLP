@@ -1,8 +1,15 @@
 package org.maochen.nlp.classifier.hmm;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -12,10 +19,12 @@ import java.util.stream.Collectors;
  * Created by Maochen on 8/5/15.
  */
 public class HMM {
+    private static final Logger LOG = LoggerFactory.getLogger(HMM.class);
+
     protected static final String START = "<START>";
     protected static final String END = "<END>";
 
-    public static List<HMMTuple> readFile(String filename, String delimiter, int wordColIndex, int tagColIndex) {
+    public static List<HMMTuple> readTrainFile(String filename, String delimiter, int wordColIndex, int tagColIndex) {
         List<HMMTuple> data = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
             String line = br.readLine();
@@ -101,13 +110,12 @@ public class HMM {
         return model;
     }
 
-
     public static List<String> viterbi(HMMModel model, List<String> words) {
         return Viterbi.resolve(model, words);
     }
 
     public static void eval(HMMModel model, String testFile, String delimiter, int wordColIndex, int tagColIndex) {
-        List<HMMTuple> testData = readFile(testFile, delimiter, wordColIndex, tagColIndex);
+        List<HMMTuple> testData = readTrainFile(testFile, delimiter, wordColIndex, tagColIndex);
         int totalcount = 0;
         int errcount = 0;
 
@@ -130,12 +138,29 @@ public class HMM {
         System.out.println("accurancy: " + errcount + "/" + totalcount + " -> " + String.format("%.2f", accurancy) + "%");
     }
 
+    public static HMMModel loadModel(String modelPath) {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(modelPath))) {
+            return (HMMModel) ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            LOG.error("Load model err.", e);
+        }
+        return null;
+    }
+
+    public static void saveModel(String modelPath, HMMModel model) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(modelPath))) {
+            oos.writeObject(model);
+        } catch (IOException e) {
+            LOG.error("Persist model err.", e);
+        }
+    }
+
     public static void main(String[] args) throws InterruptedException {
 //        Thread.sleep(5000);
 
-        List<HMMTuple> data = HMM.readFile("/Users/Maochen/Desktop/POS/penntreebank.txt", "\t", 1, 4);
-        List<HMMTuple> data2 = HMM.readFile("/Users/Maochen/Desktop/POS/extra.txt", "\t", 1, 4);
-        List<HMMTuple> data3 = HMM.readFile("/Users/Maochen/Desktop/POS/training.pos", "\t", 0, 1);
+        List<HMMTuple> data = HMM.readTrainFile("/Users/Maochen/Desktop/POS/penntreebank.txt", "\t", 1, 4);
+        List<HMMTuple> data2 = HMM.readTrainFile("/Users/Maochen/Desktop/POS/extra.txt", "\t", 1, 4);
+        List<HMMTuple> data3 = HMM.readTrainFile("/Users/Maochen/Desktop/POS/training.pos", "\t", 0, 1);
 
         data.addAll(data2);
         data.addAll(data3);
@@ -145,6 +170,7 @@ public class HMM {
 
         String str = "The quick brown fox jumped over the lazy dog";
         List<String> result = viterbi(model, Arrays.asList(str.split("\\s")));
+        System.out.println(str);
         System.out.println(result);
     }
 }

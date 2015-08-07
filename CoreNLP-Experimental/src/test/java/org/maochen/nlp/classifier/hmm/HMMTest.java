@@ -4,14 +4,39 @@ import com.google.common.collect.Lists;
 
 import org.junit.Test;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * Created by Maochen on 8/5/15.
  */
 public class HMMTest {
+
+    @Test
+    public void testWriteReadModel() {
+        HMMModel model = new HMMModel();
+        model.emission.put("fish", "NN", 8D);
+        model.emission.put("sleep", "NN", 2D);
+
+        model.emission.put("fish", "VB", 5D);
+        model.emission.put("sleep", "VB", 5D);
+
+        try {
+            Path tempDir = Files.createTempDirectory("HMMModelTest");
+            String path = tempDir.toAbsolutePath().toString() + "/hmm_model.dat";
+            HMM.saveModel(path, model);
+            HMMModel newModel = HMM.loadModel(path);
+            assertEquals(5D, newModel.emission.get("fish", "VB"), Double.MIN_NORMAL);
+        } catch (IOException e) {
+            fail(e.getMessage());
+        }
+
+    }
 
     @Test
     public void testNormalize() {
@@ -24,11 +49,23 @@ public class HMMTest {
 
         HMM.normalizeEmission(model);
 
-        assertEquals(model.emission.get("fish", "NN"), 0.8, Double.MIN_NORMAL);
-        assertEquals(model.emission.get("sleep", "NN"), 0.2, Double.MIN_NORMAL);
+        assertEquals(0.8, model.emission.get("fish", "NN"), Double.MIN_NORMAL);
+        assertEquals(0.2, model.emission.get("sleep", "NN"), Double.MIN_NORMAL);
 
-        assertEquals(model.emission.get("fish", "VB"), 0.5, Double.MIN_NORMAL);
-        assertEquals(model.emission.get("sleep", "VB"), 0.5, Double.MIN_NORMAL);
+        assertEquals(0.5, model.emission.get("fish", "VB"), Double.MIN_NORMAL);
+        assertEquals(0.5, model.emission.get("sleep", "VB"), Double.MIN_NORMAL);
+
+
+        model.transition.put("NN", "VB", 4D);
+        model.transition.put("NN", "JJ", 6D);
+
+        model.transition.put("DT", "NN", 6D);
+        HMM.normalizeTrans(model);
+
+        assertEquals(0.4, model.transition.get("NN", "VB"), Double.MIN_NORMAL);
+        assertEquals(0.6, model.transition.get("NN", "JJ"), Double.MIN_NORMAL);
+
+        assertEquals(1.0, model.transition.get("DT", "NN"), Double.MIN_NORMAL);
     }
 
     @Test

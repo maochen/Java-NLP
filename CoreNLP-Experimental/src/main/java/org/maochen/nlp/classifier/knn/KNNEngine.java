@@ -17,11 +17,11 @@ import java.util.function.BiFunction;
 final class KNNEngine {
     private static final Logger LOG = LoggerFactory.getLogger(KNNEngine.class);
 
-    private Tuple predict;
-    private List<Tuple> trainingData;
+    private KNNTuple predict;
+    private List<KNNTuple> trainingData;
     private int k;
 
-    public KNNEngine(Tuple predict, List<Tuple> trainingData, int k) {
+    public KNNEngine(KNNTuple predict, List<KNNTuple> trainingData, int k) {
         this.predict = predict;
         this.trainingData = trainingData;
         this.k = k;
@@ -32,7 +32,7 @@ final class KNNEngine {
     public BiFunction<double[], double[], Double> manhattanDistance = (v1, v2) -> Math.sqrt(Arrays.stream(VectorUtils.zip(v1, v2, (x, y) -> Math.abs(x - y))).parallel().sum());
 
     public void getDistance(BiFunction<double[], double[], Double> distanceFunction) {
-        for (Tuple tuple : trainingData) {
+        for (KNNTuple tuple : trainingData) {
             if (predict.featureVector.length != tuple.featureVector.length) {
                 LOG.error("2 Vectors must has same dimension.");
                 return;

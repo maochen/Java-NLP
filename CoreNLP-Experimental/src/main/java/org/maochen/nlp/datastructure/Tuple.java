@@ -8,8 +8,8 @@ import org.apache.commons.lang3.StringUtils;
 public class Tuple {
     public int id;
     public String label;
+    public String[] featureName = null; //Optional
     public double[] featureVector;
-    public double distance;
 
     // This is for predict
     public Tuple(double[] featureVector) {
@@ -23,6 +23,14 @@ public class Tuple {
         this.featureVector = featureVector;
         this.label = label;
     }
+
+    public Tuple(int id, String[] featureName, double[] featureVector, String label) {
+        this.id = id;
+        this.featureName = featureName;
+        this.featureVector = featureVector;
+        this.label = label;
+    }
+
 
     @Override
     public String toString() {

@@ -1,8 +1,8 @@
-package org.maochen.nlp.classifier.maxent;
+package org.maochen.nlp.classifier.maxent.eventstream;
 
 import opennlp.model.Event;
-import opennlp.model.EventStream;
 import opennlp.model.RealValueFileEventStream;
+
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Iterator;
@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Created by Maochen on 12/10/14.
  */
-public class StringEventStream implements EventStream {
+public class StringEventStream implements EventStream, opennlp.model.EventStream {
 
     private Iterator<String[]> dataIter;
 

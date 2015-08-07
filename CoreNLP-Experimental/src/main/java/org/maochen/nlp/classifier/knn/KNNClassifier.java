@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * Simple Wrapper, Id is based on the input sequence.
@@ -16,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class KNNClassifier implements IClassifier {
 
-    private List<Tuple> trainingData;
+    private List<KNNTuple> trainingData;
 
     private int k = 1;
     private int mode = 0;
@@ -25,8 +26,8 @@ public class KNNClassifier implements IClassifier {
     }
 
     /**
-     * k: k nearest neighbors.
-     * mode: 0 - EuclideanDistance, 1 - ChebyshevDistance, 2 - ManhattanDistance
+     * k: k nearest neighbors. mode: 0 - EuclideanDistance, 1 - ChebyshevDistance, 2 -
+     * ManhattanDistance
      *
      * @param paraMap Parameters Map.
      */
@@ -45,7 +46,7 @@ public class KNNClassifier implements IClassifier {
      */
     @Override
     public IClassifier train(List<Tuple> trainingData) {
-        this.trainingData = trainingData;
+        this.trainingData = trainingData.stream().map(KNNTuple::new).collect(Collectors.toList());
         return this;
     }
 
@@ -56,7 +57,9 @@ public class KNNClassifier implements IClassifier {
      */
     @Override
     public Map<String, Double> predict(Tuple predict) {
-        KNNEngine engine = new KNNEngine(predict, trainingData, k);
+        KNNTuple predictKNNTuple = new KNNTuple(predict);
+
+        KNNEngine engine = new KNNEngine(predictKNNTuple, trainingData, k);
 
         if (mode == 1) {
             engine.getDistance(engine.chebyshevDistance);
