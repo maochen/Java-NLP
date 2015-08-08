@@ -18,12 +18,17 @@ import java.util.function.Function;
 public class ChiSquare {
     private static final Logger LOG = LoggerFactory.getLogger(ChiSquare.class);
 
+    // http://www.wikihow.com/Calculate-P-Value
+    public static final double EMPIRICAL_P_VALUE = 0.05;
 
     // Row - feats, Col - label
     protected Table<String, String, Integer> dataTable = HashBasedTable.create();
 
     // Value smaller -> independent
     protected Table<String, String, Double> chiSquareTable = HashBasedTable.create();
+
+    // < EMPIRICAL_P_VALUE -> independent
+    protected Table<String, String, Double> pValTable = HashBasedTable.create();
 
     protected int df;
 
@@ -60,7 +65,11 @@ public class ChiSquare {
     }
 
     public void calculateChiSquare() {
-        df = (dataTable.rowKeySet().size() - 1) * (dataTable.columnKeySet().size() - 1);
+        df = (dataTable.rowKeySet().size() - 1);
+        df = df == 0 ? df = 1 : df;
+        df = df * (dataTable.columnKeySet().size() - 1);
+        df = df == 0 ? df = 1 : df;
+
         total = getTotal.apply(dataTable);
         // R, C, V
         dataTable.cellSet().forEach(cell -> {
@@ -73,9 +82,18 @@ public class ChiSquare {
             chiSquareTable.put(feat, label, Math.pow(count - e_xi_yi, 2) / e_xi_yi);
         });
 
+        chiSquareTable.cellSet().forEach(cell -> {
+            double pVal = cell.getValue() == null ? 0D : getPValue(cell.getValue(), df);
+            pValTable.put(cell.getRowKey(), cell.getColumnKey(), pVal);
+
+        });
 
         totalChiSquare = chiSquareTable.cellSet().parallelStream().mapToDouble(cell -> cell.getValue() == null ? 0D : cell.getValue()).sum();
         totalPVal = getPValue(totalChiSquare, df);
+    }
+
+    public boolean isFeatureUseful() {
+        return totalPVal >= EMPIRICAL_P_VALUE;
     }
 
 }
