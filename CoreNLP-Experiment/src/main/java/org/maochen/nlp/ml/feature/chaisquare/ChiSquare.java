@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 /**
  * Created by Maochen on 8/7/15.
@@ -27,8 +26,8 @@ public class ChiSquare {
     // Value smaller -> independent
     protected Table<String, String, Double> chiSquareTable = HashBasedTable.create();
 
-    // < EMPIRICAL_P_VALUE -> independent
-    protected Table<String, String, Double> pValTable = HashBasedTable.create();
+//    // > EMPIRICAL_P_VALUE -> independent
+//    protected Table<String, String, Double> pValTable = HashBasedTable.create();
 
     protected int df;
 
@@ -38,30 +37,20 @@ public class ChiSquare {
 
     public double totalPVal;
 
-    private Function<Table<String, String, Integer>, Integer> getTotal = table1 ->
-            table1.rowMap().values().stream().map(Map::values) // List<Collection<Int>>
-                    .map(lst -> lst.stream().mapToInt(num -> num).sum()) // List<Int>
-                    .mapToInt(num -> num).sum();
 
     public void loadTrainingData(List<Tuple> trainingData) {
+        for (int i = 0; i < trainingData.size(); i++) {
+            if (i % 1000 == 0) {
+                LOG.debug("Processed " + i + " of " + trainingData.size());
+            }
 
-        for (Tuple t : trainingData) {
-            String label = t.label;
-
+            Tuple t = trainingData.get(i);
             for (String featName : t.featureName) {
-                Integer count = dataTable.get(featName, label);
+                Integer count = dataTable.get(featName, t.label);
                 count = count == null ? 1 : count + 1;
-                dataTable.put(featName, label, count);
+                dataTable.put(featName, t.label, count);
             }
         }
-
-    }
-
-    protected static double getPValue(final double chiSquare, double df) {
-        GammaDistribution gamma = new GammaDistribution(df / 2.0D, 2.0D);
-        double gammaVal = gamma.cumulativeProbability(chiSquare);
-
-        return 1 - gammaVal;
     }
 
     public void calculateChiSquare() {
@@ -70,8 +59,10 @@ public class ChiSquare {
         df = df * (dataTable.columnKeySet().size() - 1);
         df = df == 0 ? df = 1 : df;
 
-        total = getTotal.apply(dataTable);
-        // R, C, V
+        total = dataTable.rowMap().values().stream().map(Map::values) // List<Collection<Int>>
+                .map(lst -> lst.stream().mapToInt(num -> num).sum()) // List<Int>
+                .mapToInt(num -> num).sum();        // R, C, V
+
         dataTable.cellSet().forEach(cell -> {
             String feat = cell.getRowKey();
             String label = cell.getColumnKey();
@@ -82,18 +73,40 @@ public class ChiSquare {
             chiSquareTable.put(feat, label, Math.pow(count - e_xi_yi, 2) / e_xi_yi);
         });
 
-        chiSquareTable.cellSet().forEach(cell -> {
-            double pVal = cell.getValue() == null ? 0D : getPValue(cell.getValue(), df);
-            pValTable.put(cell.getRowKey(), cell.getColumnKey(), pVal);
-
-        });
+//        chiSquareTable.cellSet().forEach(cell -> {
+//            double pVal = cell.getValue() == null ? 0D : getPValue(cell.getValue(), df);
+//            pValTable.put(cell.getRowKey(), cell.getColumnKey(), pVal);
+//        });
 
         totalChiSquare = chiSquareTable.cellSet().parallelStream().mapToDouble(cell -> cell.getValue() == null ? 0D : cell.getValue()).sum();
         totalPVal = getPValue(totalChiSquare, df);
     }
 
-    public boolean isFeatureUseful() {
-        return totalPVal >= EMPIRICAL_P_VALUE;
+    protected static double getPValue(final double chiSquare, double df) {
+        GammaDistribution gamma = new GammaDistribution(df / 2.0D, 2.0D);
+        double gammaVal = gamma.cumulativeProbability(chiSquare);
+        return 1 - gammaVal;
+    }
+
+    public void printPTable() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("Greater than " + EMPIRICAL_P_VALUE + " might be independent.")
+                .append(System.lineSeparator());
+
+        stringBuilder.append("Total P Value: " + String.format("%.5f", totalPVal)).append(System.lineSeparator());
+
+//        List<String> columnList = pValTable.columnKeySet().stream().collect(Collectors.toList());
+//        stringBuilder.append("\t\t").append(columnList.stream().reduce((c1, c2) -> c1 + "\t" + c2).get()).append(System.lineSeparator()); // Head
+//        pValTable.rowKeySet().forEach(rowName -> {
+//            stringBuilder.append(rowName);
+//            for (String col : columnList) {
+//                String pVal = String.format("%.3f", pValTable.get(rowName, col));
+//                stringBuilder.append("\t").append(pVal);
+//            }
+//            stringBuilder.append(System.lineSeparator());
+//        });
+
+        System.out.println(stringBuilder.toString());
     }
 
 }

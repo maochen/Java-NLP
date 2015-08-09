@@ -49,7 +49,7 @@ public class NaiveBayesClassifier implements IClassifier {
 
     @Override
     public void setParameter(Map<String, String> paraMap) {
-        throw new NotImplementedException("not implemented");
+        throw new NotImplementedException("No parameter needed for Naive Bayes.");
     }
 
     // Integer is label's Index from labelIndexer

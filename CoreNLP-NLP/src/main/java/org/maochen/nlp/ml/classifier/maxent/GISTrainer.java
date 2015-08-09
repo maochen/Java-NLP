@@ -330,11 +330,11 @@ class GISTrainer {
 
     /* Estimate and return the model parameters. */
     private void findParameters(int iterations, double correctionConstant) {
-        LOG.debug("Performing max " + iterations + " iterations.");
+        LOG.info("Performing max " + iterations + " iterations.");
 
         double prevLL = 0.0;
         for (int i = 1; i <= iterations; i++) {
-            LOG.debug("Iteration " + i);
+            LOG.info("Iteration " + i);
             double currLL = nextIteration(correctionConstant); // Core
 
             if (i > 1) {
@@ -539,7 +539,7 @@ class GISTrainer {
             }
         }
 
-        LOG.debug("loglikelihood=" + loglikelihood + "\taccurancy:\t" + ((double) numCorrect / numEvents));
+        LOG.info("loglikelihood = " + loglikelihood + "\taccurancy:\t" + ((double) numCorrect / numEvents));
 
         return loglikelihood;
     }

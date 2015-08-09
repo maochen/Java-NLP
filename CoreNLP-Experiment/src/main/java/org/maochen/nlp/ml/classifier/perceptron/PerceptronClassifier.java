@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -53,10 +52,12 @@ public class PerceptronClassifier implements IClassifier {
                 .toArray();
     }
 
-    // public use for doing one training sample.
-    // instead of directly change a model, we will do a copy of a model and change the copy.
-    // Target is labelIndex
-    // return error and copy of perceptron model
+    /**
+     * public use for doing one training sample.
+     *
+     * @param x          Feature Vector
+     * @param labelIndex label's index, from PerceptronModel.LabelIndexer
+     */
     public void onlineTrain(final double[] x, final int labelIndex) {
         Map<Integer, Double> result = predict(x);
         Map.Entry<Integer, Double> maxResult = result.entrySet().stream().max((e1, e2) -> e1.getValue().compareTo(e2.getValue())).orElse(null);
@@ -84,7 +85,7 @@ public class PerceptronClassifier implements IClassifier {
         int errCount;
         int iter = 0;
         do {
-            LOG.info("Iteration " + (++iter));
+            LOG.debug("Iteration " + (++iter));
             Collections.shuffle(trainingData);
 
             for (Tuple entry : trainingData) {
@@ -98,6 +99,13 @@ public class PerceptronClassifier implements IClassifier {
         return this;
     }
 
+    /**
+     * Do a prediction.
+     *
+     * @param predict predict tuple.
+     * @return Map's key is the actual label, Value is probability, the probability is random
+     * depends on the order of training sample.
+     */
     @Override
     public Map<String, Double> predict(Tuple predict) {
         Map<Integer, Double> indexResult = predict(predict.featureVector);
@@ -124,25 +132,5 @@ public class PerceptronClassifier implements IClassifier {
 
     public PerceptronClassifier() {
         this.model = new PerceptronModel();
-    }
-
-    public static void main(String[] args) throws IOException {
-        String modelPath = PerceptronClassifier.class.getResource("/").getPath() + "/perceptron_model.dat";
-        System.out.println(modelPath);
-        PerceptronClassifier perceptronClassifier = new PerceptronClassifier();
-
-        List<Tuple> data = new ArrayList<>();
-        data.add(new Tuple(1, new double[]{1, 0, 0}, String.valueOf(1)));
-        data.add(new Tuple(2, new double[]{1, 0, 1}, String.valueOf(1)));
-        data.add(new Tuple(3, new double[]{1, 1, 0}, String.valueOf(1)));
-        data.add(new Tuple(4, new double[]{1, 1, 1}, String.valueOf(0)));
-        perceptronClassifier.train(data);
-
-        perceptronClassifier.persistModel(modelPath);
-        perceptronClassifier = new PerceptronClassifier();
-        perceptronClassifier.loadModel(modelPath);
-
-        Tuple test = new Tuple(5, new double[]{1, 1, 1}, null);
-        System.out.println(perceptronClassifier.predict(test));
     }
 }

@@ -23,6 +23,8 @@ import opennlp.model.DataIndexer;
 import opennlp.model.Event;
 
 import org.maochen.nlp.ml.classifier.maxent.eventstream.EventStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,6 +41,7 @@ import java.util.Set;
  * provides a unique integer index for each of the predicates and maintains event values.
  */
 public class OnePassRealValueDataIndexer implements DataIndexer {
+    private static final Logger LOG = LoggerFactory.getLogger(OnePassRealValueDataIndexer.class);
 
     private float[][] values;
 
@@ -74,19 +77,17 @@ public class OnePassRealValueDataIndexer implements DataIndexer {
     public OnePassRealValueDataIndexer(EventStream eventStream, int cutoff, boolean sort) {
         Map<String, Integer> predicateIndex = new HashMap<>();
 
-        System.out.println("Indexing events using cutoff of " + cutoff + "\n");
-
-        System.out.print("\tComputing event counts...  ");
+        LOG.info("Indexing events using cutoff of " + cutoff);
+        
         LinkedList<Event> events = computeEventCounts(eventStream, predicateIndex, cutoff);
-        System.out.println("done. " + events.size() + " events");
+        LOG.info("Computed event counts... " + events.size());
 
-        System.out.print("\tIndexing...  ");
         List<ComparableEvent> eventsToCompare = index(events, predicateIndex);
-        System.out.println("done.");
+        LOG.info("Indexing... done.");
 
-        System.out.print("Sorting and merging events... ");
+        LOG.info("Sorting and merging events... ");
         sortAndMerge(eventsToCompare, sort);
-        System.out.println("Done indexing.");
+        LOG.info("Done indexing.");
     }
 
     /**
@@ -160,7 +161,7 @@ public class OnePassRealValueDataIndexer implements DataIndexer {
                     numUniqueEvents++; // increment the # of unique events
                 }
             }
-            System.out.println("done. Reduced " + numEvents + " events to " + numUniqueEvents + ".");
+            LOG.info("done. Reduced " + numEvents + " events to " + numUniqueEvents + ".");
         } else {
             numUniqueEvents = eventsToCompare.size();
         }

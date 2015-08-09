@@ -3,7 +3,6 @@ package org.maochen.nlp.ml.feature.chaisquare;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 
 /**
  * Created by Maochen on 8/7/15.
@@ -33,11 +32,36 @@ public class ChiSquareTest {
         chiSquare.dataTable.put("Female", "Indep", 50);
 
         chiSquare.calculateChiSquare();
-        
+
         assertEquals(1000, chiSquare.total);
         assertEquals(2, chiSquare.df);
         assertEquals(16.203703703703702, chiSquare.totalChiSquare, Double.MIN_NORMAL);
         assertEquals(3.0297754871455584E-4, chiSquare.totalPVal, Double.MIN_NORMAL);
-        assertFalse(chiSquare.isFeatureUseful());
+    }
+
+    @Test
+    public void testChiSquareWikiExample() {
+        ChiSquare chiSquare = new ChiSquare();
+        chiSquare.dataTable.put("Blue collar", "A", 90);
+        chiSquare.dataTable.put("Blue collar", "B", 60);
+        chiSquare.dataTable.put("Blue collar", "C", 104);
+        chiSquare.dataTable.put("Blue collar", "D", 95);
+
+        chiSquare.dataTable.put("White collar", "A", 30);
+        chiSquare.dataTable.put("White collar", "B", 50);
+        chiSquare.dataTable.put("White collar", "C", 51);
+        chiSquare.dataTable.put("White collar", "D", 20);
+
+        chiSquare.dataTable.put("Service", "A", 30);
+        chiSquare.dataTable.put("Service", "B", 40);
+        chiSquare.dataTable.put("Service", "C", 45);
+        chiSquare.dataTable.put("Service", "D", 35);
+
+        chiSquare.calculateChiSquare();
+
+        assertEquals(650, chiSquare.total);
+        assertEquals(6, chiSquare.df);
+        assertEquals(24.571202858582602, chiSquare.totalChiSquare, Double.MIN_NORMAL);
+        assertEquals(4.098425861096544E-4, chiSquare.totalPVal, Double.MIN_NORMAL);
     }
 }
