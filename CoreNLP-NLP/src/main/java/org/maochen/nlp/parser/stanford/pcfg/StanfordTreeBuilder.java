@@ -1,10 +1,10 @@
 package org.maochen.nlp.parser.stanford.pcfg;
 
 import org.apache.commons.lang3.StringUtils;
-import org.maochen.nlp.datastructure.DNode;
-import org.maochen.nlp.datastructure.DTree;
-import org.maochen.nlp.datastructure.LangLib;
-import org.maochen.nlp.datastructure.LangTools;
+import org.maochen.nlp.parser.DNode;
+import org.maochen.nlp.parser.DTree;
+import org.maochen.nlp.parser.LangLib;
+import org.maochen.nlp.parser.LangTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

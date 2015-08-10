@@ -1,6 +1,6 @@
 package org.maochen.nlp.ml.classifier.hmm;
 
-import org.maochen.nlp.ml.datastructure.SequenceTuple;
+import org.maochen.nlp.ml.SequenceTuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

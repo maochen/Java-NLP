@@ -1,7 +1,7 @@
 package org.maochen.nlp.ml.classifier.knn;
 
 import org.maochen.nlp.ml.classifier.IClassifier;
-import org.maochen.nlp.ml.datastructure.Tuple;
+import org.maochen.nlp.ml.Tuple;
 
 import java.io.IOException;
 import java.util.ArrayList;

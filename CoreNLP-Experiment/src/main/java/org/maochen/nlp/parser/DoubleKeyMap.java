@@ -1,4 +1,4 @@
-package org.maochen.nlp.datastructure;
+package org.maochen.nlp.parser;
 
 import java.io.Serializable;
 import java.util.ArrayList;

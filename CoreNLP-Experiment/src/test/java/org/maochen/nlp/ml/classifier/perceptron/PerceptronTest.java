@@ -2,7 +2,7 @@ package org.maochen.nlp.ml.classifier.perceptron;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.maochen.nlp.ml.datastructure.Tuple;
+import org.maochen.nlp.ml.Tuple;
 
 import java.io.IOException;
 import java.util.ArrayList;

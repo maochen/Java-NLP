@@ -6,7 +6,7 @@ import com.google.common.collect.Table;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.maochen.nlp.datastructure.DTree;
+import org.maochen.nlp.parser.DTree;
 import org.maochen.nlp.parser.stanford.StanfordParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

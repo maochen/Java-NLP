@@ -1,4 +1,4 @@
-package org.maochen.nlp.datastructure;
+package org.maochen.nlp.parser;
 
 /**
  * Author: Maochen.G   contact@maochen.org

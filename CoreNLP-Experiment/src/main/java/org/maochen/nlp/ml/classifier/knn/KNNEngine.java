@@ -1,7 +1,7 @@
 package org.maochen.nlp.ml.classifier.knn;
 
 import org.apache.commons.lang3.StringUtils;
-import org.maochen.nlp.ml.datastructure.Tuple;
+import org.maochen.nlp.ml.Tuple;
 import org.maochen.nlp.utils.VectorUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

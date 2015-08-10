@@ -1,9 +1,9 @@
-package org.maochen.nlp;
+package org.maochen.nlp.parser;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.maochen.nlp.datastructure.DTree;
-import org.maochen.nlp.datastructure.LangTools;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by Maochen on 7/1/15.
@@ -45,7 +45,7 @@ public class LangToolsTest {
 
         try {
             DTree dtree = LangTools.getDTreeFromCoNLLXString(tree);
-//            System.out.println(dtree);
+            assertTrue(dtree.stream().filter(x->x.getId()==0).count()==1);
         } catch (Exception e) {
             Assert.fail(e.toString());
         }

@@ -2,9 +2,9 @@ package org.maochen.nlp.ml.classifier.perceptron;
 
 import com.google.common.collect.Lists;
 
-import org.maochen.nlp.datastructure.LabelIndexer;
+import org.maochen.nlp.parser.LabelIndexer;
 import org.maochen.nlp.ml.classifier.ModelSerializeUtils;
-import org.maochen.nlp.ml.datastructure.Tuple;
+import org.maochen.nlp.ml.Tuple;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

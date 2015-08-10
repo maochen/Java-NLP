@@ -2,9 +2,9 @@ package org.maochen.nlp.sentencetypeclassifier;
 
 import com.google.common.collect.Sets;
 
-import org.maochen.nlp.datastructure.DNode;
-import org.maochen.nlp.datastructure.DTree;
-import org.maochen.nlp.datastructure.LangLib;
+import org.maochen.nlp.parser.DNode;
+import org.maochen.nlp.parser.DTree;
+import org.maochen.nlp.parser.LangLib;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,4 +1,4 @@
-package org.maochen.nlp.ml.feature.chaisquare;
+package org.maochen.nlp.ml.feature;
 
 import org.junit.Test;
 

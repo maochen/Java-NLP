@@ -2,7 +2,7 @@ package org.maochen.nlp.wordcorrection;
 
 import edu.stanford.nlp.ling.CoreLabel;
 import org.apache.commons.lang3.StringUtils;
-import org.maochen.nlp.datastructure.DoubleKeyMap;
+import org.maochen.nlp.parser.DoubleKeyMap;
 import org.maochen.nlp.parser.stanford.StanfordParser;
 
 import java.io.*;

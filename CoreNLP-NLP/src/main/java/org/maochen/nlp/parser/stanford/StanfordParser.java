@@ -2,8 +2,8 @@ package org.maochen.nlp.parser.stanford;
 
 import com.google.common.collect.ImmutableSet;
 
-import org.maochen.nlp.datastructure.DTree;
-import org.maochen.nlp.datastructure.LangLib;
+import org.maochen.nlp.parser.DTree;
+import org.maochen.nlp.parser.LangLib;
 import org.maochen.nlp.parser.IParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

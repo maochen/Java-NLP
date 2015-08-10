@@ -1,7 +1,5 @@
 package org.maochen.nlp.parser;
 
-import org.maochen.nlp.datastructure.DTree;
-
 /**
  * Created by Maochen on 12/8/14.
  */

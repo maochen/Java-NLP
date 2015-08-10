@@ -14,7 +14,7 @@ import org.maochen.nlp.ml.classifier.IClassifier;
 import org.maochen.nlp.ml.classifier.maxent.eventstream.EventStream;
 import org.maochen.nlp.ml.classifier.maxent.eventstream.StringEventStream;
 import org.maochen.nlp.ml.classifier.maxent.eventstream.TupleEventStream;
-import org.maochen.nlp.ml.datastructure.Tuple;
+import org.maochen.nlp.ml.Tuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

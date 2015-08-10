@@ -1,9 +1,9 @@
-package org.maochen.nlp.datastructure;
+package org.maochen.nlp.parser;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
-import org.maochen.nlp.ml.datastructure.Tuple;
+import org.maochen.nlp.ml.Tuple;
 
 import java.util.HashMap;
 import java.util.List;

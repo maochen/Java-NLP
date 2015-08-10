@@ -3,7 +3,7 @@ package org.maochen.nlp.ml.classifier.perceptron;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.maochen.nlp.ml.classifier.IClassifier;
-import org.maochen.nlp.ml.datastructure.Tuple;
+import org.maochen.nlp.ml.Tuple;
 import org.maochen.nlp.utils.VectorUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

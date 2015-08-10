@@ -1,9 +1,9 @@
 package org.maochen.nlp.sentencetypeclassifier;
 
 import org.apache.commons.lang3.StringUtils;
-import org.maochen.nlp.datastructure.DTree;
+import org.maochen.nlp.parser.DTree;
 import org.maochen.nlp.ml.classifier.maxent.MaxEntClassifier;
-import org.maochen.nlp.ml.datastructure.Tuple;
+import org.maochen.nlp.ml.Tuple;
 import org.maochen.nlp.parser.IParser;
 import org.maochen.nlp.parser.stanford.nn.StanfordNNDepParser;
 import org.slf4j.Logger;

@@ -2,7 +2,7 @@ package org.maochen.nlp.ml.classifier.maxent.eventstream;
 
 import opennlp.model.Event;
 
-import org.maochen.nlp.ml.datastructure.Tuple;
+import org.maochen.nlp.ml.Tuple;
 import org.maochen.nlp.utils.VectorUtils;
 
 import java.util.Iterator;

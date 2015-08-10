@@ -1,10 +1,10 @@
-package org.maochen.nlp.ml.feature.chaisquare;
+package org.maochen.nlp.ml.feature;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 
 import org.apache.commons.math3.distribution.GammaDistribution;
-import org.maochen.nlp.ml.datastructure.Tuple;
+import org.maochen.nlp.ml.Tuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,9 +25,6 @@ public class ChiSquare {
 
     // Value smaller -> independent
     protected Table<String, String, Double> chiSquareTable = HashBasedTable.create();
-
-//    // > EMPIRICAL_P_VALUE -> independent
-//    protected Table<String, String, Double> pValTable = HashBasedTable.create();
 
     protected int df;
 
@@ -73,12 +70,9 @@ public class ChiSquare {
             chiSquareTable.put(feat, label, Math.pow(count - e_xi_yi, 2) / e_xi_yi);
         });
 
-//        chiSquareTable.cellSet().forEach(cell -> {
-//            double pVal = cell.getValue() == null ? 0D : getPValue(cell.getValue(), df);
-//            pValTable.put(cell.getRowKey(), cell.getColumnKey(), pVal);
-//        });
-
-        totalChiSquare = chiSquareTable.cellSet().parallelStream().mapToDouble(cell -> cell.getValue() == null ? 0D : cell.getValue()).sum();
+        totalChiSquare = chiSquareTable.cellSet().parallelStream()
+                .mapToDouble(cell -> cell.getValue() == null ? 0D : cell.getValue())
+                .sum();
         totalPVal = getPValue(totalChiSquare, df);
     }
 
@@ -93,18 +87,9 @@ public class ChiSquare {
         stringBuilder.append("Greater than " + EMPIRICAL_P_VALUE + " might be independent.")
                 .append(System.lineSeparator());
 
-        stringBuilder.append("Total P Value: " + String.format("%.5f", totalPVal)).append(System.lineSeparator());
-
-//        List<String> columnList = pValTable.columnKeySet().stream().collect(Collectors.toList());
-//        stringBuilder.append("\t\t").append(columnList.stream().reduce((c1, c2) -> c1 + "\t" + c2).get()).append(System.lineSeparator()); // Head
-//        pValTable.rowKeySet().forEach(rowName -> {
-//            stringBuilder.append(rowName);
-//            for (String col : columnList) {
-//                String pVal = String.format("%.3f", pValTable.get(rowName, col));
-//                stringBuilder.append("\t").append(pVal);
-//            }
-//            stringBuilder.append(System.lineSeparator());
-//        });
+        stringBuilder.append("Total P Value: ")
+                .append(String.format("%.5f", totalPVal))
+                .append(System.lineSeparator());
 
         System.out.println(stringBuilder.toString());
     }

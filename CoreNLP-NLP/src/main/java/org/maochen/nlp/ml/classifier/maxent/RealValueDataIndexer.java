@@ -5,7 +5,7 @@ import com.google.common.collect.HashBiMap;
 
 import opennlp.model.DataIndexer;
 
-import org.maochen.nlp.ml.datastructure.Tuple;
+import org.maochen.nlp.ml.Tuple;
 
 import java.util.HashMap;
 import java.util.List;

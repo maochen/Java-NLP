@@ -1,4 +1,4 @@
-package org.maochen.nlp.ml.datastructure;
+package org.maochen.nlp.ml;
 
 import org.apache.commons.lang3.StringUtils;
 
