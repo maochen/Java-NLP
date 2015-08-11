@@ -32,7 +32,8 @@ public class PerceptronTest {
         data.add(new Tuple(4, new double[]{1, 1, 1}, String.valueOf(0)));
         perceptronClassifier.train(data);
 
-        String modelPath = PerceptronClassifier.class.getResource("/").getPath() + "/temp_perceptron_model.dat";
+        String modelPath = PerceptronClassifier.class.getResource("/").getPath()
+                + "/temp_perceptron_model.dat";
         perceptronClassifier.persistModel(modelPath);
         perceptronClassifier = new PerceptronClassifier();
         perceptronClassifier.loadModel(modelPath);
@@ -41,8 +42,23 @@ public class PerceptronTest {
         Map<String, Double> actualMap = perceptronClassifier.predict(test);
 
         String actualLabel = actualMap.entrySet().stream()
-                .max((e1, e2) -> e1.getValue().compareTo(e2.getValue())).map(Map.Entry::getKey).orElse(null);
+                .max((e1, e2) -> e1.getValue().compareTo(e2.getValue()))
+                .map(Map.Entry::getKey)
+                .orElse(null);
         String expectedLabel = "0";
         assertEquals(expectedLabel, actualLabel);
+    }
+
+    @Test
+    public void testModel() {
+        PerceptronModel model = new PerceptronModel();
+        model.threshold = 0.5;
+        model.bias = new double[]{1.3};
+        model.learningRate = 0.03;
+        model.weights = new double[3][9];
+        PerceptronModel cloneModel = new PerceptronModel(model);
+        assertEquals(0.5, cloneModel.threshold, Double.MIN_NORMAL);
+        assertEquals(0.03, cloneModel.learningRate, Double.MIN_NORMAL);
+        assertEquals(1.3, cloneModel.bias[0], Double.MIN_NORMAL);
     }
 }

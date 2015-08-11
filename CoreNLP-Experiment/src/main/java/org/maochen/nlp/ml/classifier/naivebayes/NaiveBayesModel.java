@@ -1,7 +1,7 @@
 package org.maochen.nlp.ml.classifier.naivebayes;
 
 import com.google.common.collect.Lists;
-import org.maochen.nlp.ml.classifier.ModelSerializeUtils;
+import org.maochen.nlp.ml.classifier.utils.ModelSerializeUtils;
 import org.maochen.nlp.parser.LabelIndexer;
 
 import java.io.*;

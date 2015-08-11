@@ -12,9 +12,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 /**
- * Go through every document, count prob for P(w)=C(w)/C(documents), C(w) for every doc is either 0 or 1, not the total count in that doc.
- * Here doc is sentence.
- * Created by Maochen on 5/1/15.
+ * Go through every document, count prob for P(w)=C(w)/C(documents), C(w) for every doc is either 0
+ * or 1, not the total count in that doc. Here doc is sentence. Created by Maochen on 5/1/15.
  */
 public class StopwordsGenerator {
 
@@ -33,10 +32,12 @@ public class StopwordsGenerator {
 
             stopwordsGenerator.totalCount.addAndGet(1); // increase the total doc count.
 
-            Set<String> tokens = Arrays.stream(sentence.split("\\s")).parallel().collect(Collectors.toSet());
+            Set<String> tokens = Arrays.stream(sentence.split("\\s")).parallel().collect
+                    (Collectors.toSet());
 
             tokens.parallelStream().forEach(token -> {
-                Double tokenCount = stopwordsGenerator.wordCount.containsKey(token) ? stopwordsGenerator.wordCount.get(token) : 0.0D;
+                Double tokenCount = stopwordsGenerator.wordCount.containsKey(token) ?
+                        stopwordsGenerator.wordCount.get(token) : 0.0D;
                 tokenCount++;
                 stopwordsGenerator.wordCount.put(token, tokenCount);
             });
@@ -51,7 +52,9 @@ public class StopwordsGenerator {
                 while (line != null) {
                     if (line.trim().isEmpty()) {
                         String[] sentences = sb.toString().split("\\."); // Split sentences.
-                        Arrays.stream(sentences).forEach(s -> DocumentCount.addCount(s, stopwordsGenerator)); // TODO: not parallelled. wordCount will miss. Need investigate
+                        Arrays.stream(sentences).forEach(s -> DocumentCount.addCount(s,
+                                stopwordsGenerator)); // TODO: not parallelled. wordCount will
+                                // miss. Need investigate
                         sb.setLength(0);
                     } else {
                         sb.append(line);
@@ -86,14 +89,17 @@ public class StopwordsGenerator {
                     } else {
                         String token = stopwordsGenerator.stringNormalize(wordBuilder.toString());
                         wordBuilder.setLength(0);
-                        Double count = stopwordsGenerator.wordCount.containsKey(token) ? stopwordsGenerator.wordCount.get(token) : 0.0D;
+                        Double count = stopwordsGenerator.wordCount.containsKey(token) ?
+                                stopwordsGenerator.wordCount.get(token) : 0.0D;
                         stopwordsGenerator.wordCount.put(token, ++count);
                         stopwordsGenerator.totalCount.addAndGet(1);
                         if (stopwordsGenerator.totalCount.get() % 10000000 == 0) {
                             if (maxThreshold > 0) {
-                                System.out.println("Processed tokens: " + stopwordsGenerator.totalCount.get() / (double) maxThreshold * 100 + "%");
+                                System.out.println("Processed tokens: " + stopwordsGenerator
+                                        .totalCount.get() / (double) maxThreshold * 100 + "%");
                             } else {
-                                System.out.println("Processed tokens: " + stopwordsGenerator.totalCount.get());
+                                System.out.println("Processed tokens: " + stopwordsGenerator
+                                        .totalCount.get());
                             }
                         }
                     }
@@ -157,21 +163,24 @@ public class StopwordsGenerator {
             return;
         }
 
-        StopwordsGenerator g = new StopwordsGenerator();
+        StopwordsGenerator stopwordsGenerator = new StopwordsGenerator();
 
         File file = new File(args[0]);
 
         if (file.isFile()) {
-            WikiSingleWordCount.generateFromFile(file, g);
+            WikiSingleWordCount.generateFromFile(file, stopwordsGenerator);
         } else {
             File[] files = file.listFiles();
-            Arrays.stream(files).parallel().filter(File::isFile).forEach(f -> WikiSingleWordCount.generateFromFile(f, g));
+            Arrays.stream(files).parallel()
+                    .filter(File::isFile)
+                    .forEach(f -> WikiSingleWordCount.generateFromFile(f, stopwordsGenerator));
         }
 
-        g.normalize();
-        List<Map.Entry<String, Double>> result = g.getProbability().entrySet().stream().sorted((o1, o2) -> o2.getValue().compareTo(o1.getValue())).collect(Collectors.toList());
-        g.writeFile(args[1], result);
+        stopwordsGenerator.normalize();
+        List<Map.Entry<String, Double>> result = stopwordsGenerator.getProbability()
+                .entrySet().stream()
+                .sorted((o1, o2) -> o2.getValue().compareTo(o1.getValue()))
+                .collect(Collectors.toList());
+        stopwordsGenerator.writeFile(args[1], result);
     }
-
-
 }

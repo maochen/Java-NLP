@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,8 +45,8 @@ final class KNNEngine {
     }
 
     public String getResult() {
-        Map<String, Integer> resultMap = new HashMap<String, Integer>();
-        Collections.sort(trainingData, (tuple1, tuple2) -> {
+        Map<String, Integer> resultMap = new HashMap<>();
+        trainingData.parallelStream().sorted((tuple1, tuple2) -> {
             double diff = (Double) tuple1.getExtra().get(KNNClassifier.DISTANCE) - (Double) tuple2.getExtra().get(KNNClassifier.DISTANCE);
             if (Math.abs(diff) < Double.MIN_VALUE) {
                 return 0;
@@ -55,7 +54,6 @@ final class KNNEngine {
                 return ((Double) tuple1.getExtra().get(KNNClassifier.DISTANCE)).compareTo((Double) tuple2.getExtra().get(KNNClassifier.DISTANCE));
             }
         });
-
 
         for (int i = 0; i < k; i++) {
             Tuple tuple = trainingData.get(i);

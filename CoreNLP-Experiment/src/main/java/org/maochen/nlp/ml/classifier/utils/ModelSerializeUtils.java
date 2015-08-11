@@ -1,4 +1,4 @@
-package org.maochen.nlp.ml.classifier;
+package org.maochen.nlp.ml.classifier.utils;
 
 import org.apache.commons.lang3.StringUtils;
 

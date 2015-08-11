@@ -32,7 +32,6 @@ public class WordCount {
         public WordDatum(final String word) {
             this.word = word;
             count = 1;
-            this.hashCode();
         }
 
         public WordDatum addCount() {
@@ -47,8 +46,8 @@ public class WordCount {
         }
     }
 
-    private Map<String, WordDatum> wordMap = new HashMap<String, WordDatum>();
-    private static Queue<WordDatum> q = new PriorityQueue<WordDatum>();
+    private Map<String, WordDatum> wordMap = new HashMap<>();
+    private static final Queue<WordDatum> q = new PriorityQueue<>();
     private int totalCount = 0;
     private boolean isNormalized = false;
 
@@ -56,7 +55,8 @@ public class WordCount {
         int prevTotalCount = totalCount;
         if (wordMap.containsKey(word)) {
             WordDatum deletedWordDatum = wordMap.remove(word);
-            totalCount -= isNormalized ? deletedWordDatum.getCount() * totalCount : deletedWordDatum.getCount();
+            totalCount -= isNormalized ? deletedWordDatum.getCount() * totalCount :
+                    deletedWordDatum.getCount();
             q.remove(deletedWordDatum);
         }
 
@@ -68,11 +68,16 @@ public class WordCount {
     public synchronized void put(String word) {
         if (word == null || word.isEmpty()) return;
 
-        WordDatum wordObject = wordMap.containsKey(word) ? wordMap.get(word).addCount() : new WordDatum(word);
-        if (!wordMap.containsKey(word)) wordMap.put(word, wordObject);
+        WordDatum wordObject = wordMap.containsKey(word) ?
+                wordMap.get(word).addCount() : new WordDatum(word);
+        if (!wordMap.containsKey(word)) {
+            wordMap.put(word, wordObject);
+        }
 
         // Do this Shit, or it wont do heapify automatically.
-        if (q.contains(wordObject)) q.remove(wordObject);
+        if (q.contains(wordObject)) {
+            q.remove(wordObject);
+        }
         q.add(wordObject);
         ++totalCount;
     }
@@ -95,7 +100,6 @@ public class WordCount {
     }
 
     public WordDatum getWordDatum(final String word) {
-        if (word == null || word.trim().isEmpty()) return null;
         return wordMap.containsKey(word) ? wordMap.get(word) : null;
     }
 
@@ -114,26 +118,5 @@ public class WordCount {
         if (isNormalized) return;
         isNormalized = true;
         reNormalize(1.0);
-    }
-
-    public static void main(String[] args) {
-        WordCount wordCount = new WordCount();
-        wordCount.put("c");
-        wordCount.put("a");
-        wordCount.put("b");
-        wordCount.put("b");
-        wordCount.put("b");
-        wordCount.put("a");
-        for (int i = 0; i < 199; i++) {
-            wordCount.put("ZZ");
-        }
-        wordCount.normalize();
-        wordCount.normalize();
-        wordCount.normalize();
-
-        System.out.println(wordCount.getAllWords());
-
-        wordCount.remove("ZZ");
-        System.out.println(wordCount.getAllWords());
     }
 }

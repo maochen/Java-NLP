@@ -18,13 +18,13 @@ public class DoubleKeyMap<K1, K2, V> implements Serializable{
     private Map<K2, Set<K1>> k2Cache;
 
     public DoubleKeyMap() {
-        data = new HashMap<K1, Map<K2, V>>();
-        k2Cache = new HashMap<K2, Set<K1>>();
+        data = new HashMap<>();
+        k2Cache = new HashMap<>();
     }
 
     public void clear() {
-        data = new HashMap<K1, Map<K2, V>>();
-        k2Cache = new HashMap<K2, Set<K1>>();
+        data = new HashMap<>();
+        k2Cache = new HashMap<>();
     }
 
     public boolean containsKey1(K1 k1) {

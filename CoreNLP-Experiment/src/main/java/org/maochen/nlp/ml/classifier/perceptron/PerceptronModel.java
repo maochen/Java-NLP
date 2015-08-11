@@ -3,8 +3,10 @@ package org.maochen.nlp.ml.classifier.perceptron;
 import com.google.common.collect.Lists;
 
 import org.maochen.nlp.parser.LabelIndexer;
-import org.maochen.nlp.ml.classifier.ModelSerializeUtils;
+import org.maochen.nlp.ml.classifier.utils.ModelSerializeUtils;
 import org.maochen.nlp.ml.Tuple;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -20,6 +22,9 @@ import java.util.List;
  * Created by Maochen on 6/5/15.
  */
 public class PerceptronModel {
+
+    private static final Logger LOG = LoggerFactory.getLogger(PerceptronModel.class);
+
     double learningRate = 0.1;
     double threshold = 0.5;
 
@@ -71,7 +76,7 @@ public class PerceptronModel {
             output.write("li" + System.lineSeparator());
             output.write(ModelSerializeUtils.mapSerialize(labelIndexer.labelIndexer.entrySet()));
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.error("Persist model err.", e);
         }
     }
 
@@ -90,24 +95,27 @@ public class PerceptronModel {
                     } else if (lineCount == 2) {
                         this.threshold = Double.valueOf(line);
                     } else if (lineCount == 4) {
-                        this.bias = Arrays.stream(line.split("\\s")).mapToDouble(Double::parseDouble).toArray();
+                        this.bias = Arrays.stream(line.split("\\s")).mapToDouble
+                                (Double::parseDouble).toArray();
                     } else if (lineCount == 5) {
                         int rows = Integer.parseInt(line.split("\\s")[0]);
                         this.weights = new double[rows][];
                         for (lineCount = lineCount + 1; lineCount < rows + 6; lineCount++) {
                             line = br.readLine().trim();
-                            this.weights[lineCount - 6] = Arrays.stream(line.split("\\s")).mapToDouble(Double::parseDouble).toArray();
+                            this.weights[lineCount - 6] = Arrays.stream(line.split("\\s"))
+                                    .mapToDouble(Double::parseDouble).toArray();
                         }
                     } else if (line.equalsIgnoreCase("li")) {
                         isLabelIndexer = true;
                         this.labelIndexer = new LabelIndexer(Lists.newArrayList());
                     } else if (isLabelIndexer) {
-                        this.labelIndexer.labelIndexer.put(line.split("\\s")[0], Integer.parseInt(line.split("\\s")[1]));
+                        this.labelIndexer.labelIndexer.put(line.split("\\s")[0], Integer.parseInt
+                                (line.split("\\s")[1]));
                     }
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.error("Load model err.",e);
         }
     }
 }
