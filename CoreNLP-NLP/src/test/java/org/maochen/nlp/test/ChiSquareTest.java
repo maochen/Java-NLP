@@ -1,4 +1,4 @@
-package org.maochen.nlp.ml.feature;
+package org.maochen.nlp.test;
 
 import org.junit.Test;
 
