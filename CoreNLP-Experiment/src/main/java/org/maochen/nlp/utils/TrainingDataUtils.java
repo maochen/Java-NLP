@@ -86,9 +86,9 @@ public class TrainingDataUtils {
 
         smallList.addAll(indices.stream().map(trainingData::get).collect(Collectors.toList()));
 
-        IntStream.range(0, trainingData.size()).filter(x -> !indices.contains(x)).forEach(i -> {
-            largeList.add(trainingData.get(i));
-        });
+        IntStream.range(0, trainingData.size())
+                .filter(x -> !indices.contains(x))
+                .forEach(i -> largeList.add(trainingData.get(i)));
 
         return new ImmutablePair<>(smallList, largeList);
     }

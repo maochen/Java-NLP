@@ -80,12 +80,16 @@ public class SentenceTypeClassifier {
         maxEntClassifier.loadModel(modelPath);
     }
 
-    public Map<String, Double> predict(String sentence) {
-        List<String> feats = featureExtractor.generateFeats(sentence, parser.parse(sentence));
+    public Map<String, Double> predict(String sentence, DTree tree) {
+        List<String> feats = featureExtractor.generateFeats(sentence, tree);
         String[] featsName = feats.stream().toArray(String[]::new);
         double[] feat = feats.stream().mapToDouble(x -> 1.0).toArray();
         Tuple predict = new Tuple(-1, featsName, feat, null);
         return maxEntClassifier.predict(predict);
+    }
+
+    public Map<String, Double> predict(String sentence) {
+        return predict(sentence, parser.parse(sentence));
     }
 
     public SentenceTypeClassifier() {
