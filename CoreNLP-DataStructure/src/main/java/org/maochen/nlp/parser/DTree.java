@@ -83,6 +83,9 @@ public class DTree extends ArrayList<DNode> {
         padding.setId(0);
         padding.setForm("^");
         padding.setLemma("^");
+        padding.setcPOSTag("_");
+        padding.setPOS("_");
+        padding.setDepLabel("_");
         setUUID(UUID.randomUUID());
     }
 }
