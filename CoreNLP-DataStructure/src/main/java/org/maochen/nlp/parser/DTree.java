@@ -24,7 +24,7 @@ public class DTree extends ArrayList<DNode> {
     public String toString() {
         return this.stream()
                 .map(x -> x.toString() + System.lineSeparator())
-                .reduce((x, y) -> x + y).get();
+                .reduce((x, y) -> x + y).get().trim();
     }
 
     @Override
@@ -83,9 +83,9 @@ public class DTree extends ArrayList<DNode> {
         padding.setId(0);
         padding.setForm("^");
         padding.setLemma("^");
-        padding.setcPOSTag("_");
-        padding.setPOS("_");
-        padding.setDepLabel("_");
+        padding.setcPOSTag(LangLib.CPOSTAG_X);
+        padding.setPOS(LangLib.POS_FW);
+        padding.setDepLabel(LangLib.DEP_ATTR);
         setUUID(UUID.randomUUID());
     }
 }
