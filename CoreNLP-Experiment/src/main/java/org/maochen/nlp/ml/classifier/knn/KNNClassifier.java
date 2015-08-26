@@ -4,6 +4,7 @@ import org.maochen.nlp.ml.classifier.IClassifier;
 import org.maochen.nlp.ml.Tuple;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -48,7 +49,7 @@ public class KNNClassifier implements IClassifier {
     }
 
     @Override
-    public void loadModel(String modelFile) throws IOException {
+    public void loadModel(InputStream inputStream) {
         throw new IllegalArgumentException();
     }
 

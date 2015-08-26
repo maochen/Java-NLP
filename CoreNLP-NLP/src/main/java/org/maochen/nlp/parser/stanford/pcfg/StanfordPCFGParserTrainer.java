@@ -23,6 +23,18 @@ import edu.stanford.nlp.trees.Tree;
 /**
  * Stanford PCFG Parser Trainer.
  *
+ * - Penn Treebank 3 WSJ Trees 100-2199.
+ *
+ * - The question treebank
+ *
+ * - The commands treebank
+ *
+ * - Parts of the "English Translation Treebank: An-Nahar Newswire" (LDC2012T02)
+ *
+ * - Parts of the "English Translation Treebank -- ECTB Part 2 v2.1 (LDC2009E19)
+ *
+ * - the "train" part of the Genia Treebank (GTB)
+ *
  * <p> Created by Maochen on 1/9/15.
  */
 public class StanfordPCFGParserTrainer {
@@ -76,10 +88,10 @@ public class StanfordPCFGParserTrainer {
     }
 
     public static void main(String[] args) throws IOException {
-        wsj = "/Users/Maochen/Desktop/treebank_3/parsed/mrg/wsj/";
-        extra = "/Users/Maochen/Desktop/extra/treebank_extra_data/";
-        taggedFiles = extra + "/train-tech-english";
-        modelPath = "/Users/Maochen/workspace/nlpservice/nlp-service-remote/src/main/resources/classifierData/englishPCFG.ser.gz";
+        modelPath = args[0];
+        wsj = args[1];
+        extra = args[2];
+        taggedFiles = args[3];
 
         train();
 
@@ -92,7 +104,7 @@ public class StanfordPCFGParserTrainer {
             input = scan.nextLine();
             if (!input.trim().isEmpty() && !input.matches(quitRegex)) {
 
-                Table<DTree, Tree, Double> result = parser.getKBestParse(input, 5);
+                Table<DTree, Tree, Double> result = parser.getKBestParse(input, 3); // Top 3
                 List<Table.Cell<DTree, Tree, Double>> list = result.cellSet().stream()
                         .sorted((c1, c2) -> c2.getValue().compareTo(c1.getValue()))
                         .collect(Collectors.toList());

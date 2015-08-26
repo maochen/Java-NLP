@@ -6,6 +6,7 @@ import opennlp.maxent.io.GISModelWriter;
 import opennlp.maxent.io.PlainTextGISModelWriter;
 import opennlp.model.AbstractModel;
 import opennlp.model.DataIndexer;
+import opennlp.model.PlainTextFileDataReader;
 import opennlp.model.Prior;
 import opennlp.model.RealValueFileEventStream;
 import opennlp.model.UniformPrior;
@@ -20,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -121,11 +123,16 @@ public class MaxEntClassifier implements IClassifier {
     }
 
     @Override
-    public void loadModel(String modelPath) throws IOException {
-        LOG.info("Loading MaxEnt model. ");
-        GISModelReader modelReader = new GISModelReader(new File(modelPath));
-        AbstractModel model = modelReader.getModel();
-        this.model = (GISModel) model;
+    public void loadModel(InputStream modelPath) {
+        LOG.info("Loading MaxEnt model.");
+        GISModelReader modelReader = new GISModelReader(new PlainTextFileDataReader(modelPath));
+        try {
+            AbstractModel model = modelReader.getModel();
+            this.model = (GISModel) model;
+        } catch (IOException e) {
+            LOG.error("model load err.", e);
+        }
+
     }
 
     public MaxEntClassifier() {

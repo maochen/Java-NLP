@@ -1,4 +1,4 @@
-package org.maochen.nlp.sentencetypeclassifier;
+package org.maochen.nlp.sentencetype;
 
 import com.google.common.collect.Sets;
 

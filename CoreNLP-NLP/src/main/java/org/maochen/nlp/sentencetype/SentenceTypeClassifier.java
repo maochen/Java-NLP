@@ -1,4 +1,4 @@
-package org.maochen.nlp.sentencetypeclassifier;
+package org.maochen.nlp.sentencetype;
 
 import org.apache.commons.lang3.StringUtils;
 import org.maochen.nlp.parser.DTree;
@@ -6,12 +6,15 @@ import org.maochen.nlp.ml.classifier.maxent.MaxEntClassifier;
 import org.maochen.nlp.ml.Tuple;
 import org.maochen.nlp.parser.IParser;
 import org.maochen.nlp.parser.stanford.nn.StanfordNNDepParser;
+import org.maochen.nlp.parser.stanford.pcfg.StanfordPCFGParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -76,7 +79,7 @@ public class SentenceTypeClassifier {
         maxEntClassifier.persistModel(modelPath);
     }
 
-    public void loadModel(String modelPath) throws IOException {
+    public void loadModel(InputStream modelPath) throws IOException {
         maxEntClassifier.loadModel(modelPath);
     }
 
@@ -105,12 +108,12 @@ public class SentenceTypeClassifier {
         String trainFilePath = "/Users/Maochen/workspace/nlp-service_training-data/sentence_type_corpus.txt";
         String modelPath = prefix + "/sent_type_model.dat";
 
-        SentenceTypeClassifier sentenceTypeClassifier = new SentenceTypeClassifier();
+        SentenceTypeClassifier sentenceTypeClassifier = new SentenceTypeClassifier(new StanfordPCFGParser());
 
         sentenceTypeClassifier.train(trainFilePath);
         sentenceTypeClassifier.persist(modelPath);
 
-        sentenceTypeClassifier.loadModel(modelPath);
+        sentenceTypeClassifier.loadModel(new FileInputStream(modelPath));
 
         Scanner scanner = new Scanner(System.in);
         System.out.println("Input Sentence:");

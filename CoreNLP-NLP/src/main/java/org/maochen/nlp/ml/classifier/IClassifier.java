@@ -3,6 +3,7 @@ package org.maochen.nlp.ml.classifier;
 import org.maochen.nlp.ml.Tuple;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -15,5 +16,5 @@ public interface IClassifier {
 
     void persistModel(String modelFile) throws IOException;
 
-    void loadModel(String modelFile) throws IOException;
+    void loadModel(InputStream modelFile);
 }

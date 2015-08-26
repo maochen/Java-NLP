@@ -2,14 +2,14 @@ package org.maochen.nlp.ml.classifier.perceptron;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.maochen.nlp.ml.classifier.IClassifier;
 import org.maochen.nlp.ml.Tuple;
+import org.maochen.nlp.ml.classifier.IClassifier;
 import org.maochen.nlp.utils.VectorUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -126,8 +126,8 @@ public class PerceptronClassifier implements IClassifier {
     }
 
     @Override
-    public void loadModel(String modelFile) throws IOException {
-        model.load(new FileInputStream(modelFile));
+    public void loadModel(InputStream inputStream) {
+        model.load(inputStream);
     }
 
     public PerceptronClassifier() {
