@@ -8,8 +8,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Author: Maochen.G   contact@maochen.org License: check the LICENSE file. <p> Created by Maochen
- * on 12/10/14.
+ * Author: Maochen.G   contact@maochen.org License: check the LICENSE file. <p> Created by Maochen on 12/10/14.
  */
 public class LangTools {
 
@@ -84,7 +83,7 @@ public class LangTools {
         String[] dNodesString = input.split(System.lineSeparator());
         DTree tree = new DTree();
 
-        Arrays.stream(dNodesString).parallel()
+        Arrays.stream(dNodesString)
                 .map(s -> s.split("\t"))
                 .forEachOrdered(fields -> {
                     int currentIndex = 0;
@@ -119,7 +118,7 @@ public class LangTools {
                     }
 
                     DNode node = id == 0 ? tree.getPaddingNode() : new DNode(id, form, lemma, cPOSTag, pos, depLabel);
-                    if (id == 0) {
+                    if (id == 0 && !featsMap.containsKey("uuid")) {
                         featsMap.put("uuid", tree.getUUID().toString());
                     }
                     node.setFeats(featsMap);
