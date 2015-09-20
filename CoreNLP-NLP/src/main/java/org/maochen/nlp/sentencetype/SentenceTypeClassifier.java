@@ -1,6 +1,7 @@
 package org.maochen.nlp.sentencetype;
 
 import org.apache.commons.lang3.StringUtils;
+import org.maochen.nlp.ml.vector.DenseVector;
 import org.maochen.nlp.parser.DTree;
 import org.maochen.nlp.ml.classifier.maxent.MaxEntClassifier;
 import org.maochen.nlp.ml.Tuple;
@@ -67,9 +68,9 @@ public class SentenceTypeClassifier {
             DTree parseTree = depTreeCache.get(sentence);
 
             List<String> feats = featureExtractor.generateFeats(sentence, parseTree);
-            String[] featsName = feats.stream().toArray(String[]::new);
+//            String[] featsName = feats.stream().toArray(String[]::new);
             double[] feat = feats.stream().mapToDouble(x -> 1.0).toArray();
-            return new Tuple(1, featsName, feat, label);
+            return new Tuple(1, new DenseVector(feat), label);
         }).collect(Collectors.toList());
         LOG.info("Extracted Feats.");
         maxEntClassifier.train(trainingTuples);
@@ -85,9 +86,9 @@ public class SentenceTypeClassifier {
 
     public Map<String, Double> predict(String sentence, DTree tree) {
         List<String> feats = featureExtractor.generateFeats(sentence, tree);
-        String[] featsName = feats.stream().toArray(String[]::new);
+//        String[] featsName = feats.stream().toArray(String[]::new);
         double[] feat = feats.stream().mapToDouble(x -> 1.0).toArray();
-        Tuple predict = new Tuple(-1, featsName, feat, null);
+        Tuple predict = new Tuple(new DenseVector(feat));
         return maxEntClassifier.predict(predict);
     }
 

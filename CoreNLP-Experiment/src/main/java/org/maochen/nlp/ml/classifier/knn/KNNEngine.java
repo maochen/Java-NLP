@@ -36,11 +36,11 @@ final class KNNEngine {
 
     public void getDistance(BiFunction<double[], double[], Double> distanceFunction) {
         for (Tuple tuple : trainingData) {
-            if (predict.featureVector.length != tuple.featureVector.length) {
+            if (predict.vector.getVector().length != tuple.vector.getVector().length) {
                 LOG.error("2 Vectors must has same dimension.");
                 return;
             }
-            tuple.addExtra(KNNClassifier.DISTANCE, distanceFunction.apply(predict.featureVector, tuple.featureVector));
+            tuple.addExtra(KNNClassifier.DISTANCE, distanceFunction.apply(predict.vector.getVector(), tuple.vector.getVector()));
         }
     }
 

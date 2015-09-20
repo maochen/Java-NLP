@@ -2,8 +2,10 @@ package org.maochen.nlp.ml.classifier.perceptron;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.maochen.nlp.ml.vector.DenseVector;
 import org.maochen.nlp.ml.Tuple;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,19 +28,18 @@ public class PerceptronTest {
     @Test
     public void test() throws IOException {
         List<Tuple> data = new ArrayList<>();
-        data.add(new Tuple(1, new double[]{1, 0, 0}, String.valueOf(1)));
-        data.add(new Tuple(2, new double[]{1, 0, 1}, String.valueOf(1)));
-        data.add(new Tuple(3, new double[]{1, 1, 0}, String.valueOf(1)));
-        data.add(new Tuple(4, new double[]{1, 1, 1}, String.valueOf(0)));
+        data.add(new Tuple(1, new DenseVector(new double[]{1, 0, 0}), String.valueOf(1)));
+        data.add(new Tuple(2, new DenseVector(new double[]{1, 0, 1}), String.valueOf(1)));
+        data.add(new Tuple(3, new DenseVector(new double[]{1, 1, 0}), String.valueOf(1)));
+        data.add(new Tuple(4, new DenseVector(new double[]{1, 1, 1}), String.valueOf(0)));
         perceptronClassifier.train(data);
 
-        String modelPath = PerceptronClassifier.class.getResource("/").getPath()
-                + "/temp_perceptron_model.dat";
+        String modelPath = PerceptronClassifier.class.getResource("/").getPath() + "/temp_perceptron_model.dat";
         perceptronClassifier.persistModel(modelPath);
         perceptronClassifier = new PerceptronClassifier();
-        perceptronClassifier.loadModel(modelPath);
+        perceptronClassifier.loadModel(new FileInputStream(modelPath));
 
-        Tuple test = new Tuple(5, new double[]{1, 1, 1}, null);
+        Tuple test = new Tuple(5, new DenseVector(new double[]{1, 1, 1}), null);
         Map<String, Double> actualMap = perceptronClassifier.predict(test);
 
         String actualLabel = actualMap.entrySet().stream()

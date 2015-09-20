@@ -5,6 +5,7 @@ import com.google.common.collect.Table;
 
 import org.apache.commons.math3.distribution.GammaDistribution;
 import org.maochen.nlp.ml.Tuple;
+import org.maochen.nlp.ml.vector.LabeledVector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +43,7 @@ public class ChiSquare {
             }
 
             Tuple t = trainingData.get(i);
-            for (String featName : t.featureName) {
+            for (String featName : ((LabeledVector) t.vector).featsName) {
                 Integer count = dataTable.get(featName, t.label);
                 count = count == null ? 1 : count + 1;
                 dataTable.put(featName, t.label, count);

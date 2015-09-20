@@ -1,8 +1,8 @@
 package org.maochen.nlp.test;
 
 import org.apache.commons.lang3.StringUtils;
+import org.maochen.nlp.ml.IClassifier;
 import org.maochen.nlp.ml.Tuple;
-import org.maochen.nlp.ml.classifier.IClassifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

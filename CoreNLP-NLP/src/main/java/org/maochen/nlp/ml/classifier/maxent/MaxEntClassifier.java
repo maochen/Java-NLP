@@ -11,11 +11,12 @@ import opennlp.model.Prior;
 import opennlp.model.RealValueFileEventStream;
 import opennlp.model.UniformPrior;
 
-import org.maochen.nlp.ml.classifier.IClassifier;
+import org.maochen.nlp.ml.IClassifier;
+import org.maochen.nlp.ml.Tuple;
 import org.maochen.nlp.ml.classifier.maxent.eventstream.EventStream;
 import org.maochen.nlp.ml.classifier.maxent.eventstream.StringEventStream;
 import org.maochen.nlp.ml.classifier.maxent.eventstream.TupleEventStream;
-import org.maochen.nlp.ml.Tuple;
+import org.maochen.nlp.ml.vector.LabeledVector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,14 +55,17 @@ public class MaxEntClassifier implements IClassifier {
         return this;
     }
 
-    public Map<String, Double> predict(String[] predictStr) {
-        Tuple predict = new Tuple(null);
-        float[] val = RealValueFileEventStream.parseContexts(predictStr);
-        predict.featureVector = new double[val.length];
+    public Map<String, Double> predict(String[] feats) {
+        float[] val = RealValueFileEventStream.parseContexts(feats); // This will remove the val in feats
+        double[] vector = new double[val.length];
         for (int i = 0; i < val.length; i++) {
-            predict.featureVector[i] = val[i];
+            vector[i] = val[i];
         }
-        predict.featureName = predictStr;
+
+        LabeledVector labeledVector = new LabeledVector(vector);
+        Tuple predict = new Tuple(labeledVector);
+
+        labeledVector.featsName = feats;
         return predict(predict);
     }
 
@@ -73,12 +77,16 @@ public class MaxEntClassifier implements IClassifier {
 
     @Override
     public Map<String, Double> predict(Tuple predict) {
-        float[] featureVector = new float[predict.featureVector.length];
-        for (int i = 0; i < featureVector.length; i++) {
-            featureVector[i] = (float) predict.featureVector[i]; // So damn stupid.
+        if (!(predict.vector instanceof LabeledVector)) {
+            throw new IllegalArgumentException("Please use LabeledVector");
         }
 
-        double[] prob = model.eval(predict.featureName, featureVector, new double[model.getNumOutcomes()]);
+        float[] featureVector = new float[predict.vector.getVector().length];
+        for (int i = 0; i < featureVector.length; i++) {
+            featureVector[i] = (float) predict.vector.getVector()[i]; // So damn stupid.
+        }
+
+        double[] prob = model.eval(((LabeledVector) predict.vector).featsName, featureVector, new double[model.getNumOutcomes()]);
 
         Map<String, Double> resultMap = new HashMap<>();
         for (int i = 0; i < prob.length; i++) {

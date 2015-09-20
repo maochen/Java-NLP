@@ -2,8 +2,8 @@ package org.maochen.nlp.ml.classifier.perceptron;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.maochen.nlp.ml.IClassifier;
 import org.maochen.nlp.ml.Tuple;
-import org.maochen.nlp.ml.classifier.IClassifier;
 import org.maochen.nlp.utils.VectorUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,10 +89,10 @@ public class PerceptronClassifier implements IClassifier {
             Collections.shuffle(trainingData);
 
             for (Tuple entry : trainingData) {
-                onlineTrain(entry.featureVector, model.labelIndexer.getIndex(entry.label)); // for Xi
+                onlineTrain(entry.vector.getVector(), model.labelIndexer.getIndex(entry.label)); // for Xi
             }
 
-            errCount = (int) trainingData.stream().filter(entry -> predictMax(entry.featureVector).getLeft() != model.labelIndexer.getIndex(entry.label)).count();
+            errCount = (int) trainingData.stream().filter(entry -> predictMax(entry.vector.getVector()).getLeft() != model.labelIndexer.getIndex(entry.label)).count();
         } while (errCount != 0 && iter < MAX_ITERATION);
 
         LOG.debug("Err size: " + errCount);
@@ -103,12 +103,12 @@ public class PerceptronClassifier implements IClassifier {
      * Do a prediction.
      *
      * @param predict predict tuple.
-     * @return Map's key is the actual label, Value is probability, the probability is random
-     * depends on the order of training sample.
+     * @return Map's key is the actual label, Value is probability, the probability is random depends on the order of training
+     * sample.
      */
     @Override
     public Map<String, Double> predict(Tuple predict) {
-        Map<Integer, Double> indexResult = predict(predict.featureVector);
+        Map<Integer, Double> indexResult = predict(predict.vector.getVector());
         Map<String, Double> result = indexResult.entrySet().stream()
                 .map(e -> new ImmutablePair<>(model.labelIndexer.getLabel(e.getKey()), VectorUtils.sigmoid.apply(e.getValue()))) // Only do sigmoid here!
                 .collect(Collectors.toMap(ImmutablePair::getLeft, ImmutablePair::getRight));

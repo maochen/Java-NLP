@@ -6,6 +6,7 @@ import com.google.common.collect.HashBiMap;
 import opennlp.model.DataIndexer;
 
 import org.maochen.nlp.ml.Tuple;
+import org.maochen.nlp.ml.vector.LabeledVector;
 
 import java.util.HashMap;
 import java.util.List;
@@ -31,7 +32,10 @@ public class RealValueDataIndexer implements DataIndexer {
     private void generateFeats(List<Tuple> trainingData) {
         int featCount = 0;
         for (Tuple t : trainingData) {
-            for (String featName : t.featureName) {
+            if (!(t.vector instanceof LabeledVector)) {
+                throw new IllegalArgumentException("Please use LabeledVector.");
+            }
+            for (String featName : ((LabeledVector) t.vector).featsName) {
                 if (featsIndexer.containsValue(featName)) {
                     int id = featsIndexer.inverse().get(featName);
                     int val = featsOccurance.get(id) + 1;

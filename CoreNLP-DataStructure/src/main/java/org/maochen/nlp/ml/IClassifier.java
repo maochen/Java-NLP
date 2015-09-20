@@ -1,6 +1,4 @@
-package org.maochen.nlp.ml.classifier;
-
-import org.maochen.nlp.ml.Tuple;
+package org.maochen.nlp.ml;
 
 import java.io.IOException;
 import java.io.InputStream;

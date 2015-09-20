@@ -27,7 +27,7 @@ final class NBTrainingEngine {
         for (Tuple t : trainingData) {
             int index = model.labelIndexer.getIndex(t.label);
             count[index]++;
-            model.meanVectors[index] = VectorUtils.zip(model.meanVectors[index], t.featureVector, (x, y) -> x + y);
+            model.meanVectors[index] = VectorUtils.zip(model.meanVectors[index], t.vector.getVector(), (x, y) -> x + y);
         }
 
         for (int i = 0; i < model.meanVectors.length; i++) {
@@ -51,7 +51,7 @@ final class NBTrainingEngine {
     private void calculateVariance() {
         for (Tuple t : trainingData) {
             int index = model.labelIndexer.getIndex(t.label);
-            double[] diff = VectorUtils.zip(t.featureVector, model.meanVectors[index], (x, y) -> x - y);
+            double[] diff = VectorUtils.zip(t.vector.getVector(), model.meanVectors[index], (x, y) -> x - y);
             diff = Arrays.stream(diff).map(x -> x * x).toArray();
 
             double[] varianceVector = VectorUtils.zip(model.varianceVectors[index], diff, (x, y) -> x + y);
@@ -94,7 +94,7 @@ final class NBTrainingEngine {
         this.model = new NaiveBayesModel();
         this.model.labelIndexer = new LabelIndexer(trainingData);
 
-        int vectorLength = trainingData.stream().findFirst().map(x -> x.featureVector.length).orElse(0);
+        int vectorLength = trainingData.stream().findFirst().map(x -> x.vector.getVector().length).orElse(0);
         count = new int[model.labelIndexer.getLabelSize()];
 
         model.meanVectors = new double[model.labelIndexer.getLabelSize()][vectorLength];

@@ -3,6 +3,7 @@ package org.maochen.nlp.ml.classifier.maxent.eventstream;
 import opennlp.model.Event;
 
 import org.maochen.nlp.ml.Tuple;
+import org.maochen.nlp.ml.vector.LabeledVector;
 import org.maochen.nlp.utils.VectorUtils;
 
 import java.util.Iterator;
@@ -18,8 +19,12 @@ public class TupleEventStream implements EventStream {
     @Override
     public Event next() {
         Tuple tuple = dataIter.next();
+        if (!(tuple.vector instanceof LabeledVector)) {
+            throw new IllegalArgumentException("Please use LabeledVector to set feat label");
+        }
         // Label, feature name, feature value
-        return new Event(tuple.label, tuple.featureName, VectorUtils.doubleToFloat(tuple.featureVector));
+        return new Event(tuple.label, ((LabeledVector) tuple.vector).featsName,
+                VectorUtils.doubleToFloat(tuple.vector.getVector()));
     }
 
     @Override

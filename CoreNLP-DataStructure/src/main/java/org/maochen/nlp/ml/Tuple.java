@@ -1,7 +1,10 @@
 package org.maochen.nlp.ml;
 
 import org.apache.commons.lang3.StringUtils;
+import org.maochen.nlp.ml.vector.DenseVector;
+import org.maochen.nlp.ml.vector.IVector;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,29 +15,28 @@ public class Tuple {
     public int id;
     public String label;
 
-    public String[] featureName = null; //Optional
-    public double[] featureVector;
+    public IVector vector;
 
     private Map<String, Object> extra = null;
 
     // This is for predict
+    public Tuple(IVector vector) {
+        this.vector = vector;
+        this.label = null;
+    }
+
+    public Tuple(int id, IVector vector, String label) {
+        this.id = id;
+        this.vector = vector;
+        this.label = label;
+    }
+
+    /**
+     * Default using dense vector.
+     */
     public Tuple(double[] featureVector) {
-        this.featureVector = featureVector;
+        this.vector = new DenseVector(featureVector);
         label = null;
-    }
-
-    // This is for training data
-    public Tuple(int id, double[] featureVector, String label) {
-        this.id = id;
-        this.featureVector = featureVector;
-        this.label = label;
-    }
-
-    public Tuple(int id, String[] featureName, double[] featureVector, String label) {
-        this.id = id;
-        this.featureName = featureName;
-        this.featureVector = featureVector;
-        this.label = label;
     }
 
     public Map<String, Object> getExtra() {
@@ -48,14 +50,11 @@ public class Tuple {
         extra.put(key, val);
     }
 
-
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(label).append(StringUtils.SPACE);
-        for (double v : featureVector) {
-            stringBuilder.append(v).append(StringUtils.SPACE);
-        }
+        stringBuilder.append(Arrays.toString(vector.getVector()));
 
         return stringBuilder.toString().trim();
     }

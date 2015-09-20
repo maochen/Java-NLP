@@ -2,8 +2,9 @@ package org.maochen.nlp.ml.classifier.naivebayes;
 
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
-import org.maochen.nlp.ml.classifier.IClassifier;
+import org.maochen.nlp.ml.IClassifier;
 import org.maochen.nlp.ml.Tuple;
+import org.maochen.nlp.ml.vector.DenseVector;
 import org.maochen.nlp.utils.VectorUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,22 +12,16 @@ import org.slf4j.LoggerFactory;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Scanner;
 import java.util.stream.Collectors;
 
 /**
@@ -59,8 +54,8 @@ public class NaiveBayesClassifier implements IClassifier {
         for (Integer labelIndex : model.labelIndexer.getIndexSet()) {
             double likelihood = 1.0D;
 
-            for (int i = 0; i < predict.featureVector.length; i++) {
-                double fi = predict.featureVector[i];
+            for (int i = 0; i < predict.vector.getVector().length; i++) {
+                double fi = predict.vector.getVector()[i];
                 likelihood = likelihood * VectorUtils.gaussianPDF(model.meanVectors[labelIndex][i], model.varianceVectors[labelIndex][i], fi);
             }
 
@@ -76,11 +71,6 @@ public class NaiveBayesClassifier implements IClassifier {
 
         labelProb.entrySet().forEach(entry -> {
             double prob = entry.getValue() / evidence;
-            if (prob > 0.999) {
-                prob = 1D;
-            } else if (prob < 0.001) {
-                prob = 0D;
-            }
             labelProb.put(entry.getKey(), prob);
         }); // This is denominator of posterior
 
@@ -141,7 +131,7 @@ public class NaiveBayesClassifier implements IClassifier {
                 String tokenString = tokens[i].contains(":") ? tokens[i].split(":")[1] : tokens[i];
                 values[i - 1] = Double.parseDouble(tokenString);
             }
-            data.add(new Tuple(0, values, label));
+            data.add(new Tuple(0, new DenseVector(values), label));
         }
 
         return data;
@@ -197,65 +187,33 @@ public class NaiveBayesClassifier implements IClassifier {
         writeToFile(wrongData, originalTrainingDataFile + ".wrong");
     }
 
-    public static void main(String[] args) throws FileNotFoundException {
-        String folder = "/Users/Maochen/Desktop/w2v_weight_training/";
-        String outputModelFolder = "/Users/Maochen/workspace/amelia/eliza-ir/src/main/resources/";
-        //        splitData(folder + "training.all.txt");
-
-
-        NaiveBayesClassifier nbc = new NaiveBayesClassifier();
-        List<Tuple> trainingData = readTrainingData(folder + "/training.all.txt.aligned", "\\s");
-        nbc.train(trainingData);
-        nbc.persistModel(outputModelFolder + "/nb_model.dat");
-
-        nbc.loadModel(new FileInputStream(outputModelFolder + "/nb_model.dat"));
-        Scanner scan = new Scanner(System.in);
-        String input = StringUtils.EMPTY;
-
-        String quitRegex = "q|quit|exit";
-        while (!input.matches(quitRegex)) {
-            System.out.println("Please enter feats:");
-            input = scan.nextLine();
-            if (!input.trim().isEmpty() && !input.matches(quitRegex)) {
-                double[] feats = Arrays.stream(input.split("\\s")).mapToDouble(Double::parseDouble).toArray();
-                Map<String, Double> results = nbc.predict(new Tuple(feats));
-                System.out.println(results);
-            }
-        }
-
-
-    }
-
-    public static void main1(String[] args) {
-        IClassifier nbc = new NaiveBayesClassifier();
-
-        List<Tuple> trainingData;
-
-        trainingData = new ArrayList<>();
-        trainingData.add(new Tuple(1, new double[]{6, 180, 12}, "male"));
-        trainingData.add(new Tuple(2, new double[]{5.92, 190, 11}, "male"));
-        trainingData.add(new Tuple(3, new double[]{5.58, 170, 12}, "male"));
-        trainingData.add(new Tuple(4, new double[]{5.92, 165, 10}, "male"));
-        trainingData.add(new Tuple(5, new double[]{5, 100, 6}, "female"));
-        trainingData.add(new Tuple(6, new double[]{5.5, 150, 8}, "female"));
-        trainingData.add(new Tuple(7, new double[]{5.42, 130, 7}, "female"));
-        trainingData.add(new Tuple(8, new double[]{5.75, 150, 9}, "female"));
-
-        Tuple predict = new Tuple(new double[]{6, 130, 8});
-
-        nbc.train(trainingData);
-        Map<String, Double> probs = nbc.predict(predict);
-
-
-        // male: 6.197071843878083E-9;
-        // female: 5.377909183630024E-4;
-
-        List<Entry<String, Double>> result = new ArrayList<>(); // Just for ordered display.
-        Comparator<Entry<String, Double>> reverseCmp = Collections.reverseOrder(Comparator.comparing(Entry::getValue));
-        probs.entrySet().stream().sorted(reverseCmp).forEach(result::add);
-
-        System.out.println("Result: " + predict);
-        result.forEach(e -> System.out.println(e.getKey() + "\t:\t" + e.getValue()));
-    }
+//    public static void main(String[] args) throws FileNotFoundException {
+//        String folder = "/Users/Maochen/Desktop/w2v_weight_training/";
+//        String outputModelFolder = "/Users/Maochen/workspace/amelia/eliza-ir/src/main/resources/";
+//        //        splitData(folder + "training.all.txt");
+//
+//
+//        NaiveBayesClassifier nbc = new NaiveBayesClassifier();
+//        List<Tuple> trainingData = readTrainingData(folder + "/training.all.txt.aligned", "\\s");
+//        nbc.train(trainingData);
+//        nbc.persistModel(outputModelFolder + "/nb_model.dat");
+//
+//        nbc.loadModel(new FileInputStream(outputModelFolder + "/nb_model.dat"));
+//        Scanner scan = new Scanner(System.in);
+//        String input = StringUtils.EMPTY;
+//
+//        String quitRegex = "q|quit|exit";
+//        while (!input.matches(quitRegex)) {
+//            System.out.println("Please enter feats:");
+//            input = scan.nextLine();
+//            if (!input.trim().isEmpty() && !input.matches(quitRegex)) {
+//                double[] feats = Arrays.stream(input.split("\\s")).mapToDouble(Double::parseDouble).toArray();
+//                Map<String, Double> results = nbc.predict(new Tuple(feats));
+//                System.out.println(results);
+//            }
+//        }
+//
+//
+//    }
 
 }

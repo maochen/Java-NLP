@@ -53,7 +53,7 @@ public class PerceptronModel {
 
     public PerceptronModel(List<Tuple> trainingData) {
         labelIndexer = new LabelIndexer(trainingData);
-        int featurelength = trainingData.stream().findFirst().orElse(null).featureVector.length;
+        int featurelength = trainingData.stream().findFirst().orElse(null).vector.getVector().length;
         weights = new double[labelIndexer.getLabelSize()][featurelength];
         bias = new double[labelIndexer.getLabelSize()];
 
