@@ -1,10 +1,17 @@
 package org.maochen.nlp.ml.classifier.naivebayes;
 
 import com.google.common.collect.Lists;
-import org.maochen.nlp.ml.classifier.utils.ModelSerializeUtils;
-import org.maochen.nlp.parser.LabelIndexer;
 
-import java.io.*;
+import org.maochen.nlp.ml.classifier.LabelIndexer;
+import org.maochen.nlp.ml.classifier.utils.ModelSerializeUtils;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;

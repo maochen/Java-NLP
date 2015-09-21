@@ -2,8 +2,8 @@ package org.maochen.nlp.ml.classifier.perceptron;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.maochen.nlp.ml.vector.DenseVector;
 import org.maochen.nlp.ml.Tuple;
+import org.maochen.nlp.ml.vector.DenseVector;
 
 import java.io.FileInputStream;
 import java.io.IOException;

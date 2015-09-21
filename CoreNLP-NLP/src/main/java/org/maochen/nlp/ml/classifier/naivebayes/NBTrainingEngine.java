@@ -1,7 +1,7 @@
 package org.maochen.nlp.ml.classifier.naivebayes;
 
-import org.maochen.nlp.parser.LabelIndexer;
 import org.maochen.nlp.ml.Tuple;
+import org.maochen.nlp.ml.classifier.LabelIndexer;
 import org.maochen.nlp.utils.VectorUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

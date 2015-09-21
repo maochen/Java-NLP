@@ -1,4 +1,4 @@
-package org.maochen.nlp.parser;
+package org.maochen.nlp.ml.classifier;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
