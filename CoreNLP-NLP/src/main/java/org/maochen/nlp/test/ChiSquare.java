@@ -35,7 +35,6 @@ public class ChiSquare {
 
     public double totalPVal;
 
-
     public void loadTrainingData(List<Tuple> trainingData) {
         for (int i = 0; i < trainingData.size(); i++) {
             if (i % 1000 == 0) {

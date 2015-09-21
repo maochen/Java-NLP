@@ -132,16 +132,10 @@ public class MaxEntTest {
         traindata.add(new String[]{"home", "pdiff=0.8125", "ptwins=0.5714", "lose"});
         traindata.add(new String[]{"away", "pdiff=0.9375", "ptwins=0.4545", "lose"});
 
-
         MaxEntClassifier maxent = new MaxEntClassifier();
         maxent.trainString(traindata);
 
-//        maxent.persist(maxent.pathPrefix + "/maxentModel.txt");
-//        maxent.model = null;
-//        maxent.loadModel(maxent.pathPrefix + "/maxentModel.txt");
-
         List<String[]> predictData = new ArrayList<>();
-
 
         predictData.add(new String[]{"home", "pdiff=0.6875", "ptwins=0.5"});
         predictData.add(new String[]{"home", "pdiff=1.0625", "ptwins=0.5"});
@@ -166,7 +160,6 @@ public class MaxEntTest {
         predictExpected.add(getMap("tie=0.1688, lose=0.3409, win=0.4903"));
         predictExpected.add(getMap("tie=0.272, lose=0.3665, win=0.3614"));
         predictExpected.add(getMap("tie=0.1899, lose=0.3686, win=0.4416"));
-
 
         for (int i = 0; i < predictData.size(); i++) {
             String[] predict = predictData.get(i);

@@ -20,9 +20,7 @@ public class NaiveBayesTest {
 
     @Test
     public void test() {
-        List<Tuple> trainingData;
-
-        trainingData = new ArrayList<>();
+        List<Tuple> trainingData = new ArrayList<>();
         trainingData.add(new Tuple(1, new DenseVector(new double[]{6, 180, 12}), "male"));
         trainingData.add(new Tuple(2, new DenseVector(new double[]{5.92, 190, 11}), "male"));
         trainingData.add(new Tuple(3, new DenseVector(new double[]{5.58, 170, 12}), "male"));
@@ -36,7 +34,6 @@ public class NaiveBayesTest {
 
         nbc.train(trainingData);
         Map<String, Double> probs = nbc.predict(predict);
-
 
         // male: 6.197071843878083E-9;
         // female: 5.377909183630024E-4;
