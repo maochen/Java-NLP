@@ -35,7 +35,7 @@ public class VectorUtils {
         }
 
         double[] result = new double[vec1.length];
-        IntStream.range(0, vec1.length).parallel().forEach(i -> result[i] = op.apply(vec1[i], vec2[i]));
+        IntStream.range(0, vec1.length).forEach(i -> result[i] = op.apply(vec1[i], vec2[i]));
         return result;
     }
 

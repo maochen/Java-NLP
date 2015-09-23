@@ -2,6 +2,7 @@ package org.maochen.nlp.sentencetype;
 
 import org.apache.commons.lang3.StringUtils;
 import org.maochen.nlp.ml.vector.DenseVector;
+import org.maochen.nlp.ml.vector.LabeledVector;
 import org.maochen.nlp.parser.DTree;
 import org.maochen.nlp.ml.classifier.maxent.MaxEntClassifier;
 import org.maochen.nlp.ml.Tuple;
@@ -86,9 +87,12 @@ public class SentenceTypeClassifier {
 
     public Map<String, Double> predict(String sentence, DTree tree) {
         List<String> feats = featureExtractor.generateFeats(sentence, tree);
-//        String[] featsName = feats.stream().toArray(String[]::new);
+        String[] featsName = feats.stream().toArray(String[]::new);
         double[] feat = feats.stream().mapToDouble(x -> 1.0).toArray();
-        Tuple predict = new Tuple(new DenseVector(feat));
+
+        LabeledVector vector = new LabeledVector(feat);
+        vector.featsName = featsName;
+        Tuple predict = new Tuple(vector);
         return maxEntClassifier.predict(predict);
     }
 
@@ -105,14 +109,15 @@ public class SentenceTypeClassifier {
     }
 
     public static void main(String[] args) throws IOException {
-        String prefix = "/Users/Maochen/Desktop/";
+        String prefix = "/Users/Maochen/workspace/ameliang/ameliang/amelia-nlp/src/main/resources/models";
         String trainFilePath = "/Users/Maochen/workspace/nlp-service_training-data/sentence_type_corpus.txt";
         String modelPath = prefix + "/sent_type_model.dat";
+        String pcfgModel = prefix + "/englishPCFG.ser.gz";
 
-        SentenceTypeClassifier sentenceTypeClassifier = new SentenceTypeClassifier(new StanfordPCFGParser());
+        SentenceTypeClassifier sentenceTypeClassifier = new SentenceTypeClassifier(new StanfordPCFGParser(pcfgModel, null, null));
 
-        sentenceTypeClassifier.train(trainFilePath);
-        sentenceTypeClassifier.persist(modelPath);
+//        sentenceTypeClassifier.train(trainFilePath);
+//        sentenceTypeClassifier.persist(modelPath);
 
         sentenceTypeClassifier.loadModel(new FileInputStream(modelPath));
 
