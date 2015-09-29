@@ -1,11 +1,10 @@
 package org.maochen.nlp.sentencetype;
 
 import org.apache.commons.lang3.StringUtils;
-import org.maochen.nlp.ml.vector.DenseVector;
+import org.maochen.nlp.ml.Tuple;
+import org.maochen.nlp.ml.classifier.maxent.MaxEntClassifier;
 import org.maochen.nlp.ml.vector.LabeledVector;
 import org.maochen.nlp.parser.DTree;
-import org.maochen.nlp.ml.classifier.maxent.MaxEntClassifier;
-import org.maochen.nlp.ml.Tuple;
 import org.maochen.nlp.parser.IParser;
 import org.maochen.nlp.parser.stanford.nn.StanfordNNDepParser;
 import org.maochen.nlp.parser.stanford.pcfg.StanfordPCFGParser;
@@ -69,9 +68,12 @@ public class SentenceTypeClassifier {
             DTree parseTree = depTreeCache.get(sentence);
 
             List<String> feats = featureExtractor.generateFeats(sentence, parseTree);
-//            String[] featsName = feats.stream().toArray(String[]::new);
+
+            String[] featsName = feats.stream().toArray(String[]::new);
             double[] feat = feats.stream().mapToDouble(x -> 1.0).toArray();
-            return new Tuple(1, new DenseVector(feat), label);
+            LabeledVector labeledVector = new LabeledVector(feat);
+            labeledVector.featsName = featsName;
+            return new Tuple(1, labeledVector, label);
         }).collect(Collectors.toList());
         LOG.info("Extracted Feats.");
         maxEntClassifier.train(trainingTuples);
@@ -116,8 +118,8 @@ public class SentenceTypeClassifier {
 
         SentenceTypeClassifier sentenceTypeClassifier = new SentenceTypeClassifier(new StanfordPCFGParser(pcfgModel, null, null));
 
-//        sentenceTypeClassifier.train(trainFilePath);
-//        sentenceTypeClassifier.persist(modelPath);
+        sentenceTypeClassifier.train(trainFilePath);
+        sentenceTypeClassifier.persist(modelPath);
 
         sentenceTypeClassifier.loadModel(new FileInputStream(modelPath));
 
