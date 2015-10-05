@@ -26,34 +26,43 @@ import edu.stanford.nlp.trees.TypedDependency;
  */
 public class StanfordParserUtils {
 
-    public static String getCoNLLXString(Collection<TypedDependency> deps, List<CoreLabel> tokens) {
-        StringBuilder bf = new StringBuilder();
-
+    public static DTree getDTreeFromCoreNLP(Collection<TypedDependency> deps, List<CoreLabel> tokens) {
         Map<Integer, TypedDependency> indexedDeps = new HashMap<>(deps.size());
         for (TypedDependency dep : deps) {
             indexedDeps.put(dep.dep().index(), dep);
         }
 
-        int idx = 1;
-
         if (tokens.get(0).lemma() == null) {
             StanfordNNDepParser.tagLemma(tokens);
         }
 
+        DTree tree = new DTree();
+        int idx = 1;
         for (CoreLabel token : tokens) {
             String word = token.word();
             String pos = token.tag();
-            String cPos = (token.get(CoreAnnotations.CoarseTagAnnotation.class) != null) ?
-                    token.get(CoreAnnotations.CoarseTagAnnotation.class) : LangTools.getCPOSTag(pos);
+            String cPos = (token.get(CoreAnnotations.CoarseTagAnnotation.class) != null) ? token.get(CoreAnnotations.CoarseTagAnnotation.class) : LangTools.getCPOSTag(pos);
             String lemma = token.lemma();
             Integer gov = indexedDeps.containsKey(idx) ? indexedDeps.get(idx).gov().index() : 0;
             String reln = indexedDeps.containsKey(idx) ? indexedDeps.get(idx).reln().toString() : "erased";
-            String out = String.format("%d\t%s\t%s\t%s\t%s\t_\t%d\t%s\t_\t_\n", idx, word, lemma, cPos, pos, gov, reln);
-            bf.append(out);
+            String namedEntity = token.get(CoreAnnotations.NamedEntityTagAnnotation.class) == null ? "O" : token.get(CoreAnnotations.NamedEntityTagAnnotation.class);
+            DNode node = new DNode(idx, word, lemma, cPos, pos, reln);
+            if (!namedEntity.equalsIgnoreCase("O")) {
+                node.setNamedEntity(namedEntity);
+            }
+
+            node.addFeature("head", String.valueOf(gov));
+            tree.add(node);
             idx++;
         }
-        bf.append("\n");
-        return bf.toString();
+
+        tree.stream().filter(x -> tree.getPaddingNode() != x).forEach(node -> {
+            int headId = Integer.parseInt(node.getFeature("head"));
+            node.setHead(tree.get(headId));
+            tree.get(headId).addChild(node);
+            node.getFeats().remove("head");
+        });
+        return tree;
     }
 
     private static void count(int counter, int size) {

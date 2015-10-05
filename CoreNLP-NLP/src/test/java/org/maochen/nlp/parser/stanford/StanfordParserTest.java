@@ -4,6 +4,8 @@ import com.google.common.collect.Table;
 
 import org.apache.commons.lang3.StringUtils;
 import org.maochen.nlp.parser.DTree;
+import org.maochen.nlp.parser.IParser;
+import org.maochen.nlp.parser.stanford.nn.StanfordNNDepParser;
 import org.maochen.nlp.parser.stanford.pcfg.StanfordPCFGParser;
 
 import java.util.ArrayList;
@@ -21,9 +23,10 @@ import edu.stanford.nlp.trees.Tree;
 public class StanfordParserTest {
 
 
-    public static void main(String[] args) {
-        String modelFile = "/Users/Maochen/workspace/ameliang/ameliang/amelia-nlp/src/main/resources/models/englishPCFG.ser.gz";
-        String posTaggerModel = null;//"/Users/Maochen/workspace/nlpservice/nlp-service-remote/src/main/resources/classifierData/english-left3words-distsim.tagger";
+    public static void main1(String[] args) {
+        String modelFile = "/Users/mguan/workspace/ameliang/ameliang/amelia-nlp/src/main/resources/models/englishPCFG.ser.gz";
+        String posTaggerModel = null;//"/Users/mguan/workspace/nlpservice/nlp-service-remote/src/main/resources/classifierData
+        // /english-left3words-distsim.tagger";
         StanfordPCFGParser parser = new StanfordPCFGParser(modelFile, posTaggerModel, new ArrayList<>());
 
         Scanner scan = new Scanner(System.in);
@@ -47,6 +50,23 @@ public class StanfordParserTest {
                     System.out.println(entry.getRowKey());
                 }
 
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        String model = "/Users/mguan/workspace/ameliang/ameliang/amelia-nlp/src/main/resources/models/NNDep.model";
+        IParser parser = new StanfordNNDepParser(model, null, new ArrayList<>());
+
+        Scanner scan = new Scanner(System.in);
+        String input = StringUtils.EMPTY;
+        String quitRegex = "q|quit|exit";
+        while (!input.matches(quitRegex)) {
+            System.out.println("Please enter sentence:");
+            input = scan.nextLine();
+            if (!input.trim().isEmpty() && !input.matches(quitRegex)) {
+                DTree tree = parser.parse(input);
+                System.out.println(tree);
             }
         }
 

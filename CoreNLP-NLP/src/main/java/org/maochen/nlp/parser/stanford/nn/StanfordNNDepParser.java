@@ -1,7 +1,6 @@
 package org.maochen.nlp.parser.stanford.nn;
 
 import org.maochen.nlp.parser.DTree;
-import org.maochen.nlp.parser.LangTools;
 import org.maochen.nlp.parser.StanfordParserUtils;
 import org.maochen.nlp.parser.stanford.StanfordParser;
 
@@ -32,8 +31,7 @@ public class StanfordNNDepParser extends StanfordParser {
         tagLemma(tokenizedSentence);
         GrammaticalStructure gs = tagDependencies(tokenizedSentence);
         tagNamedEntity(tokenizedSentence);
-        String conllXString = StanfordParserUtils.getCoNLLXString(gs.typedDependencies(), tokenizedSentence);
-        DTree dTree = LangTools.getDTreeFromCoNLLXString(conllXString);
+        DTree dTree = StanfordParserUtils.getDTreeFromCoreNLP(gs.typedDependencies(), tokenizedSentence);
         dTree.setOriginalSentence(sentence);
         return dTree;
     }
