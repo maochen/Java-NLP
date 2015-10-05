@@ -88,7 +88,9 @@ public class StanfordParserUtils {
 
             trees.forEach(dTree -> {
                 try {
+                    dTree.remove(0);
                     fw.write(dTree.toString());
+                    fw.write(System.lineSeparator());
                     fw.write(System.lineSeparator());
                 } catch (IOException e) {
                     e.printStackTrace();
