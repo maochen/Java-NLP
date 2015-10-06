@@ -91,6 +91,9 @@ public class StanfordPCFGParser extends StanfordParser {
 
     @Override
     public DTree parse(final String sentence) {
+        if (sentence == null || sentence.trim().isEmpty()) {
+            return null;
+        }
         List<CoreLabel> tokens = stanfordTokenize(sentence);
         // Parse right after get through tokenizer.
         Tree tree = parser.parse(tokens);

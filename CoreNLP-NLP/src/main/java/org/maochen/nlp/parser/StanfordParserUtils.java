@@ -39,7 +39,7 @@ public class StanfordParserUtils {
         DTree tree = new DTree();
         int idx = 1;
         for (CoreLabel token : tokens) {
-            String word = token.word();
+            String word = token.originalText();
             String pos = token.tag();
             String cPos = (token.get(CoreAnnotations.CoarseTagAnnotation.class) != null) ? token.get(CoreAnnotations.CoarseTagAnnotation.class) : LangTools.getCPOSTag(pos);
             String lemma = token.lemma();
