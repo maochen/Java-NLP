@@ -26,6 +26,10 @@ public class StanfordNNDepParser extends StanfordParser {
 
     @Override
     public DTree parse(String sentence) {
+        if (sentence == null || sentence.trim().isEmpty()) {
+            return null;
+        }
+
         List<CoreLabel> tokenizedSentence = stanfordTokenize(sentence);
         tagPOS(tokenizedSentence);
         tagLemma(tokenizedSentence);
