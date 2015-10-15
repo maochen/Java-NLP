@@ -22,7 +22,6 @@ import edu.stanford.nlp.trees.Tree;
  */
 public class StanfordParserTest {
 
-
     public static void main1(String[] args) {
         String modelFile = "/Users/mguan/workspace/ameliang/ameliang/amelia-nlp/src/main/resources/models/englishPCFG.ser.gz";
         String posTaggerModel = null;//"/Users/mguan/workspace/nlpservice/nlp-service-remote/src/main/resources/classifierData
