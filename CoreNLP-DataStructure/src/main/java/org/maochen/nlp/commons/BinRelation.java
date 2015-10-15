@@ -11,6 +11,8 @@ public class BinRelation {
     public UUID id = UUID.randomUUID();
 
     private String rel = StringUtils.EMPTY;
+
+    private String relType = StringUtils.EMPTY;
     private Entity left = null;
     private Entity right = null;
 
@@ -25,6 +27,14 @@ public class BinRelation {
         this.rel = rel.toUpperCase();
     }
 
+
+    public String getRelType() {
+        return relType;
+    }
+
+    public void setRelType(String relType) {
+        this.relType = relType;
+    }
 
     public Entity getLeft() {
         return left;
@@ -50,6 +60,15 @@ public class BinRelation {
 
     @Override
     public String toString() {
-        return "(" + rel + StringUtils.SPACE + left + StringUtils.SPACE + right + ") => " + id;
+        return relType + " = (" + rel + StringUtils.SPACE + left + StringUtils.SPACE + right + ") => " + id;
     }
+
+//    public static void main(String[] args) {
+//        BinRelation binRelation = new BinRelation();
+//        binRelation.setRel("like");
+//        binRelation.setRelType("VP");
+//        binRelation.left = new Entity<>("Mary");
+//        binRelation.right = new Entity<>("Tom");
+//        System.out.println(binRelation);
+//    }
 }
