@@ -1,4 +1,4 @@
-package org.maochen.nlp.test;
+package org.maochen.nlp.ml.util;
 
 import org.junit.Test;
 

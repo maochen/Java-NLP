@@ -1,4 +1,4 @@
-package org.maochen.nlp.utils;
+package org.maochen.nlp.ml.util;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -58,8 +58,7 @@ public class TrainingDataUtils {
      * @param proportion   scale from 0.1 - 1.0.
      * @return Left- small chunk. Right - large chunk.
      */
-    public static Pair<List<Tuple>, List<Tuple>> splitData(final List<Tuple> trainingData,
-                                                           double proportion) {
+    public static Pair<List<Tuple>, List<Tuple>> splitData(final List<Tuple> trainingData, double proportion) {
         if (proportion < 0 || proportion > 1) {
             throw new RuntimeException("Proportion should between 0.0 - 1.0");
         }

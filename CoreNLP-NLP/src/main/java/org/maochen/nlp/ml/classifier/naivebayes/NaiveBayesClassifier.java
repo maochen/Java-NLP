@@ -5,7 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.maochen.nlp.ml.IClassifier;
 import org.maochen.nlp.ml.Tuple;
 import org.maochen.nlp.ml.vector.DenseVector;
-import org.maochen.nlp.utils.VectorUtils;
+import org.maochen.nlp.util.VectorUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

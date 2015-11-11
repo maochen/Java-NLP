@@ -1,4 +1,4 @@
-package org.maochen.nlp.test;
+package org.maochen.nlp.ml.util;
 
 import org.apache.commons.lang3.StringUtils;
 import org.maochen.nlp.ml.IClassifier;

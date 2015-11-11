@@ -1,4 +1,4 @@
-package org.maochen.nlp.utils;
+package org.maochen.nlp.util;
 
 import org.apache.commons.lang3.StringUtils;
 

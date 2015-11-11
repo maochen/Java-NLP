@@ -1,4 +1,4 @@
-package org.maochen.nlp.utils;
+package org.maochen.nlp.util;
 
 import java.util.Arrays;
 import java.util.function.Function;

@@ -1,4 +1,4 @@
-package org.maochen.nlp.sentencetype;
+package org.maochen.nlp.app.sentencetype;
 
 import com.google.common.collect.Sets;
 
@@ -15,12 +15,12 @@ import java.util.Set;
 /**
  * Created by Maochen on 8/5/14.
  */
-public class FeatureExtractor {
+public class SentenceTypeFeatureExtractor {
 
-    private static final Logger LOG = LoggerFactory.getLogger(FeatureExtractor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SentenceTypeFeatureExtractor.class);
 
     // Bossssssss.... currently all binary features.
-    public List<String> generateFeats(String sentence, DTree tree) {
+    public List<String> generateFeats(DTree tree) {
         List<String> feats = new ArrayList<>();
 
         feats.add("first_word_pos_" + tree.get(1).getPOS());
@@ -58,7 +58,7 @@ public class FeatureExtractor {
         Set<String> bagOfQuestionPrefix = Sets.newHashSet("tell me", "let me know", "clarify for me", "name");
         boolean isStartPrefixMatch = false;
         for (String prefix : bagOfQuestionPrefix) {
-            if (sentence.toLowerCase().startsWith(prefix)) {
+            if (tree.getOriginalSentence().toLowerCase().startsWith(prefix)) {
                 isStartPrefixMatch = true;
                 break;
             }

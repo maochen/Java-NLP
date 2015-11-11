@@ -1,4 +1,4 @@
-package org.maochen.nlp.parser;
+package org.maochen.nlp.wordcorrection;
 
 import java.io.Serializable;
 import java.util.ArrayList;

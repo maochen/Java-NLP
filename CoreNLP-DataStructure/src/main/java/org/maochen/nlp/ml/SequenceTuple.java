@@ -1,6 +1,8 @@
 package org.maochen.nlp.ml;
 
-import java.util.HashMap;
+import org.maochen.nlp.ml.vector.LabeledVector;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -11,27 +13,36 @@ import java.util.Map;
  */
 public class SequenceTuple {
     public int id;
-    public List<String> words;
+
+    /*
+      Tuple1, Tuple2,  Tuple3,   Tuple4
+        I,     have,     a,        car
+        PRP,   VBP,      DT,       NN
+  tag:   O,    B-VP,    B-NP,     I-NP
+     */
+    public List<Tuple> entries;
     public List<String> tag;
 
-    private Map<String, Object> extra = null;
-
-    public Map<String, Object> getExtra() {
-        return extra;
-    }
-
-    public void addExtra(String key, Object val) {
-        if (extra == null) {
-            extra = new HashMap<>();
-        }
-        extra.put(key, val);
-    }
-
-    public SequenceTuple(List<String> words, List<String> tags) {
-        if (words == null || tags == null || words.size() != tags.size()) {
+    public SequenceTuple(Map<Integer, List<String>> entries, List<String> tags) {
+        if (entries == null || tags == null || entries.get(0).size() != tags.size()) {
             throw new RuntimeException("words and tags are invalid (Size mismatch).");
         }
-        this.words = words;
+
+        this.entries = new ArrayList<>();
+
+        int max = entries.keySet().stream().max(Integer::compare).get();
+
+        for (int i = 0; i <= max; i++) {
+            Tuple entry = null;
+
+            if (entries.containsKey(i)) {
+                entry = new Tuple(new LabeledVector(entries.get(i).stream().toArray(String[]::new)));
+                entry.label = tags.get(i);
+            }
+
+            this.entries.add(entry);
+        }
+
         this.tag = tags;
     }
 

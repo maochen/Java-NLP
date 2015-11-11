@@ -1,15 +1,23 @@
 package org.maochen.nlp.wordcorrection;
 
-import edu.stanford.nlp.ling.CoreLabel;
 import org.apache.commons.lang3.StringUtils;
-import org.maochen.nlp.parser.DoubleKeyMap;
 import org.maochen.nlp.parser.stanford.StanfordParser;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import edu.stanford.nlp.ling.CoreLabel;
 
 /**
  * This is for the single words correction. It doesn't count in the prev/following words to generate NGram.

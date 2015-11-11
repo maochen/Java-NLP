@@ -1,6 +1,7 @@
 package org.maochen.nlp.ml.classifier.hmm;
 
 import org.maochen.nlp.ml.SequenceTuple;
+import org.maochen.nlp.ml.vector.LabeledVector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,7 +14,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -22,8 +25,16 @@ import java.util.stream.Collectors;
 public class HMM {
     private static final Logger LOG = LoggerFactory.getLogger(HMM.class);
 
+    public static final int WORD_INDEX = 0;
+
     protected static final String START = "<START>";
     protected static final String END = "<END>";
+
+    private static SequenceTuple getSequenceTuple(List<String> words, List<String> pos) {
+        Map<Integer, List<String>> wordFeat = new HashMap<>();
+        wordFeat.put(WORD_INDEX, words);
+        return new SequenceTuple(wordFeat, pos);
+    }
 
     public static List<SequenceTuple> readTrainFile(String filename, String delimiter, int wordColIndex, int tagColIndex) {
         List<SequenceTuple> data = new ArrayList<>();
@@ -35,7 +46,7 @@ public class HMM {
             while (line != null) {
                 if (line.trim().isEmpty()) {
                     if (!words.isEmpty() && !pos.isEmpty()) {
-                        SequenceTuple tuple = new SequenceTuple(words, pos);
+                        SequenceTuple tuple = getSequenceTuple(words, pos);
                         data.add(tuple);
                         words = new ArrayList<>();
                         pos = new ArrayList<>();
@@ -87,22 +98,26 @@ public class HMM {
     public static HMMModel train(List<SequenceTuple> data) {
         HMMModel model = new HMMModel();
 
-        for (SequenceTuple tuple : data) {
-            tuple.words.add(0, START);
-            tuple.words.add(END);
-            tuple.tag.add(0, START);
-            tuple.tag.add(END);
+        for (SequenceTuple seqTuple : data) {
+            LabeledVector vector = (LabeledVector) seqTuple.entries.get(WORD_INDEX).vector;
+            List<String> words = new ArrayList<>(Arrays.asList(vector.featsName));
+            List<String> tag = seqTuple.tag;
 
-            for (int i = 0; i < tuple.words.size(); i++) {
-                Double ct = model.emission.get(tuple.words.get(i), tuple.tag.get(i));
+            words.add(0, START);
+            words.add(END);
+            tag.add(0, START);
+            tag.add(END);
+
+            for (int i = 0; i < words.size(); i++) {
+                Double ct = model.emission.get(words.get(i), seqTuple.tag.get(i));
                 ct = ct == null ? 1 : ct + 1;
-                model.emission.put(tuple.words.get(i), tuple.tag.get(i), ct);
+                model.emission.put(words.get(i), seqTuple.tag.get(i), ct);
             }
 
-            for (int i = 0; i < tuple.tag.size() - 1; i++) {
-                Double ct = model.transition.get(tuple.tag.get(i), tuple.tag.get(i + 1));
+            for (int i = 0; i < seqTuple.tag.size() - 1; i++) {
+                Double ct = model.transition.get(seqTuple.tag.get(i), seqTuple.tag.get(i + 1));
                 ct = ct == null ? 1 : ct + 1;
-                model.transition.put(tuple.tag.get(i), tuple.tag.get(i + 1), ct);
+                model.transition.put(seqTuple.tag.get(i), seqTuple.tag.get(i + 1), ct);
             }
         }
 
@@ -111,32 +126,33 @@ public class HMM {
         return model;
     }
 
-    public static List<String> viterbi(HMMModel model, List<String> words) {
+    public static List<String> viterbi(HMMModel model, String[] words) {
         return Viterbi.resolve(model, words);
     }
 
     public static void eval(HMMModel model, String testFile, String delimiter, int wordColIndex, int tagColIndex) {
         List<SequenceTuple> testData = readTrainFile(testFile, delimiter, wordColIndex, tagColIndex);
-        int totalcount = 0;
-        int errcount = 0;
+        int totalCount = 0;
+        int errCount = 0;
 
         for (SequenceTuple tuple : testData) {
-            List<String> result = viterbi(model, tuple.words);
+            List<String> result = viterbi(model, ((LabeledVector) tuple.entries.get(WORD_INDEX).vector).featsName);
 
             for (int i = 0; i < result.size(); i++) {
-                totalcount++;
+                totalCount++;
                 String expected = WordUtils.normalizeTag(tuple.tag.get(i));
                 String actual = WordUtils.normalizeTag(result.get(i));
                 if (!(actual.startsWith(expected) || expected.startsWith(actual))) {
-                    System.out.println(tuple.words.get(i) + " exp: " + expected + " actual: " + result.get(i));
-                    errcount++;
+                    String[] words = ((LabeledVector) tuple.entries.get(WORD_INDEX).vector).featsName;
+                    System.out.println(words[i] + " exp: " + expected + " actual: " + result.get(i));
+                    errCount++;
                 }
             }
 
         }
 
-        double accurancy = (1 - errcount / (double) totalcount) * 100;
-        System.out.println("accurancy: " + errcount + "/" + totalcount + " -> " + String.format("%.2f", accurancy) + "%");
+        double accurancy = (1 - errCount / (double) totalCount) * 100;
+        System.out.println("accurancy: " + errCount + "/" + totalCount + " -> " + String.format("%.2f", accurancy) + "%");
     }
 
     public static HMMModel loadModel(String modelPath) {
@@ -159,18 +175,16 @@ public class HMM {
     public static void main(String[] args) throws InterruptedException {
 //        Thread.sleep(5000);
 
-        List<SequenceTuple> data = HMM.readTrainFile("/Users/Maochen/Desktop/POS/penntreebank.txt", "\t", 1, 4);
-        List<SequenceTuple> data2 = HMM.readTrainFile("/Users/Maochen/Desktop/POS/extra.txt", "\t", 1, 4);
-        List<SequenceTuple> data3 = HMM.readTrainFile("/Users/Maochen/Desktop/POS/training.pos", "\t", 0, 1);
-
+        String prefix = "/Users/mguan/Dropbox/Course/Natural Lang Processing/HW/HW4_POSTagger_HMM/Homework4_corpus/POSData";
+        List<SequenceTuple> data = HMM.readTrainFile(prefix + "/development.pos", "\t", 0, 1);
+        List<SequenceTuple> data2 = HMM.readTrainFile(prefix + "/training.pos", "\t", 0, 1);
         data.addAll(data2);
-        data.addAll(data3);
 
         HMMModel model = train(data);
-//        eval(model, "/Users/Maochen/Desktop/POS/test.pos", "\t", 0, 1);
+        eval(model, prefix + "/training.pos", "\t", 0, 1);
 
         String str = "The quick brown fox jumped over the lazy dog";
-        List<String> result = viterbi(model, Arrays.asList(str.split("\\s")));
+        List<String> result = viterbi(model, str.split("\\s"));
         System.out.println(str);
         System.out.println(result);
     }

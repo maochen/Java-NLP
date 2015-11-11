@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 
 import org.maochen.nlp.ml.Tuple;
 import org.maochen.nlp.ml.classifier.LabelIndexer;
-import org.maochen.nlp.ml.classifier.utils.ModelSerializeUtils;
+import org.maochen.nlp.ml.util.ModelSerializeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

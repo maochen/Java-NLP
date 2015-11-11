@@ -4,7 +4,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.maochen.nlp.ml.IClassifier;
 import org.maochen.nlp.ml.Tuple;
-import org.maochen.nlp.utils.VectorUtils;
+import org.maochen.nlp.util.VectorUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

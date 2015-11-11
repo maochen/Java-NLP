@@ -90,7 +90,7 @@ public class HMMTest {
         model.transition.put("VB", "VB", 0.1);
         model.transition.put("VB", "NN", 0.2);
 
-        List<String> result = Viterbi.resolve(model, Lists.newArrayList("fish", "sleep"));
+        List<String> result = Viterbi.resolve(model, new String[]{"fish", "sleep"});
         List<String> expected = Lists.newArrayList("NN", "VB");
         assertEquals(result, expected);
     }

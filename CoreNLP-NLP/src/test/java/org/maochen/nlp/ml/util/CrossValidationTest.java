@@ -1,8 +1,10 @@
-package org.maochen.nlp.test;
+package org.maochen.nlp.ml.util;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.maochen.nlp.ml.util.CrossValidation;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 
 import static org.junit.Assert.assertEquals;
@@ -20,29 +22,14 @@ public class CrossValidationTest {
         crossValidation = new CrossValidation(1, null, false);
     }
 
-//    private Object getField(Object instance, String fieldName) throws NoSuchFieldException,
-//            ClassNotFoundException, IllegalAccessException {
-//        Class cls = Class.forName("org.maochen.nlp.test.CrossValidation");
-//        Field dataField = cls.getDeclaredField(fieldName);
-//        dataField.setAccessible(true);
-//        return dataField.get(instance);
-//    }
+    private Object getField(Object instance, String fieldName) throws NoSuchFieldException,
+            ClassNotFoundException, IllegalAccessException {
+        Class cls = Class.forName("org.maochen.nlp.ml.util.CrossValidation");
+        Field dataField = cls.getDeclaredField(fieldName);
+        dataField.setAccessible(true);
+        return dataField.get(instance);
+    }
 
-    /*
-       String label1 = "A";
-        String label2 = "B";
-
-        Class cls = Class.forName("org.maochen.nlp.test.CrossValidation");
-        Constructor c = cls.getDeclaredConstructor(int.class, IClassifier.class, boolean.class);
-        Object crossValidation = c.newInstance(1, null, false);
-
-        List<Tuple> data = (List<Tuple>) getField(crossValidation, "data");
-        Set<String> labels = (Set<String>) getField(crossValidation, "labels");
-
-        data = new ArrayList<>();
-        labels = ImmutableSet.of(label1, label2);
-
-     */
 
     @Test
     public void testScoreCorrect() throws ClassNotFoundException, IllegalAccessException,

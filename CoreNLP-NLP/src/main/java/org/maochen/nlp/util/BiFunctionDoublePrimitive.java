@@ -1,4 +1,4 @@
-package org.maochen.nlp.utils;
+package org.maochen.nlp.util;
 
 /**
  * Created by Maochen on 5/22/15.

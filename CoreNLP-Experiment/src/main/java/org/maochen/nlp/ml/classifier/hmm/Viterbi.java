@@ -18,8 +18,8 @@ import java.util.stream.Collectors;
 public class Viterbi {
     private static final Logger LOG = LoggerFactory.getLogger(Viterbi.class);
 
-    public static List<String> resolve(HMMModel model, List<String> words) {
-        Set<String> tagSet = words.stream().map(x -> model.emission.row(x).keySet()).reduce((s1, s2) -> {
+    public static List<String> resolve(HMMModel model, String[] words) {
+        Set<String> tagSet = Arrays.stream(words).map(x -> model.emission.row(x).keySet()).reduce((s1, s2) -> {
             Set<String> s = new HashSet<>();
             s.addAll(s1);
             s.addAll(s2);
@@ -31,7 +31,7 @@ public class Viterbi {
         tags.add(HMM.END);
 
         List<String> rowString = tags;
-        List<String> colString = new ArrayList<>(words);
+        List<String> colString = Arrays.stream(words).collect(Collectors.toList());
         colString.add(0, HMM.START);
         colString.add(HMM.END);
 

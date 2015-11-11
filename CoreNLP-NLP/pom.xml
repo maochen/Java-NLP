@@ -8,12 +8,11 @@
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Natural Language Tools</description>
     <url>${project.parent.url}</url>
-    <version>1.0.12-RC7</version>
 
     <parent>
         <groupId>org.maochen.nlp</groupId>
         <artifactId>NLP</artifactId>
-        <version>1.0.12</version>
+        <version>1.0.13</version>
     </parent>
 
     <licenses>
@@ -124,8 +123,7 @@
         <dependency>
             <groupId>org.maochen.nlp</groupId>
             <artifactId>CoreNLP-DataStructure</artifactId>
-            <!--<version>${project.parent.version}</version>-->
-            <version>1.0.12-RC1</version>
+            <version>${project.parent.version}</version>
         </dependency>
 
         <dependency>
@@ -163,7 +161,7 @@
             <artifactId>stanford-corenlp</artifactId>
             <version>3.5.2</version>
             <classifier>models</classifier>
-            <scope>test</scope>
+            <!--<scope>test</scope>-->
         </dependency>
 
         <dependency>

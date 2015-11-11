@@ -1,4 +1,4 @@
-package org.maochen.nlp.utils;
+package org.maochen.nlp.ml.util;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Test;
