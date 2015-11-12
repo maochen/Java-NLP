@@ -28,6 +28,8 @@ public class PerceptronClassifier implements IClassifier {
 
     protected PerceptronModel model = null;
 
+    private Properties properties = null;
+
     private static int MAX_ITERATION = 200;
 
     // Key is LabelIndex.
@@ -81,7 +83,8 @@ public class PerceptronClassifier implements IClassifier {
 
     @Override
     public IClassifier train(List<Tuple> trainingData) {
-        model = new PerceptronModel(trainingData);
+        this.model = new PerceptronModel(trainingData);
+        setParameter(properties);
 
         int errCount;
         int iter = 0;
@@ -117,6 +120,12 @@ public class PerceptronClassifier implements IClassifier {
 
     @Override
     public void setParameter(Properties props) {
+        this.properties = props;
+
+        if (props == null) {
+            return;
+        }
+
         if (props.containsKey("learning_rate")) {
             this.model.learningRate = Double.parseDouble(props.getProperty("learning_rate"));
         }
