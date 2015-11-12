@@ -15,10 +15,10 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -33,10 +33,10 @@ public class SentenceTypeTagger extends MaxEntClassifier implements ITagger {
 
     @Override
     public void train(String trainFilePath) {
-        Map<String, String> para = new HashMap<String, String>() {{
-            put("iterations", "120");
-        }};
-        super.setParameter(para);
+        Properties props = new Properties();
+        props.setProperty("iter", "120");
+
+        super.setParameter(props);
 
         parser.parse("."); // For loading POS Tagger.
         final Map<String, DTree> depTreeCache = new ConcurrentHashMap<>();

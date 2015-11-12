@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 public class MaxEntClassifier implements IClassifier {
 
@@ -97,29 +98,29 @@ public class MaxEntClassifier implements IClassifier {
     }
 
     @Override
-    public void setParameter(Map<String, String> paraMap) {
+    public void setParameter(Properties paraMap) {
         if (paraMap == null) {
             return;
         }
 
         if (paraMap.containsKey("use_smoothing")) {
-            this.useSmoothing = Boolean.valueOf(paraMap.get("use_smoothing"));
+            this.useSmoothing = Boolean.valueOf(paraMap.getProperty("use_smoothing"));
         }
 
-        if (paraMap.containsKey("iterations")) {
-            this.iterations = Integer.parseInt(paraMap.get("iterations"));
+        if (paraMap.containsKey("iter")) {
+            this.iterations = Integer.parseInt(paraMap.getProperty("iter"));
         }
 
         if (paraMap.containsKey("cutoff")) {
-            this.cutoff = Integer.parseInt(paraMap.get("cutoff"));
+            this.cutoff = Integer.parseInt(paraMap.getProperty("cutoff"));
         }
 
         if (paraMap.containsKey("nthreads")) {
-            this.nthreads = Integer.parseInt(paraMap.get("nthreads"));
+            this.nthreads = Integer.parseInt(paraMap.getProperty("nthreads"));
         }
 
         if (paraMap.containsKey("smoothing_observation")) {
-            this.smoothingObservation = Double.parseDouble(paraMap.get("smoothing_observation"));
+            this.smoothingObservation = Double.parseDouble(paraMap.getProperty("smoothing_observation"));
         }
     }
 

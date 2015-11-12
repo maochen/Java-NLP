@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -27,7 +28,7 @@ public class PerceptronClassifier implements IClassifier {
 
     protected PerceptronModel model = null;
 
-    private static final int MAX_ITERATION = 200;
+    private static int MAX_ITERATION = 200;
 
     // Key is LabelIndex.
     private Map<Integer, Double> predict(final double[] x) {
@@ -109,15 +110,24 @@ public class PerceptronClassifier implements IClassifier {
     @Override
     public Map<String, Double> predict(Tuple predict) {
         Map<Integer, Double> indexResult = predict(predict.vector.getVector());
-        Map<String, Double> result = indexResult.entrySet().stream()
+        return indexResult.entrySet().stream()
                 .map(e -> new ImmutablePair<>(model.labelIndexer.getLabel(e.getKey()), VectorUtils.sigmoid.apply(e.getValue()))) // Only do sigmoid here!
                 .collect(Collectors.toMap(ImmutablePair::getLeft, ImmutablePair::getRight));
-        return result;
     }
 
     @Override
-    public void setParameter(Map<String, String> paraMap) {
+    public void setParameter(Properties props) {
+        if (props.containsKey("learning_rate")) {
+            this.model.learningRate = Double.parseDouble(props.getProperty("learning_rate"));
+        }
 
+        if (props.containsKey("iter")) {
+            MAX_ITERATION = Integer.parseInt(props.getProperty("iter"));
+        }
+
+        if (props.containsKey("threshold")) {
+            this.model.threshold = Double.parseDouble(props.getProperty("threshold"));
+        }
     }
 
     @Override

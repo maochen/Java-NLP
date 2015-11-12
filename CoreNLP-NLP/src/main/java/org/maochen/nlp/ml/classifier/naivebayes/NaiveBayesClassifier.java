@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
 /**
@@ -43,7 +44,7 @@ public class NaiveBayesClassifier implements IClassifier {
     }
 
     @Override
-    public void setParameter(Map<String, String> paraMap) {
+    public void setParameter(Properties props) {
         throw new NotImplementedException("No parameter needed for Naive Bayes.");
     }
 
