@@ -52,6 +52,14 @@ public class StanfordParserUtils {
             }
 
             node.addFeature("head", String.valueOf(gov));
+            if (token.beginPosition() != -1) {
+                node.addFeature("index_start", String.valueOf(token.beginPosition()));
+            }
+
+            if (token.endPosition() != -1) {
+                node.addFeature("index_end", String.valueOf(token.endPosition()));
+            }
+
             tree.add(node);
             idx++;
         }

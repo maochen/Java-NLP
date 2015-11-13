@@ -63,6 +63,8 @@ public abstract class StanfordParser implements IParser {
             coreLabel.setWord(tokens.get(i).word());
             coreLabel.setOriginalText(originalTokens.get(i).word());
             coreLabel.setValue(tokens.get(i).word());
+            coreLabel.setBeginPosition(((CoreLabel) tokens.get(i)).beginPosition());
+            coreLabel.setEndPosition(((CoreLabel) tokens.get(i)).endPosition());
             coreLabels.add(coreLabel);
         }
 
@@ -91,11 +93,15 @@ public abstract class StanfordParser implements IParser {
         // must be a verb and contain an underscore
         assert (word != null);
         assert (tag != null);
-        if (!tag.startsWith(LangLib.POS_VB) || !word.contains("_")) return null;
+        if (!tag.startsWith(LangLib.POS_VB) || !word.contains("_")) {
+            return null;
+        }
 
         // check whether the last part is a particle
         String[] verb = word.split("_");
-        if (verb.length != 2) return null;
+        if (verb.length != 2) {
+            return null;
+        }
         String particle = verb[1];
         if (particles.contains(particle)) {
             String base = verb[0];

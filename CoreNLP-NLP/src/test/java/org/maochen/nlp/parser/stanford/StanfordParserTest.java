@@ -3,6 +3,7 @@ package org.maochen.nlp.parser.stanford;
 import com.google.common.collect.Table;
 
 import org.apache.commons.lang3.StringUtils;
+import org.junit.Test;
 import org.maochen.nlp.parser.DTree;
 import org.maochen.nlp.parser.IParser;
 import org.maochen.nlp.parser.stanford.nn.StanfordNNDepParser;
@@ -12,8 +13,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import edu.stanford.nlp.trees.Tree;
+
+import static junit.framework.Assert.assertEquals;
 
 /**
  * StanfordPCFGParser class no longer has dep to the default model. Do the main here.
@@ -21,6 +25,24 @@ import edu.stanford.nlp.trees.Tree;
  * <p>Created by Maochen on 9/16/15.
  */
 public class StanfordParserTest {
+
+    @Test
+    public void testPositionStartEnd() {
+        String sentence = "This is Tom's cat (A).";
+        IParser parser = new StanfordNNDepParser(null, null, null);
+        DTree tree = parser.parse(sentence);
+
+        int[] expectedStart = new int[]{0, 5, 8, 11, 14, 18, 19, 20, 21};
+        int[] expectedEnd = new int[]{4, 7, 11, 13, 17, 19, 20, 21, 22};
+
+        IntStream.range(1, tree.size()).forEach(i -> {
+            int actualStart = Integer.valueOf(tree.get(i).getFeature("index_start"));
+            int actualEnd = Integer.valueOf(tree.get(i).getFeature("index_end"));
+
+            assertEquals(expectedStart[i - 1], actualStart);
+            assertEquals(expectedEnd[i - 1], actualEnd);
+        });
+    }
 
     public static void main1(String[] args) {
         String modelFile = "/Users/mguan/workspace/ameliang/ameliang/amelia-nlp/src/main/resources/models/englishPCFG.ser.gz";
@@ -55,7 +77,7 @@ public class StanfordParserTest {
 
     public static void main(String[] args) {
         String model = "/Users/mguan/workspace/ameliang/ameliang/amelia-nlp/src/main/resources/models/NNDep.model";
-        IParser parser = new StanfordNNDepParser(model, null, new ArrayList<>());
+        IParser parser = new StanfordNNDepParser(model, null, null);//new ArrayList<>());
 
         Scanner scan = new Scanner(System.in);
         String input = StringUtils.EMPTY;
