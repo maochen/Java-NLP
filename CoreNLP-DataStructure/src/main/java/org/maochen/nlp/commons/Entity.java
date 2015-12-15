@@ -1,9 +1,12 @@
 package org.maochen.nlp.commons;
 
 import org.apache.commons.lang3.StringUtils;
+import org.maochen.nlp.parser.DNode;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -13,8 +16,11 @@ import java.util.UUID;
 public class Entity<T> extends ArrayList<T> {
     public UUID id = UUID.randomUUID();
     public String suggestedName = null;
-    public Set<String> attributes = new HashSet<>();
-    public Set<BinRelation> binRelations = new HashSet<>();
+    public Set<String> type = new HashSet<>();
+
+    public Set<BinRelation> relations = new HashSet<>();
+    public Set<BinRelation> childRelations = new HashSet<>();
+    public Map<String, Object> feats = new HashMap<>();
 
     public Entity() {
 
@@ -28,6 +34,8 @@ public class Entity<T> extends ArrayList<T> {
     public String toString() {
         if (suggestedName != null) {
             return suggestedName;
+        } else if (this.get(0) instanceof DNode) {
+            return this.stream().map(x -> ((DNode) x).getForm()).reduce((x1, x2) -> x1 + StringUtils.SPACE + x2).orElse(StringUtils.EMPTY);
         } else {
             return this.stream().map(Object::toString).reduce((x1, x2) -> x1 + StringUtils.SPACE + x2).orElse(StringUtils.EMPTY);
         }

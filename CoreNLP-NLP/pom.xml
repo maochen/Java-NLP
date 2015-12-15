@@ -8,12 +8,11 @@
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Natural Language Tools</description>
     <url>${project.parent.url}</url>
-    <version>1.0.13-RC1</version>
 
     <parent>
         <groupId>org.maochen.nlp</groupId>
         <artifactId>NLP</artifactId>
-        <version>1.0.13</version>
+        <version>1.0.14</version>
     </parent>
 
     <licenses>
@@ -130,7 +129,7 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
-            <version>1.7.12</version>
+            <version>1.7.13</version>
         </dependency>
 
         <dependency>

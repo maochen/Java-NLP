@@ -5,18 +5,18 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * Created by Maochen on 10/15/15.
  */
-public class BinRelation<T> extends TupleRelation<T> {
-    private Entity<T> left = null;
-    private Entity<T> right = null;
+public class BinRelation extends TupleRelation {
+    private Entity<?> left = null;
+    private Entity<?> right = null;
 
     public Entity getLeft() {
         return left;
     }
 
-    public void setLeft(Entity<T> left) {
+    public void setLeft(Entity<?> left) {
         this.left = left;
         if (left != null) {
-            left.binRelations.add(this);
+            left.relations.add(this);
         }
     }
 
@@ -24,16 +24,24 @@ public class BinRelation<T> extends TupleRelation<T> {
         return right;
     }
 
-    public void setRight(Entity<T> right) {
+    public void setRight(Entity<?> right) {
         this.right = right;
         if (right != null) {
-            right.binRelations.add(this);
+            right.relations.add(this);
         }
     }
 
     @Override
     public String toString() {
-        return super.getRelType() + " = (" + super.getRel() + StringUtils.SPACE + left + StringUtils.SPACE + right + ") => " + id;
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("(")
+                .append(super.getRel()).append(StringUtils.SPACE)
+                .append("[").append(left).append("]").append(StringUtils.SPACE)
+                .append("[").append(right).append("]")
+                .append(") => ")
+                .append(feats.values().stream().reduce((x1, x2) -> x1 + StringUtils.SPACE + x2).orElse(StringUtils.EMPTY))
+                .append(" - ").append(id);
+        return stringBuilder.toString();
     }
 
 //    public static void main(String[] args) {
