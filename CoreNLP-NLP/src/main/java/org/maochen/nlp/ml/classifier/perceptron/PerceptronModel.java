@@ -51,15 +51,17 @@ public class PerceptronModel {
         }
     }
 
-    public PerceptronModel(List<Tuple> trainingData) {
+    public void init(List<Tuple> trainingData, boolean initWeightRandom) {
         labelIndexer = new LabelIndexer(trainingData);
         int featurelength = trainingData.stream().findFirst().orElse(null).vector.getVector().length;
         weights = new double[labelIndexer.getLabelSize()][featurelength];
         bias = new double[labelIndexer.getLabelSize()];
 
-        for (int i = 0; i < weights.length; i++) {
-            for (int j = 0; j < weights[i].length; j++) {
-                weights[i][j] = Math.random();
+        if (initWeightRandom) {
+            for (int i = 0; i < weights.length; i++) {
+                for (int j = 0; j < weights[i].length; j++) {
+                    weights[i][j] = Math.random();
+                }
             }
         }
     }
@@ -115,7 +117,7 @@ public class PerceptronModel {
                 }
             }
         } catch (IOException e) {
-            LOG.error("Load model err.",e);
+            LOG.error("Load model err.", e);
         }
     }
 }

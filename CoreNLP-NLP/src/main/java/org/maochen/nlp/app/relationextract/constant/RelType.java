@@ -1,4 +1,4 @@
-package org.maochen.nlp.app.relationextract;
+package org.maochen.nlp.app.relationextract.constant;
 
 /**
  * Created by Maochen on 11/26/15.

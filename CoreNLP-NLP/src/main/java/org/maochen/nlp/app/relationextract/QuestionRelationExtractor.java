@@ -2,6 +2,8 @@ package org.maochen.nlp.app.relationextract;
 
 import com.google.common.collect.ImmutableSet;
 
+import org.maochen.nlp.app.relationextract.constant.EntityType;
+import org.maochen.nlp.app.relationextract.constant.RelType;
 import org.maochen.nlp.commons.BinRelation;
 import org.maochen.nlp.commons.Entity;
 import org.maochen.nlp.parser.DNode;
@@ -12,9 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -25,24 +24,9 @@ public class QuestionRelationExtractor {
 
     private static final Logger LOG = LoggerFactory.getLogger(QuestionRelationExtractor.class);
 
-    private static Set<DNode> bfs(DNode root) {
-
-        Set<DNode> result = new HashSet<>();
-        Queue<DNode> q = new LinkedList<>();
-        q.add(root);
-
-        while (!q.isEmpty()) {
-            DNode current = q.poll();
-            result.add(current);
-            q.addAll(current.getChildren());
-        }
-
-        return result;
-    }
-
     private static Entity<DNode> extractRemaining(final DNode wildcardNode, final DNode wildcardHeadVerb, final DTree tree) {
         Set<DNode> remain = wildcardHeadVerb.getChildren().stream().filter(x -> x != wildcardNode).collect(Collectors.toSet());
-        Set<DNode> children = remain.stream().map(QuestionRelationExtractor::bfs).flatMap(Collection::stream).collect(Collectors.toSet());
+        Set<DNode> children = remain.stream().map(RelExtUtils::bfs).flatMap(Collection::stream).collect(Collectors.toSet());
         remain.addAll(children);
 
         Set<String> excludingLabels = ImmutableSet.of(LangLib.DEP_AUX, LangLib.DEP_AUXPASS);
@@ -56,6 +40,7 @@ public class QuestionRelationExtractor {
     private static Entity<DNode> getWildcardEntity(DNode wildcardNode, String questionType) {
         Entity<DNode> wildcardEntity = new Entity<>(wildcardNode);
         wildcardEntity.suggestedName = "?X";
+        wildcardEntity.type.add(EntityType.WILDCARD.toString());
         wildcardEntity.feats.put("question_type", questionType);
         return wildcardEntity;
     }
@@ -101,11 +86,16 @@ public class QuestionRelationExtractor {
     }
 
     public static BinRelation extract(DTree tree, String qt) {
+        BinRelation questionRel;
         if (qt.equals("YESNO")) {
-            return extractPolar(tree);
+            questionRel = extractPolar(tree);
         } else {
-            return extractNonPolar(tree, qt);
+            questionRel = extractNonPolar(tree, qt);
         }
+
+        RelExtUtils.annotateEntityNameByNode((Entity<DNode>) questionRel.getLeft());
+        RelExtUtils.annotateEntityNameByNode((Entity<DNode>) questionRel.getRight());
+        return questionRel;
     }
 
     public static void main(String[] args) {

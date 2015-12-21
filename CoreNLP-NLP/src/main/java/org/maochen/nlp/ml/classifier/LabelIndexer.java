@@ -5,6 +5,7 @@ import com.google.common.collect.HashBiMap;
 
 import org.maochen.nlp.ml.Tuple;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,7 @@ public class LabelIndexer {
     }
 
     public void putByLabels(List<String> labels) {
+        Collections.sort(labels);
         int maxIndex = labelIndexer.values().stream().max(Integer::compareTo).orElse(-1);
         IntStream.range(0, labels.size())
                 .forEachOrdered(i -> labelIndexer.put(labels.get(i), maxIndex + 1 + i));

@@ -31,6 +31,7 @@ public class PerceptronClassifier implements IClassifier {
     private Properties properties = null;
 
     private static int MAX_ITERATION = 200;
+    private boolean initWeightRandom = true;
 
     // Key is LabelIndex.
     private Map<Integer, Double> predict(final double[] x) {
@@ -83,8 +84,9 @@ public class PerceptronClassifier implements IClassifier {
 
     @Override
     public IClassifier train(List<Tuple> trainingData) {
-        this.model = new PerceptronModel(trainingData);
+        this.model = new PerceptronModel();
         setParameter(properties);
+        this.model.init(trainingData, initWeightRandom);
 
         int errCount;
         int iter = 0;
@@ -136,6 +138,10 @@ public class PerceptronClassifier implements IClassifier {
 
         if (props.containsKey("threshold")) {
             this.model.threshold = Double.parseDouble(props.getProperty("threshold"));
+        }
+
+        if (props.containsKey("init_weight_random")) {
+            this.initWeightRandom = Boolean.parseBoolean(props.getProperty("init_weight_random"));
         }
     }
 
