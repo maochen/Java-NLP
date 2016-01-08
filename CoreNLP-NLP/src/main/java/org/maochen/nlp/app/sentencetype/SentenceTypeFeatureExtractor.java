@@ -1,16 +1,18 @@
 package org.maochen.nlp.app.sentencetype;
 
-import com.google.common.collect.Sets;
+import com.google.common.collect.ImmutableSet;
 
-import org.maochen.nlp.parser.DNode;
-import org.maochen.nlp.parser.DTree;
-import org.maochen.nlp.parser.LangLib;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Created by Maochen on 8/5/14.
@@ -19,87 +21,80 @@ public class SentenceTypeFeatureExtractor {
 
     private static final Logger LOG = LoggerFactory.getLogger(SentenceTypeFeatureExtractor.class);
 
+    private static final Set<String> IMPERATIVE_KEYWORDS = ImmutableSet.of("verify", "ask", "say", "solve", "run", "execute");
+    private static final Set<String> QUESTION_PREFIX = ImmutableSet.of("tell me", "let me know", "clarify for me", "name");
+
     // Bossssssss.... currently all binary features.
-    public List<String> generateFeats(DTree tree) {
+    public List<String> generateFeats(String[] tokens) {
+        tokens = Arrays.stream(tokens).filter(Objects::nonNull).filter(x -> !x.trim().isEmpty())
+                .map(String::toLowerCase).toArray(String[]::new);
+
+        if (tokens.length == 0) {
+            return new ArrayList<>();
+        }
+
         List<String> feats = new ArrayList<>();
 
-        feats.add("first_word_pos_" + tree.get(1).getPOS());
-
-        DNode lastWord = tree.get(tree.size() - 1).getDepLabel().equals(LangLib.DEP_PUNCT) ? tree.get(tree.size() - 2) : tree.get(tree.size() - 1);
-        feats.add("last_word_pos_" + lastWord.getPOS());
-
-        if (tree.get(tree.size() - 1).getDepLabel().equals(LangLib.DEP_PUNCT)) {
-            feats.add("punct_" + tree.get(tree.size() - 1).getLemma());
-        }
-
-        if (tree.getRoots().contains(tree.get(1))) {
-            feats.add("first_word_root");
-        }
-
-        int auxCount = (int) tree.stream().parallel().filter(x -> LangLib.DEP_AUX.equals(x.getDepLabel())).distinct().count();
-        if (auxCount > 0) {
-            feats.add("has_aux_verb");
-        }
-
         // Verify, Ask, Say - imperative
-        Set<String> imperativeKeywords = Sets.newHashSet("verify", "ask", "say", "solve", "run", "execute");
-        boolean isImperativeStart = imperativeKeywords.contains(tree.get(1).getLemma()) && tree.get(1).isRoot();
+        boolean isImperativeStart = IMPERATIVE_KEYWORDS.contains(tokens[0]);
+        String lastToken = tokens[tokens.length - 1];
         if (isImperativeStart) {
             feats.add("imperative_start");
-        }
-
-        // whether
-        DNode whether = tree.stream().filter(x -> "whether".equals(x.getLemma())).findFirst().orElse(null);
-        if (whether != null) {
-            feats.add("has_whether");
+            if (!Pattern.matches("\\p{Punct}+", lastToken)) {
+                String[] newTokens = new String[tokens.length + 1];
+                System.arraycopy(tokens, 0, newTokens, 0, tokens.length);
+                tokens = newTokens;
+            }
+            tokens[tokens.length - 1] = "!";
         }
 
         // Start with question words.
-        Set<String> bagOfQuestionPrefix = Sets.newHashSet("tell me", "let me know", "clarify for me", "name");
-        boolean isStartPrefixMatch = false;
-        for (String prefix : bagOfQuestionPrefix) {
-            if (tree.getOriginalSentence().toLowerCase().startsWith(prefix)) {
-                isStartPrefixMatch = true;
-                break;
+        String sentence = Arrays.stream(tokens).collect(Collectors.joining(StringUtils.SPACE));
+        long questionPrefixCount = QUESTION_PREFIX.stream().filter(sentence::startsWith).count();
+        if (questionPrefixCount > 0) {
+            feats.add("question_prefix");
+            if (!Pattern.matches("\\p{Punct}+", lastToken)) {
+                String[] newTokens = new String[tokens.length + 1];
+                System.arraycopy(tokens, 0, newTokens, 0, tokens.length);
+                tokens = newTokens;
             }
+            tokens[tokens.length - 1] = "?";
         }
 
-        if (isStartPrefixMatch) {
-            feats.add("question_bow_head");
+        feats.add("first_word_" + tokens[0]);
+
+        if (tokens.length > 1) {
+            feats.add("sec_word_" + tokens[1]);
+        }
+
+        lastToken = tokens[tokens.length - 1];
+        if (Pattern.matches("\\p{Punct}+", lastToken)) {
+            feats.add("punct_" + lastToken);
+        }
+
+        // whether
+        long whetherKeyWord = Arrays.stream(tokens).filter("whether"::equals).count();
+        if (whetherKeyWord > 0) {
+            feats.add("has_whether");
         }
 
         List<String> biWord = new ArrayList<>();
-        List<String> biDep = new ArrayList<>();
-
         List<String> triWord = new ArrayList<>();
-        List<String> triDep = new ArrayList<>();
 
-        for (int i = 1; i < tree.size(); i++) {
-            DNode node = tree.get(i);
-            if (tree.getPaddingNode() == node) {
-                continue;
-            }
-
+        for (int i = 0; i < tokens.length && i < 6; i++) { // 6 words maximum
             // Bigram
-            if (i + 1 < tree.size()) {
-                DNode nextNode = tree.get(i + 1);
-                biWord.add(node.getForm().toLowerCase() + "_" + nextNode.getForm().toLowerCase());
-                biDep.add(node.getDepLabel() + "_" + nextNode.getDepLabel());
+            if (i + 1 < tokens.length) {
+                biWord.add(tokens[i] + "_" + tokens[i + 1]);
             }
 
             // Trigram
-            if (i + 2 < tree.size()) {
-                DNode nextNode = tree.get(i + 1);
-                DNode nextNextNode = tree.get(i + 2);
-                triWord.add(node.getForm().toLowerCase() + "_" + nextNode.getForm().toLowerCase() + "_" + nextNextNode.getForm().toLowerCase());
-                triDep.add(node.getDepLabel() + "_" + nextNode.getDepLabel() + "_" + nextNextNode.getDepLabel());
+            if (i + 2 < tokens.length) {
+                triWord.add(tokens[i] + "_" + tokens[i + 1] + "_" + tokens[i + 2]);
             }
         }
 
         feats.addAll(biWord);
-        feats.addAll(biDep);
         feats.addAll(triWord);
-        feats.addAll(triDep);
 
 //        LOG.debug("feats: " + feats);
         return feats;

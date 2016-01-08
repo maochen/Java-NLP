@@ -1,13 +1,12 @@
 package org.maochen.nlp.app.sentencetype;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
 import org.maochen.nlp.app.ITagger;
 import org.maochen.nlp.ml.Tuple;
 import org.maochen.nlp.ml.classifier.maxent.MaxEntClassifier;
 import org.maochen.nlp.ml.vector.LabeledVector;
 import org.maochen.nlp.parser.DTree;
-import org.maochen.nlp.parser.IParser;
-import org.maochen.nlp.parser.stanford.nn.StanfordNNDepParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +20,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class SentenceTypeTagger extends MaxEntClassifier implements ITagger {
@@ -29,17 +27,12 @@ public class SentenceTypeTagger extends MaxEntClassifier implements ITagger {
     private static final Logger LOG = LoggerFactory.getLogger(SentenceTypeTagger.class);
 
     private SentenceTypeFeatureExtractor featureExtractor = new SentenceTypeFeatureExtractor();
-    private IParser parser;
 
     @Override
     public void train(String trainFilePath) {
         Properties props = new Properties();
         props.setProperty("iter", "120");
-
         super.setParameter(props);
-
-        parser.parse("."); // For loading POS Tagger.
-        final Map<String, DTree> depTreeCache = new ConcurrentHashMap<>();
 
         // Preparing training data
         Set<String> trainingData = new HashSet<>();
@@ -56,25 +49,15 @@ public class SentenceTypeTagger extends MaxEntClassifier implements ITagger {
         // -----------
         LOG.info("Loaded Training data.");
 
-        LOG.info("Generating parse tree.");
-        trainingData.parallelStream().map(x -> {
-            String sentence = x.split("\\t")[1];
-            depTreeCache.put(sentence, parser.parse(sentence));
-            return null;
-        }).collect(Collectors.toSet());
-
         LOG.info("Generating feats");
         List<Tuple> trainingTuples = trainingData.stream().map(line -> {
             String sentence = line.split("\\t")[1];
             String label = line.split("\\t")[0];
-            DTree parseTree = depTreeCache.get(sentence);
-
-            List<String> feats = featureExtractor.generateFeats(parseTree);
+            sentence = sentence.replaceAll("(\\p{Punct}+$)", " $1");
+            List<String> feats = featureExtractor.generateFeats(sentence.split("\\s"));
 
             String[] featsName = feats.stream().toArray(String[]::new);
-            double[] feat = feats.stream().mapToDouble(x -> 1.0).toArray();
-            LabeledVector labeledVector = new LabeledVector(feat);
-            labeledVector.featsName = featsName;
+            LabeledVector labeledVector = new LabeledVector(featsName);
             Tuple t = new Tuple(1, labeledVector, label);
             t.addExtra("sentence", sentence);
             return t;
@@ -100,7 +83,13 @@ public class SentenceTypeTagger extends MaxEntClassifier implements ITagger {
 
     @Override
     public Map<String, Double> predict(DTree tree) {
-        List<String> feats = featureExtractor.generateFeats(tree);
+        throw new NotImplementedException("Sentence type classifier doesn't require parse tree.");
+    }
+
+    @Override
+    public Map<String, Double> predict(String sentence) {
+        sentence = sentence.replaceAll("(\\p{Punct}+$)", " $1");
+        List<String> feats = featureExtractor.generateFeats(sentence.split("\\s"));
         String[] featsName = feats.stream().toArray(String[]::new);
         double[] feat = feats.stream().mapToDouble(x -> 1.0).toArray();
 
@@ -110,21 +99,16 @@ public class SentenceTypeTagger extends MaxEntClassifier implements ITagger {
         return super.predict(predict);
     }
 
-    @Override
-    public Map<String, Double> predict(String sentence) {
-        return predict(parser.parse(sentence));
-    }
+    public SentenceTypeTagger() {
 
-    public SentenceTypeTagger(final IParser parser) {
-        this.parser = parser;
     }
 
     public static void main(String[] args) throws IOException {
         String prefix = "/Users/mguan/Desktop";
-        String trainFilePath = "/Users/mguan/workspace/nlp-service_training-data/sentence_type_corpus.txt";
+        String trainFilePath = "/Users/mguan/workspace/ameliang/ameliang/amelia-nlp/src/main/resources/classifierData/utteranceClassifierData/training/sentencetype/sentencetype.train";
         String modelPath = prefix + "/sent_type_model.dat";
 
-        ITagger sentenceTypeTagger = new SentenceTypeTagger(new StanfordNNDepParser());
+        ITagger sentenceTypeTagger = new SentenceTypeTagger();
 
         sentenceTypeTagger.train(trainFilePath);
         sentenceTypeTagger.persistModel(modelPath);
