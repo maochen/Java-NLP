@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * This tuple is for the Sequence Model using. Don't mess up with regular Tuple.
@@ -13,10 +14,9 @@ import java.util.Map;
  * Created by Maochen on 8/5/15.
  */
 public class SequenceTuple {
-    public int id;
 
+    public int id;
     public List<Tuple> entries;
-    public List<String> tag;
 
     /**
      * featMap
@@ -63,7 +63,10 @@ public class SequenceTuple {
         }
 
         this.entries = Arrays.asList(tuples);
-        this.tag = tags;
+    }
+
+    public List<String> getLabel() {
+        return this.entries.stream().map(x -> x.label).collect(Collectors.toList());
     }
 
     public SequenceTuple() {

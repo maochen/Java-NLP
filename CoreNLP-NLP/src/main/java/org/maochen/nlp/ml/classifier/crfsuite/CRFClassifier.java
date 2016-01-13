@@ -61,7 +61,7 @@ public class CRFClassifier implements ISeqClassifier {
         for (SequenceTuple sequenceTuple : trainingData) {
             xseqs.add(getXseqForOneSeqTuple(sequenceTuple));
             StringList yseq = new StringList();
-            sequenceTuple.tag.stream().forEach(yseq::add);
+            sequenceTuple.getLabel().stream().forEach(yseq::add);
             yseqs.add(yseq);
         }
 
@@ -224,7 +224,7 @@ public class CRFClassifier implements ISeqClassifier {
         int err = 0;
         for (SequenceTuple st : testingData) {
             List<String> actual = predict(st).stream().map(Pair::getLeft).collect(Collectors.toList());
-            List<String> expected = st.tag;
+            List<String> expected = st.getLabel();
             if (actual.size() != expected.size()) {
                 throw new RuntimeException("Actual size: " + actual.size() + "\tExpected size: " + expected.size());
             }

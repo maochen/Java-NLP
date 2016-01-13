@@ -111,7 +111,6 @@ public class TrainingDataUtils {
 
             while (line != null) {
                 if (line.trim().isEmpty()) {
-                    sequenceTuple.tag = sequenceTuple.entries.stream().map(x -> x.label).collect(Collectors.toList());
                     data.add(sequenceTuple);
                     tupleId = 0;
                     seqId++;

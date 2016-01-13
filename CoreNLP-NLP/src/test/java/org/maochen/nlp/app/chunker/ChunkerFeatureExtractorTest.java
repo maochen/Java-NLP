@@ -8,10 +8,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -32,15 +30,10 @@ public class ChunkerFeatureExtractorTest {
     };
 
     @Test
-    public void testNull() {
-        assertNull(ChunkerFeatureExtractor.extract(null));
-    }
-
-    @Test
     public void testExtractFeatFromString() {
-        Set<String> feats = ChunkerFeatureExtractor.extractFeatSingle(3, MOCK_TOKENS, MOCK_POS, MOCK_TAGS);
+        List<String> feats = ChunkerFeatureExtractor.extractFeatSingle(3, MOCK_TOKENS, MOCK_POS, MOCK_TAGS);
 
-        assertEquals(24, feats.size());
+        assertEquals(31, feats.size());
         assertTrue(feats.contains("tag-3=B-NP"));
         assertTrue(feats.contains("pos-10+1=DT_NN_NNS"));
         assertTrue(feats.contains("pos-3=NNS"));
@@ -65,16 +58,58 @@ public class ChunkerFeatureExtractorTest {
         assertTrue(feats.contains("w+1=figures"));
         assertTrue(feats.contains("pos+1=NNS"));
         assertTrue(feats.contains("pos+2=VBP"));
+
+        assertTrue(feats.contains("w-10=the_trade"));
+        assertTrue(feats.contains("pos-10=DT_NN"));
+        assertTrue(feats.contains("w-2=for"));
+        assertTrue(feats.contains("pos-2-10=IN_DT_NN"));
+        assertTrue(feats.contains("w0+1=trade_figures"));
+        assertTrue(feats.contains("w+2=range"));
+        assertTrue(feats.contains("pos+1+2=NNS_VBP"));
+
+        feats.remove("tag-3=B-NP");
+        feats.remove("pos-10+1=DT_NN_NNS");
+        feats.remove("pos-3=NNS");
+        feats.remove("w0=trade");
+        feats.remove("pos-2-1=IN_DT");
+        feats.remove("tag-2-1pos0=B-PP_B-NP_NN");
+        feats.remove("pos-3-2=NNS_IN");
+        feats.remove("pos0=NN");
+        feats.remove("pos-2=IN");
+        feats.remove("pos0+1=NN_NNS");
+        feats.remove("w-1=the");
+        feats.remove("pos-1=DT");
+        feats.remove("pos0+1+2=NN_NNS_VBP");
+        feats.remove("tag-3-2-1pos0=B-NP_B-PP_B-NP_NN");
+        feats.remove("tag-1=B-NP");
+        feats.remove("pos-30=NNS_NN");
+        feats.remove("pos-1tag-1pos0=DT_B-NP_NN");
+        feats.remove("tag-2=B-PP");
+        feats.remove("pos-20=IN_NN");
+        feats.remove("pos-2-10+1=IN_DT_NN_NNS");
+        feats.remove("pos0+2=NN_VBP");
+        feats.remove("w+1=figures");
+        feats.remove("pos+1=NNS");
+        feats.remove("pos+2=VBP");
+        feats.remove("w-10=the_trade");
+        feats.remove("pos-10=DT_NN");
+        feats.remove("w-2=for");
+        feats.remove("pos-2-10=IN_DT_NN");
+        feats.remove("w0+1=trade_figures");
+        feats.remove("w+2=range");
+        feats.remove("pos+1+2=NNS_VBP");
+
+        assertTrue(feats.isEmpty());
     }
 
     @Test
     public void testExtractFeatSentenceTuple() {
         Map<Integer, List<String>> feats = new HashMap<>();
-        feats.put(Chunker.WORD_INDEX, Arrays.asList(MOCK_TOKENS));
-        feats.put(Chunker.POS_INDEX, Arrays.asList(MOCK_POS));
+        feats.put(ChunkerFeatureExtractor.WORD_INDEX, Arrays.asList(MOCK_TOKENS));
+        feats.put(ChunkerFeatureExtractor.POS_INDEX, Arrays.asList(MOCK_POS));
         SequenceTuple st = new SequenceTuple(feats, Arrays.asList(MOCK_TAGS));
 
-        List<Tuple> tuples = ChunkerFeatureExtractor.extractFeat(st);
+        List<Tuple> tuples = ChunkerFeatureExtractor.extractFeat(st, true);
 
         assertEquals(7, tuples.size());
 
