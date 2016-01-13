@@ -19,7 +19,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
+import java.util.Scanner;
 import java.util.stream.Collectors;
+
+import edu.stanford.nlp.ling.CoreLabel;
+import edu.stanford.nlp.ling.TaggedWord;
+import edu.stanford.nlp.tagger.maxent.MaxentTagger;
 
 /**
  * Created by Maochen on 11/10/15.
@@ -37,7 +42,7 @@ public class CRFChunker extends CRFClassifier {
         LOG.info("Loaded Training data.");
 
         LOG.info("Generating feats");
-        trainingData.stream().forEach(seq -> seq.entries = ChunkerFeatureExtractor.extractFeat(seq, false));
+        trainingData.stream().forEach(seq -> seq.entries = ChunkerFeatureExtractor.extractFeat(seq));
         LOG.info("Extracted Feats.");
 
         super.train(trainingData);
@@ -51,7 +56,7 @@ public class CRFChunker extends CRFClassifier {
             st.entries.add(new Tuple(v));
         }
 
-        st.entries = ChunkerFeatureExtractor.extractFeat(st, false);
+        st.entries = ChunkerFeatureExtractor.extractFeat(st);
         List<Pair<String, Double>> result = super.predict(st);
         List<String> tags = result.stream().map(Pair::getLeft).collect(Collectors.toList());
 
@@ -117,29 +122,52 @@ public class CRFChunker extends CRFClassifier {
 
         Properties para = new Properties();
         para.setProperty("model", modelPath);
+        para.setProperty("algorithm", "l2sgd");
+        para.setProperty("feature.possible_transitions", "1");
+        para.setProperty("feature.possible_states", "1");
+
         chunker.setParameter(para);
 
         String trainFile = "/Users/mguan/workspace/nlp-service_training-data/corpora/CoNLL_Shared_Task/CoNLL_2000_Chunking/train.txt";
 
 //        chunker.train(trainFile);
-        // TODO: persist has some issue.
-//        chunker.persistModel(modelPath);
+//        chunker.persistModel(modelPath + ".dup");
+//        para.setProperty("model", modelPath + ".dup");
+//        chunker.setParameter(para);
+//        chunker.loadModel(null);
 
-        chunker.loadModel(null);
         chunker.validate("/Users/mguan/workspace/nlp-service_training-data/corpora/CoNLL_Shared_Task/CoNLL_2000_Chunking/test.txt");
 
-//        Scanner scan = new Scanner(System.in);
-//        String input = StringUtils.EMPTY;
-//
-//        String quitRegex = "q|quit|exit";
-//        while (!input.matches(quitRegex)) {
-//            System.out.println("Please enter sentence:");
-//            input = scan.nextLine();
-//            if (!input.trim().isEmpty() && !input.matches(quitRegex)) {
-//                SequenceTuple st = chunker.predict(input);
-//                printSequenceTuple(st, null);
-//            }
-//        }
+        MaxentTagger posTagger = new MaxentTagger("edu/stanford/nlp/models/pos-tagger/english-left3words/english-left3words-distsim.tagger");
+        Scanner scan = new Scanner(System.in);
+        String input = StringUtils.EMPTY;
+        String quitRegex = "q|quit|exit";
+        while (!input.matches(quitRegex)) {
+            System.out.println("Please enter sentence:");
+            input = scan.nextLine();
+            if (!input.trim().isEmpty() && !input.matches(quitRegex)) {
+                String[] words = input.split("\\s");
+
+                List<CoreLabel> tokens = Arrays.stream(words).map(word -> {
+                    CoreLabel coreLabel = new CoreLabel();
+                    coreLabel.setWord(word);
+                    coreLabel.setOriginalText(word);
+                    coreLabel.setValue(word);
+                    return coreLabel;
+                }).collect(Collectors.toList());
+
+                List<TaggedWord> posList = posTagger.tagSentence(tokens);
+                for (int i = 0; i < tokens.size(); i++) {
+                    String pos = posList.get(i).tag();
+                    tokens.get(i).setTag(pos);
+                }
+
+                String[] pos = tokens.stream().map(CoreLabel::tag).toArray(String[]::new);
+
+                SequenceTuple st = chunker.predict(words, pos);
+                printSequenceTuple(st, null);
+            }
+        }
 
 
     }

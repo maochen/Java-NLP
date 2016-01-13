@@ -25,7 +25,7 @@ import java.util.stream.IntStream;
 /**
  * Not as good as CRFs.
  *
- * Accuracy: 82.95375393123246%
+ * Accuracy: 85.21%
  *
  * <p>Created by Maochen on 11/10/15.
  */
@@ -42,7 +42,7 @@ public class MaxEntChunker extends MaxEntClassifier {
         LOG.info("Loaded Training data.");
 
         LOG.info("Generating feats");
-        List<Tuple> trainingTuples = trainingData.parallelStream().map(x -> ChunkerFeatureExtractor.extractFeat(x, false)).flatMap(Collection::stream).collect(Collectors.toList());
+        List<Tuple> trainingTuples = trainingData.parallelStream().map(ChunkerFeatureExtractor::extractFeat).flatMap(Collection::stream).collect(Collectors.toList());
 
         LOG.info("Extracted Feats.");
         super.train(trainingTuples);
@@ -59,7 +59,7 @@ public class MaxEntChunker extends MaxEntClassifier {
 
         for (int i = 0; i < st.entries.size(); i++) {
             Tuple t = st.entries.get(i);
-            String[] currentFeats = ChunkerFeatureExtractor.extractFeatSingle(i, words, pos, st.getLabel().stream().toArray(String[]::new)).stream().toArray(String[]::new);
+            String[] currentFeats = ChunkerFeatureExtractor.extractFeatSingle(i, words, pos).stream().toArray(String[]::new);
             ((LabeledVector) t.vector).featsName = currentFeats;
             t.vector.setVector(IntStream.range(0, currentFeats.length).mapToDouble(x -> 1.0D).toArray());
             t.label = super.predict(t).entrySet().stream()
@@ -105,7 +105,7 @@ public class MaxEntChunker extends MaxEntClassifier {
         String modelPath = "/Users/mguan/Desktop/chunker.maxent.model";
 
         Properties para = new Properties();
-//        para.put("iter", "250");
+//        para.put("iter", "1000");
         chunker.setParameter(para);
 
         String trainFile = "/Users/mguan/workspace/nlp-service_training-data/corpora/CoNLL_Shared_Task/CoNLL_2000_Chunking/train.txt";

@@ -4,9 +4,15 @@ import org.maochen.nlp.ml.SequenceTuple;
 import org.maochen.nlp.ml.Tuple;
 import org.maochen.nlp.ml.vector.LabeledVector;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -28,72 +34,80 @@ public class ChunkerFeatureExtractor {
         feat.add(entry);
     }
 
-    public static List<String> extractFeatSingle(int i, final String[] tokens, final String[] pos, final String[] resolvedPrevTags) {
+    private static Map<String, String> BROWN_CLUSTER = new HashMap<>();
+
+    private static int[] BROWN_PREFIX = new int[]{4, 6, 10, 20};
+
+    static {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(ChunkerFeatureExtractor.class.getResourceAsStream("/brown.rcv1.3200.txt")))) {
+            String line = br.readLine();
+
+            while (line != null) {
+                String[] fields = line.split("\\s");
+
+                BROWN_CLUSTER.put(fields[1], fields[0]);
+                line = br.readLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // k: feat key - v: cluster Id
+    private static Map<String, String> extractBrownFeat(String word) {
+        if (!BROWN_CLUSTER.containsKey(word)) {
+            return new HashMap<>();
+        }
+
+        String clusterId = BROWN_CLUSTER.get(word);
+
+        return Arrays.stream(BROWN_PREFIX).mapToObj(p -> {
+            int end = Math.min(p, clusterId.length());
+            return new AbstractMap.SimpleEntry<>("brown_" + p, clusterId.substring(0, end));
+        }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+    }
+
+    // Feats from http://www.aclweb.org/anthology/P10-1040
+    public static List<String> extractFeatSingle(int i, final String[] tokens, final String[] pos) {
         List<String> currentFeats = new ArrayList<>();
 
-        addFeat(currentFeats, "w0", tokens[i]);
-        addFeat(currentFeats, "pos0", pos[i]);
+        for (int index = Math.max(0, i - 2); index < Math.min(i + 3, tokens.length); index++) { // [-2,2]
+            addFeat(currentFeats, "w" + (index - i), tokens[index]);
+            addFeat(currentFeats, "pos" + (index - i), pos[index]);
 
-        if (i > 0) {
-            if (resolvedPrevTags != null) {
-                addFeat(currentFeats, "tag-1", resolvedPrevTags[i - 1]);
-                addFeat(currentFeats, "pos-1tag-1pos0", pos[i - 1], resolvedPrevTags[i - 1], pos[i]);
+            if (index == i - 1) {
+                addFeat(currentFeats, "w-10", tokens[i - 1], tokens[i]);
+                addFeat(currentFeats, "pos-10", pos[i - 1], pos[i]);
+            } else if (index == i + 1) {
+                addFeat(currentFeats, "w0+1", tokens[i], tokens[i + 1]);
+                addFeat(currentFeats, "pos0+1", pos[i], pos[i + 1]);
+            } else if (index == i - 2) {
+                addFeat(currentFeats, "pos-2-1", pos[i - 2], pos[i - 1]);
+                addFeat(currentFeats, "pos-2-10", pos[i - 2], pos[i - 1], pos[i]);
+            } else if (index == i + 2) {
+                addFeat(currentFeats, "pos+1+2", pos[i + 1], pos[i + 2]);
             }
 
-            addFeat(currentFeats, "w-1", tokens[i - 1]);
-            addFeat(currentFeats, "w-10", tokens[i - 1], tokens[i]);
-            addFeat(currentFeats, "pos-1", pos[i - 1]);
-            addFeat(currentFeats, "pos-10", pos[i - 1], pos[i]);
-
-        }
-
-        if (i > 1) {
-            if (resolvedPrevTags != null) {
-                addFeat(currentFeats, "tag-2", resolvedPrevTags[i - 2]);
-                addFeat(currentFeats, "tag-2-1pos0", resolvedPrevTags[i - 2], resolvedPrevTags[i - 1], pos[i]);
+            if (index == i - 1 && i < tokens.length - 1) {
+                addFeat(currentFeats, "pos-10+1", pos[i - 1], pos[i], pos[i + 1]);
             }
 
-            addFeat(currentFeats, "w-2", tokens[i - 2]);
-            addFeat(currentFeats, "pos-2", pos[i - 2]);
-            addFeat(currentFeats, "pos-2-1", pos[i - 2], pos[i - 1]);
-            addFeat(currentFeats, "pos-20", pos[i - 2], pos[i]);
-            addFeat(currentFeats, "pos-2-10", pos[i - 2], pos[i - 1], pos[i]);
-
-        }
-
-        if (i > 2) {
-            if (resolvedPrevTags != null) {
-                addFeat(currentFeats, "tag-3", resolvedPrevTags[i - 3]);
-                addFeat(currentFeats, "tag-3-2-1pos0", resolvedPrevTags[i - 3], resolvedPrevTags[i - 2], resolvedPrevTags[i - 1], pos[i]);
+            if (index == i + 2) {
+                addFeat(currentFeats, "pos0+1+2", pos[i], pos[i + 1], pos[i + 2]);
             }
-
-            addFeat(currentFeats, "pos-3", pos[i - 3]);
-            addFeat(currentFeats, "pos-30", pos[i - 3], pos[i]);
-            addFeat(currentFeats, "pos-3-2", pos[i - 3], pos[i - 2]);
         }
 
-        if (i < tokens.length - 1) {
-            addFeat(currentFeats, "w0+1", tokens[i], tokens[i + 1]);
-            addFeat(currentFeats, "w+1", tokens[i + 1]);
-            addFeat(currentFeats, "pos+1", pos[i + 1]);
-            addFeat(currentFeats, "pos0+1", pos[i], pos[i + 1]);
+        for (int index = Math.max(0, i - 2); index < Math.min(i + 3, tokens.length); index++) { // [-2,2]
+
+            Map<String, String> feats = extractBrownFeat(tokens[index]);
+
+            final int finalIndex = index;
+            feats.entrySet().stream().forEach(entry -> {
+                addFeat(currentFeats, entry.getKey() + "_" + (finalIndex - i), entry.getValue());
+            });
         }
 
-        if (i < tokens.length - 2) {
-            addFeat(currentFeats, "w+2", tokens[i + 2]);
-            addFeat(currentFeats, "pos+2", pos[i + 2]);
-            addFeat(currentFeats, "pos0+2", pos[i], pos[i + 2]);
-            addFeat(currentFeats, "pos+1+2", pos[i + 1], pos[i + 2]);
-            addFeat(currentFeats, "pos0+1+2", pos[i], pos[i + 1], pos[i + 2]);
-        }
-
-        if (i > 0 && i < tokens.length - 1) {
-            addFeat(currentFeats, "pos-10+1", pos[i - 1], pos[i], pos[i + 1]);
-        }
-
-        if (i > 1 && i < tokens.length - 1) {
-            addFeat(currentFeats, "pos-2-10+1", pos[i - 2], pos[i - 1], pos[i], pos[i + 1]);
-        }
 
         return currentFeats;
     }
@@ -101,13 +115,12 @@ public class ChunkerFeatureExtractor {
     /**
      * Single SequenceTuple featExtractor
      */
-    public static List<Tuple> extractFeat(final SequenceTuple entry, boolean extractPrevTagFeat) {
+    public static List<Tuple> extractFeat(final SequenceTuple entry) {
         String[] tokens = entry.entries.stream().map(tuple -> ((LabeledVector) tuple.vector).featsName[WORD_INDEX]).toArray(String[]::new);
         String[] pos = entry.entries.stream().map(tuple -> ((LabeledVector) tuple.vector).featsName[POS_INDEX]).toArray(String[]::new);
-        String[] tags = extractPrevTagFeat ? entry.entries.stream().map(t -> t.label).toArray(String[]::new) : null;
 
         List<List<String>> feats = IntStream.range(0, tokens.length)
-                .mapToObj(i -> extractFeatSingle(i, tokens, pos, tags))
+                .mapToObj(i -> extractFeatSingle(i, tokens, pos))
                 .collect(Collectors.toList());
 
         List<Tuple> tuples = new ArrayList<>();

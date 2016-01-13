@@ -12,11 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
@@ -198,23 +195,13 @@ public class CRFClassifier implements ISeqClassifier {
 
     @Override
     public void persistModel(String modelFile) throws IOException {
+        if (modelPath.equals(modelFile)) {
+            throw new IOException("same as original model path.");
+        }
+
         File sourceFile = new File(modelPath);
         File destFile = new File(modelFile);
-        if (!sourceFile.exists()) {
-            return;
-        }
-        if (!destFile.exists()) {
-            destFile.createNewFile();
-        }
-        FileChannel source = new FileInputStream(sourceFile).getChannel();
-        FileChannel destination = new FileOutputStream(destFile).getChannel();
-        if (source != null) {
-            destination.transferFrom(source, 0, source.size());
-        }
-        if (source != null) {
-            source.close();
-        }
-        destination.close();
+        Files.copy(sourceFile.toPath(), destFile.toPath());
     }
 
 
@@ -237,7 +224,7 @@ public class CRFClassifier implements ISeqClassifier {
         }
 
         System.out.println("Err/Total: " + err + "/" + total);
-        System.out.println("Accurancy: " + (1 - (err / (double) total)) * 100 + "%");
+        System.out.println("Accuracy: " + (1 - (err / (double) total)) * 100 + "%");
         return new ImmutablePair<>(err, total);
     }
 
