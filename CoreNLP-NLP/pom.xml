@@ -152,6 +152,12 @@
         </dependency>
 
         <dependency>
+            <groupId>com.github.vinhkhuc</groupId>
+            <artifactId>jcrfsuite</artifactId>
+            <version>0.6</version>
+        </dependency>
+
+        <dependency>
             <groupId>edu.stanford.nlp</groupId>
             <artifactId>stanford-corenlp</artifactId>
             <version>3.5.2</version>

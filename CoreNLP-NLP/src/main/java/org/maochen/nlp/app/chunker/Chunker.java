@@ -1,7 +1,6 @@
 package org.maochen.nlp.app.chunker;
 
 import org.apache.commons.lang3.StringUtils;
-import org.maochen.nlp.app.ISeqTagger;
 import org.maochen.nlp.ml.SequenceTuple;
 import org.maochen.nlp.ml.Tuple;
 import org.maochen.nlp.ml.classifier.maxent.MaxEntClassifier;
@@ -31,7 +30,7 @@ import edu.stanford.nlp.tagger.maxent.MaxentTagger;
 /**
  * Created by Maochen on 11/10/15.
  */
-public class Chunker extends MaxEntClassifier implements ISeqTagger {
+public class Chunker extends MaxEntClassifier {
 
     private static final Logger LOG = LoggerFactory.getLogger(Chunker.class);
 
@@ -77,7 +76,6 @@ public class Chunker extends MaxEntClassifier implements ISeqTagger {
         return trainingData;
     }
 
-    @Override
     public void train(String trainFilePath) {
         // Preparing training data
         Set<SequenceTuple> trainingData = readFile(trainFilePath);
@@ -91,7 +89,6 @@ public class Chunker extends MaxEntClassifier implements ISeqTagger {
 
     }
 
-    @Override
     public SequenceTuple predict(String sentence) {
         List<CoreLabel> tokenizedSentence = StanfordParser.stanfordTokenize(sentence);
         if (POS_TAGGER == null) {
@@ -143,7 +140,6 @@ public class Chunker extends MaxEntClassifier implements ISeqTagger {
         System.out.println("Accurancy:\t" + (1 - (errCount / (double) total)) * 100 + "%");
     }
 
-    @Override
     public void predict(final SequenceTuple sequenceTuple) {
         if (sequenceTuple == null) {
             return;

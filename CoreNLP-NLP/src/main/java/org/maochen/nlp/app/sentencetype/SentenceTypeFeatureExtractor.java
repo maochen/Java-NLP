@@ -22,7 +22,7 @@ public class SentenceTypeFeatureExtractor {
     private static final Logger LOG = LoggerFactory.getLogger(SentenceTypeFeatureExtractor.class);
 
     private static final Set<String> IMPERATIVE_KEYWORDS = ImmutableSet.of("verify", "ask", "say", "solve", "run", "execute");
-    private static final Set<String> QUESTION_PREFIX = ImmutableSet.of("tell me", "let me know", "clarify for me", "name");
+    private static final Set<String> QUESTION_PREFIX = ImmutableSet.of("let me know", "clarify for me", "name");
 
     // Bossssssss.... currently all binary features.
     public List<String> generateFeats(String[] tokens) {
@@ -34,6 +34,11 @@ public class SentenceTypeFeatureExtractor {
         }
 
         List<String> feats = new ArrayList<>();
+        feats.add("word_count_" + String.valueOf(tokens.length));
+
+        if (tokens[0].toLowerCase().startsWith("wh")) {
+            feats.add("wh_start");
+        }
 
         // Verify, Ask, Say - imperative
         boolean isImperativeStart = IMPERATIVE_KEYWORDS.contains(tokens[0]);

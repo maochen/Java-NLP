@@ -1,5 +1,6 @@
 package org.maochen.nlp.ml.vector;
 
+import java.util.Arrays;
 import java.util.stream.IntStream;
 
 /**
@@ -15,5 +16,10 @@ public class LabeledVector extends DenseVector {
     public LabeledVector(String[] feats) {
         super(IntStream.range(0, feats.length).mapToDouble(x -> 1.0D).toArray());
         this.featsName = feats;
+    }
+
+    @Override
+    public String toString() {
+        return Arrays.toString(this.featsName);
     }
 }

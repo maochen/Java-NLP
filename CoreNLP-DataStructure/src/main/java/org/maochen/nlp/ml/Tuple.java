@@ -4,7 +4,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.maochen.nlp.ml.vector.DenseVector;
 import org.maochen.nlp.ml.vector.IVector;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -54,7 +53,7 @@ public class Tuple {
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(label).append(StringUtils.SPACE);
-        stringBuilder.append(Arrays.toString(vector.getVector()));
+        stringBuilder.append(vector);
 
         return stringBuilder.toString().trim();
     }

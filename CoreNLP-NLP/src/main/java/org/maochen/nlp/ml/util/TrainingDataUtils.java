@@ -2,8 +2,14 @@ package org.maochen.nlp.ml.util;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.maochen.nlp.ml.SequenceTuple;
 import org.maochen.nlp.ml.Tuple;
+import org.maochen.nlp.ml.vector.LabeledVector;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,16 +32,14 @@ public class TrainingDataUtils {
 
         Map<String, Long> tagCount = trainingData.parallelStream()
                 .map(x -> new AbstractMap.SimpleImmutableEntry<>(x.label, 1))
-                .collect(Collectors.groupingBy(
-                        AbstractMap.SimpleImmutableEntry::getKey, Collectors.counting()));
+                .collect(Collectors.groupingBy(Map.Entry::getKey, Collectors.counting()));
 
         long minCount = tagCount.values().stream().min(Long::compareTo).get();
 
         Map<String, Integer> accumulateTagCount = tagCount.entrySet().stream()
                 .map(Map.Entry::getKey)
                 .map(x -> new AbstractMap.SimpleImmutableEntry<>(x, 0))
-                .collect(Collectors.toMap(AbstractMap.SimpleImmutableEntry::getKey,
-                        AbstractMap.SimpleImmutableEntry::getValue));
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
         ListIterator<Tuple> iter = copyTrainingData.listIterator(copyTrainingData.size());
         while (iter.hasPrevious()) {
@@ -93,4 +97,39 @@ public class TrainingDataUtils {
     }
 
 
+    public static List<SequenceTuple> readSeqFile(final InputStream trainingFile, final String delimiter, final int tagCol) {
+        List<SequenceTuple> data = new ArrayList<>();
+
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(trainingFile))) {
+            String line = br.readLine();
+
+            int tupleId = 0;
+            int seqId = 0;
+            SequenceTuple sequenceTuple = new SequenceTuple();
+            sequenceTuple.entries = new ArrayList<>();
+            sequenceTuple.id = seqId;
+
+            while (line != null) {
+                if (line.trim().isEmpty()) {
+                    sequenceTuple.tag = sequenceTuple.entries.stream().map(x -> x.label).collect(Collectors.toList());
+                    data.add(sequenceTuple);
+                    tupleId = 0;
+                    seqId++;
+                    sequenceTuple = new SequenceTuple();
+                    sequenceTuple.entries = new ArrayList<>();
+                    sequenceTuple.id = seqId;
+                } else {
+                    String[] fields = line.trim().split(delimiter);
+                    String[] feats = IntStream.range(0, fields.length).filter(i -> i != tagCol).mapToObj(i -> fields[i]).toArray(String[]::new);
+                    LabeledVector v = new LabeledVector(feats);
+                    sequenceTuple.entries.add(new Tuple(tupleId++, v, fields[tagCol]));
+                }
+                line = br.readLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return data;
+    }
 }
