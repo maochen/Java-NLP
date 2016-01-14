@@ -1,7 +1,7 @@
 package org.maochen.nlp.parser.stanford.nn;
 
 import org.maochen.nlp.parser.DTree;
-import org.maochen.nlp.parser.StanfordParserUtils;
+import org.maochen.nlp.parser.stanford.util.StanfordParserUtils;
 import org.maochen.nlp.parser.stanford.StanfordParser;
 
 import java.util.List;

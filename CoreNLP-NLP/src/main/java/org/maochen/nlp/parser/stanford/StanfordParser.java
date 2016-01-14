@@ -2,9 +2,11 @@ package org.maochen.nlp.parser.stanford;
 
 import com.google.common.collect.ImmutableSet;
 
+import org.apache.commons.lang3.StringUtils;
 import org.maochen.nlp.parser.DTree;
 import org.maochen.nlp.parser.LangLib;
 import org.maochen.nlp.parser.IParser;
+import org.maochen.nlp.parser.stanford.util.StanfordConst;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +36,7 @@ public abstract class StanfordParser implements IParser {
 
     private static MaxentTagger posTagger = null;
 
-    private static String posTaggerModelPath = null;
+    private static String POS_TAGGER_MODEL_PATH = null;
 
     private List<NERClassifierCombiner> ners;
 
@@ -74,11 +76,11 @@ public abstract class StanfordParser implements IParser {
     // 2. POS Tagger
     public void tagPOS(List<CoreLabel> tokens) {
         if (posTagger == null) {
-            if (posTaggerModelPath == null) {
+            if (POS_TAGGER_MODEL_PATH == null) {
                 LOG.warn("Default POS Tagger model");
-                posTaggerModelPath = "edu/stanford/nlp/models/pos-tagger/english-left3words/english-left3words-distsim.tagger";
+                POS_TAGGER_MODEL_PATH = StanfordConst.STANFORD_DEFAULT_POS_EN_MODEL;
             }
-            posTagger = new MaxentTagger(posTaggerModelPath);
+            posTagger = new MaxentTagger(POS_TAGGER_MODEL_PATH);
         }
         List<TaggedWord> posList = posTagger.tagSentence(tokens);
         for (int i = 0; i < tokens.size(); i++) {
@@ -144,13 +146,41 @@ public abstract class StanfordParser implements IParser {
     }
 
     // 4. NER
-    public void tagNamedEntity(List<CoreLabel> tokens) {
+    // NER not thread safe ...
+    public synchronized void tagNamedEntity(List<CoreLabel> tokens) {
         boolean isPOSTagged = tokens.parallelStream().filter(x -> x.tag() == null).count() == 0;
         if (!isPOSTagged) {
             throw new RuntimeException("Please Run POS Tagger before Named Entity tagger.");
         }
         if (ners != null) {
-            ners.stream().forEach(ner -> ner.classify(tokens));
+            try {
+                ners.stream().forEach(ner -> ner.classify(tokens));
+            } catch (Exception e) {
+                /* edu.stanford.nlp.util.RuntimeInterruptedException: java.lang.InterruptedException
+                 at edu.stanford.nlp.util.HashIndex.addToIndex(HashIndex.java:173) ~[stanford-corenlp-3.5.2.jar:3.5.2]
+                 at edu.stanford.nlp.ling.tokensregex.SequenceMatcher$BranchStates.newBid(SequenceMatcher.java:902) ~[stanford-corenlp-3.5.2.jar:3.5.2]
+                 at edu.stanford.nlp.ling.tokensregex.SequenceMatcher$MatchedStates.<init>(SequenceMatcher.java:1288) ~[stanford-corenlp-3.5.2.jar:3.5.2]
+                 at edu.stanford.nlp.ling.tokensregex.SequenceMatcher.getStartStates(SequenceMatcher.java:709) ~[stanford-corenlp-3.5.2.jar:3.5.2]
+                 at edu.stanford.nlp.ling.tokensregex.SequenceMatcher.findMatchStartBacktracking(SequenceMatcher.java:488) ~[stanford-corenlp-3.5.2.jar:3.5.2]
+                 at edu.stanford.nlp.ling.tokensregex.SequenceMatcher.findMatchStart(SequenceMatcher.java:449) ~[stanford-corenlp-3.5.2.jar:3.5.2]
+                 at edu.stanford.nlp.ling.tokensregex.SequenceMatcher.find(SequenceMatcher.java:341) ~[stanford-corenlp-3.5.2.jar:3.5.2]
+                 at edu.stanford.nlp.ling.tokensregex.SequenceMatcher.findNextNonOverlapping(SequenceMatcher.java:365) ~[stanford-corenlp-3.5.2.jar:3.5.2]
+                 at edu.stanford.nlp.ling.tokensregex.SequenceMatcher.find(SequenceMatcher.java:437) ~[stanford-corenlp-3.5.2.jar:3.5.2]
+                 at edu.stanford.nlp.ie.NumberNormalizer.findNumbers(NumberNormalizer.java:452) ~[stanford-corenlp-3.5.2.jar:3.5.2]
+                 at edu.stanford.nlp.ie.NumberNormalizer.findAndMergeNumbers(NumberNormalizer.java:721) ~[stanford-corenlp-3.5.2.jar:3.5.2]
+                 at edu.stanford.nlp.time.TimeExpressionExtractorImpl.extractTimeExpressions(TimeExpressionExtractorImpl.java:184) ~[stanford-corenlp-3.5.2.jar:3.5.2]
+                 at edu.stanford.nlp.time.TimeExpressionExtractorImpl.extractTimeExpressions(TimeExpressionExtractorImpl.java:178) ~[stanford-corenlp-3.5.2.jar:3.5.2]
+                 at edu.stanford.nlp.time.TimeExpressionExtractorImpl.extractTimeExpressionCoreMaps(TimeExpressionExtractorImpl.java:116) ~[stanford-corenlp-3.5.2.jar:3.5.2]
+                 at edu.stanford.nlp.time.TimeExpressionExtractorImpl.extractTimeExpressionCoreMaps(TimeExpressionExtractorImpl.java:104) ~[stanford-corenlp-3.5.2.jar:3.5.2]
+                 at edu.stanford.nlp.ie.regexp.NumberSequenceClassifier.runSUTime(NumberSequenceClassifier.java:340) ~[stanford-corenlp-3.5.2.jar:3.5.2]
+                 at edu.stanford.nlp.ie.regexp.NumberSequenceClassifier.classifyWithSUTime(NumberSequenceClassifier.java:138) ~[stanford-corenlp-3.5.2.jar:3.5.2]
+                 at edu.stanford.nlp.ie.regexp.NumberSequenceClassifier.classifyWithGlobalInformation(NumberSequenceClassifier.java:101) ~[stanford-corenlp-3.5.2.jar:3.5.2]
+                 at edu.stanford.nlp.ie.NERClassifierCombiner.recognizeNumberSequences(NERClassifierCombiner.java:267) ~[stanford-corenlp-3.5.2.jar:3.5.2]
+                 at edu.stanford.nlp.ie.NERClassifierCombiner.classifyWithGlobalInformation(NERClassifierCombiner.java:231) ~[stanford-corenlp-3.5.2.jar:3.5.2]
+                 at edu.stanford.nlp.ie.NERClassifierCombiner.classify(NERClassifierCombiner.java:218) ~[stanford-corenlp-3.5.2.jar:3.5.2]
+                 */
+                LOG.warn("NER Classifier err for: " + tokens.stream().map(CoreLabel::word).collect(Collectors.joining(StringUtils.SPACE)));
+            }
         }
     }
 
@@ -158,15 +188,15 @@ public abstract class StanfordParser implements IParser {
     public abstract DTree parse(final String sentence);
 
     protected void load(final String posTaggerModel, List<String> nerModels) {
-        posTaggerModelPath = posTaggerModel;
+        POS_TAGGER_MODEL_PATH = posTaggerModel;
 
         if (nerModels != null) {
             if (nerModels.isEmpty()) {
-                nerModels.add("edu/stanford/nlp/models/ner/english.all.3class.distsim.crf.ser.gz");
-                nerModels.add("edu/stanford/nlp/models/ner/english.muc.7class.distsim.crf.ser.gz");
+                nerModels.add(StanfordConst.STANFORD_DEFAULT_NER_3CLASS_EN_MODEL);
+                nerModels.add(StanfordConst.STANFORD_DEFAULT_NER_7CLASS_EN_MODEL);
             }
 
-            // STUPID NER, Throw IOException in the constructor ... : (
+            // STUPID NER, throw IOException in the constructor ... : (
             ners = nerModels.stream().map(path -> {
                 NERClassifierCombiner nerClassifierCombiner = null;
                 try {

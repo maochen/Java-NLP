@@ -8,13 +8,14 @@ import org.maochen.nlp.parser.DTree;
 import org.maochen.nlp.parser.IParser;
 import org.maochen.nlp.parser.stanford.nn.StanfordNNDepParser;
 import org.maochen.nlp.parser.stanford.pcfg.StanfordPCFGParser;
+import org.maochen.nlp.parser.stanford.util.StanfordConst;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import edu.stanford.nlp.parser.nndep.DependencyParser;
 import edu.stanford.nlp.trees.Tree;
 
 import static junit.framework.Assert.assertEquals;
@@ -44,53 +45,44 @@ public class StanfordParserTest {
         });
     }
 
-    public static void main1(String[] args) {
-        String modelFile = "/Users/mguan/workspace/ameliang/ameliang/amelia-nlp/src/main/resources/models/englishPCFG.ser.gz";
-        String posTaggerModel = null;//"/Users/mguan/workspace/nlpservice/nlp-service-remote/src/main/resources/classifierData
-        // /english-left3words-distsim.tagger";
-        StanfordPCFGParser parser = new StanfordPCFGParser(modelFile, posTaggerModel, new ArrayList<>());
-
-        Scanner scan = new Scanner(System.in);
-        String input = StringUtils.EMPTY;
-
-        String quitRegex = "q|quit|exit";
-        while (!input.matches(quitRegex)) {
-            System.out.println("Please enter sentence:");
-            input = scan.nextLine();
-            if (!input.trim().isEmpty() && !input.matches(quitRegex)) {
-                // System.out.println(parser.parse(input).toString());
-                Table<DTree, Tree, Double> trees = parser.getKBestParse(input, 3);
-
-                List<Table.Cell<DTree, Tree, Double>> results = trees.cellSet().parallelStream().collect(Collectors.toList());
-                results.sort((o1, o2) -> Double.compare(o2.getValue(), o1.getValue()));
-                for (Table.Cell<DTree, Tree, Double> entry : results) {
-                    System.out.println("--------------------------");
-                    System.out.println(entry.getValue());
-                    System.out.println(entry.getColumnKey().pennString());
-                    System.out.println(StringUtils.EMPTY);
-                    System.out.println(entry.getRowKey());
-                }
-
-            }
-        }
-    }
-
     public static void main(String[] args) {
-        String model = "/Users/mguan/workspace/ameliang/ameliang/amelia-nlp/src/main/resources/models/NNDep.model";
-        IParser parser = new StanfordNNDepParser(model, null, null);//new ArrayList<>());
+        boolean usePCFG = true;
+        StanfordPCFGParser pcfgParser = null;
+        IParser nnParser = null;
+
+        if (usePCFG) {
+            pcfgParser = new StanfordPCFGParser(StanfordConst.STANFORD_DEFAULT_PCFG_EN_MODEL, null, null);
+        } else {
+            nnParser = new StanfordNNDepParser(DependencyParser.DEFAULT_MODEL, null, null);
+        }
 
         Scanner scan = new Scanner(System.in);
         String input = StringUtils.EMPTY;
+
         String quitRegex = "q|quit|exit";
         while (!input.matches(quitRegex)) {
             System.out.println("Please enter sentence:");
             input = scan.nextLine();
             if (!input.trim().isEmpty() && !input.matches(quitRegex)) {
-                DTree tree = parser.parse(input);
-                System.out.println(tree);
+
+                if (usePCFG) {
+                    // System.out.println(parser.parse(input).toString());
+                    Table<DTree, Tree, Double> trees = pcfgParser.getKBestParse(input, 3);
+
+                    List<Table.Cell<DTree, Tree, Double>> results = trees.cellSet().parallelStream().collect(Collectors.toList());
+                    results.sort((o1, o2) -> Double.compare(o2.getValue(), o1.getValue()));
+                    for (Table.Cell<DTree, Tree, Double> entry : results) {
+                        System.out.println("--------------------------");
+                        System.out.println(entry.getValue());
+                        System.out.println(entry.getColumnKey().pennString());
+                        System.out.println(StringUtils.EMPTY);
+                        System.out.println(entry.getRowKey());
+                    }
+                } else {
+                    DTree tree = nnParser.parse(input);
+                    System.out.println(tree);
+                }
             }
         }
-
     }
-
 }

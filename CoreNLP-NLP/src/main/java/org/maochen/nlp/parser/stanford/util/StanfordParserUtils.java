@@ -1,5 +1,8 @@
-package org.maochen.nlp.parser;
+package org.maochen.nlp.parser.stanford.util;
 
+import org.maochen.nlp.parser.DNode;
+import org.maochen.nlp.parser.DTree;
+import org.maochen.nlp.parser.LangTools;
 import org.maochen.nlp.parser.stanford.StanfordParser;
 import org.maochen.nlp.parser.stanford.nn.StanfordNNDepParser;
 import org.maochen.nlp.parser.stanford.pcfg.StanfordTreeBuilder;

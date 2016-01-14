@@ -7,6 +7,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.maochen.nlp.parser.DTree;
 import org.maochen.nlp.parser.stanford.StanfordParser;
+import org.maochen.nlp.parser.stanford.util.StanfordConst;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -142,7 +143,7 @@ public class StanfordPCFGParser extends StanfordParser {
 
     public StanfordPCFGParser(String modelPath, String posTaggerModel, List<String> ners) {
         if (modelPath == null || modelPath.trim().isEmpty()) {
-            modelPath = "edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz"; // Default PCFG model.
+            modelPath = StanfordConst.STANFORD_DEFAULT_PCFG_EN_MODEL;
         }
 
         parser = LexicalizedParser.loadModel(modelPath, new ArrayList<>());

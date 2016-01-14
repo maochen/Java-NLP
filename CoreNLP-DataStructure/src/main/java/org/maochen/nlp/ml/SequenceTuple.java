@@ -1,9 +1,9 @@
 package org.maochen.nlp.ml;
 
+import org.maochen.nlp.ml.vector.IVector;
 import org.maochen.nlp.ml.vector.LabeledVector;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -49,7 +49,7 @@ public class SequenceTuple {
 
         featMap.entrySet().forEach(entry -> matrix[entry.getKey()] = entry.getValue().stream().toArray(String[]::new));
 
-        Tuple[] tuples = new Tuple[dimensions[0]];
+        List<Tuple> tuples = new ArrayList<>(dimensions[0]);
 
         for (int col = 0; col < dimensions[0]; col++) {
             List<String> featString = new ArrayList<>();
@@ -57,12 +57,11 @@ public class SequenceTuple {
                 featString.add(matrix[row][col]);
             }
 
-            LabeledVector v = new LabeledVector(featString.stream().toArray(String[]::new));
-            tuples[col] = new Tuple(v);
-            tuples[col].label = tags.get(col);
+            IVector v = new LabeledVector(featString.stream().toArray(String[]::new));
+            tuples.add(new Tuple(0, v, tags.get(col)));
         }
 
-        this.entries = Arrays.asList(tuples);
+        this.entries = tuples;
     }
 
     public List<String> getLabel() {
