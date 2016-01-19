@@ -13,5 +13,7 @@ NLP classifiers and tools (Since 03/03/2013)
 	<li>Stanford Parser adapter to the Tree structure</li>
 </ul>
 
+This is a GNU license based project since it inherit Stanford CoreNLP's functionality.<br />
+
 Maochen<br />
 12/13/2014
