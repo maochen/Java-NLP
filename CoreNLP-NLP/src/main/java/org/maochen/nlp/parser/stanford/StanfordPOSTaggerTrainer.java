@@ -1,16 +1,10 @@
 package org.maochen.nlp.parser.stanford;
 
-import edu.stanford.nlp.io.ExtensionFileFilter;
-import edu.stanford.nlp.io.NumberRangeFileFilter;
-import edu.stanford.nlp.ling.Sentence;
-import edu.stanford.nlp.tagger.maxent.MaxentTagger;
-import edu.stanford.nlp.tagger.maxent.TaggerConfig;
-import edu.stanford.nlp.trees.BobChrisTreeNormalizer;
-import edu.stanford.nlp.trees.DiskTreebank;
-import edu.stanford.nlp.trees.Tree;
-import edu.stanford.nlp.trees.TreeNormalizer;
-
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
@@ -21,6 +15,16 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
+
+import edu.stanford.nlp.io.ExtensionFileFilter;
+import edu.stanford.nlp.io.NumberRangeFileFilter;
+import edu.stanford.nlp.ling.Sentence;
+import edu.stanford.nlp.tagger.maxent.MaxentTagger;
+import edu.stanford.nlp.tagger.maxent.TaggerConfig;
+import edu.stanford.nlp.trees.BobChrisTreeNormalizer;
+import edu.stanford.nlp.trees.DiskTreebank;
+import edu.stanford.nlp.trees.Tree;
+import edu.stanford.nlp.trees.TreeNormalizer;
 
 /**
  * Created by Maochen on 4/20/15.
@@ -89,7 +93,7 @@ public class StanfordPOSTaggerTrainer {
         Properties props = new Properties();
         props.setProperty("mode", TaggerConfig.Mode.TRAIN.toString());
         props.setProperty("model", outputModelPath);
-        props.setProperty("trainFile", tempLocation);
+        props.setProperty("trainFile", "format=TSV,wordColumn=1,tagColumn=4," + tempLocation);
         props.setProperty("wordFunction", "edu.stanford.nlp.process.AmericanizeFunction");
         props.setProperty("closedClassTagThreshold", "40");
         props.setProperty("curWordMinFeatureThresh", "2");
@@ -110,8 +114,9 @@ public class StanfordPOSTaggerTrainer {
         props.setProperty("veryCommonWordThresh", "250");
         props.setProperty("outputFormat", "slashTags");
         props.setProperty("nthreads", "8");
-        props.setProperty("tagSeparator", "_");
+        props.setProperty("tagSeparator", "\t");
         props.setProperty("arch", "left3words,naacl2003unknowns,wordshapes(-1,1),distsim(" + egw4_reut_512_clusters + ",-1,1),distsimconjunction(" + egw4_reut_512_clusters + ",-1,1)");
+
         TaggerConfig config = new TaggerConfig(props);
 
 

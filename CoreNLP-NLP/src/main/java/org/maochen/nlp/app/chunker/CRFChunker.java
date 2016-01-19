@@ -8,6 +8,7 @@ import org.maochen.nlp.ml.classifier.crfsuite.CRFClassifier;
 import org.maochen.nlp.ml.util.TrainingDataUtils;
 import org.maochen.nlp.ml.vector.IVector;
 import org.maochen.nlp.ml.vector.LabeledVector;
+import org.maochen.nlp.parser.stanford.util.StanfordConst;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,7 +95,7 @@ public class CRFChunker extends CRFClassifier {
         }
 
         System.out.println("Err/Total:\t" + errCount + "/" + total);
-        System.out.println("Accurancy:\t" + (1 - (errCount / (double) total)) * 100 + "%");
+        System.out.println("Accuracy:\t" + (1 - (errCount / (double) total)) * 100 + "%");
     }
 
 
@@ -145,7 +146,7 @@ public class CRFChunker extends CRFClassifier {
 
         chunker.validate("/Users/mguan/workspace/nlp-service_training-data/corpora/CoNLL_Shared_Task/CoNLL_2000_Chunking/test.txt");
 
-        MaxentTagger posTagger = new MaxentTagger("edu/stanford/nlp/models/pos-tagger/english-left3words/english-left3words-distsim.tagger");
+        MaxentTagger posTagger = new MaxentTagger(StanfordConst.STANFORD_DEFAULT_POS_EN_MODEL);
         Scanner scan = new Scanner(System.in);
         String input = StringUtils.EMPTY;
         String quitRegex = "q|quit|exit";
