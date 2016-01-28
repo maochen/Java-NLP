@@ -1,6 +1,7 @@
 package org.maochen.nlp.util;
 
 import java.util.Arrays;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
@@ -33,7 +34,7 @@ public class VectorUtils {
         return Arrays.stream(result).parallel().sum();
     }
 
-    private static double vectorLen(double[] vector) {
+    public static double vectorLen(double[] vector) {
 //        double sum = Arrays.stream(vector).parallel().map(x -> x * x).sum();
         double sum = 0;
         for (double d : vector) {
@@ -69,13 +70,6 @@ public class VectorUtils {
         return probability;
     }
 
-    public static Function<Double, Double> sigmoid = z -> 1 / (1 + Math.exp(-z));   // This is for p(s=1)
-
-    public static Function<Double, Double> tanh = z -> {
-        double e2z = Math.exp(2 * z);
-        return (e2z - 1) / (e2z + 1);
-    };
-
     public static float[] doubleToFloat(final double[] vector) {
         float[] result = new float[vector.length];
         for (int i = 0; i < vector.length; i++) {
@@ -103,5 +97,15 @@ public class VectorUtils {
         return result;
 //        return Arrays.stream(vectorIndex).parallel().mapToObj(String::valueOf).toArray(String[]::new);
     }
+
+    public static Function<Double, Double> sigmoid = z -> 1 / (1 + Math.exp(-z));   // This is for p(s=1)
+
+    public static Function<Double, Double> tanh = z -> {
+        double e2z = Math.exp(2 * z);
+        return (e2z - 1) / (e2z + 1);
+    };
+
+    public static final BiFunction<double[], double[], Double> euclideanDistance = (v1, v2) ->
+            Math.sqrt(Arrays.stream(VectorUtils.zip(v1, v2, (x1, y1) -> Math.pow(x1 - y1, 2))).sum());
 
 }
