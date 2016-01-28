@@ -2,40 +2,25 @@ package org.maochen.nlp.util;
 
 import java.util.Arrays;
 import java.util.function.Function;
-import java.util.stream.IntStream;
 
 /**
- * Copyright 2014-2015 maochen.org
- * Author: Maochen.G   contact@maochen.org
- * For the detail information about license, check the LICENSE.txt
- * <p>
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
- * <p>
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * <p>
- * You should have received a copy of the GNU General Public License
- * along with this program ; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston,
- * MA  02111-1307 USA
- * <p>
  * Created by Maochen on 12/3/14.
  */
 public class VectorUtils {
 
     public static double[] zip(final double[] vec1, final double[] vec2, BiFunctionDoublePrimitive op) {
-        if (vec1 == null || vec2 == null) return new double[0];
+        if (vec1 == null || vec2 == null) {
+            return new double[0];
+        }
         if (vec1.length != vec2.length) {
             throw new IllegalArgumentException("Two Vectors must has equal length.");
         }
 
         double[] result = new double[vec1.length];
-        IntStream.range(0, vec1.length).forEach(i -> result[i] = op.apply(vec1[i], vec2[i]));
+//        IntStream.range(0, vec1.length).forEach(i -> result[i] = op.apply(vec1[i], vec2[i]));
+        for (int i = 0; i < vec1.length; i++) {
+            result[i] = op.apply(vec1[i], vec2[i]);
+        }
         return result;
     }
 
@@ -49,21 +34,31 @@ public class VectorUtils {
     }
 
     private static double vectorLen(double[] vector) {
-        double len = Arrays.stream(vector).parallel().map(x -> x * x).sum();
-        return Math.sqrt(len);
+//        double sum = Arrays.stream(vector).parallel().map(x -> x * x).sum();
+        double sum = 0;
+        for (double d : vector) {
+            sum += d * d;
+        }
+
+        return Math.sqrt(sum);
     }
 
     // cos(theta) = A . B / ||A|| ||B||
     public static double getCosinValue(double[] vector1, double[] vector2) {
-        if (vector1 == null || vector2 == null) return 0;
+        if (vector1 == null || vector2 == null) {
+            return 0;
+        }
         double dotProduct = VectorUtils.dotProduct(vector1, vector2);
         double euclideanDistance = VectorUtils.vectorLen(vector1) * VectorUtils.vectorLen(vector2);
         double cosineValue = Math.abs(dotProduct / euclideanDistance);
         return cosineValue > 1.0D ? 1.0D : cosineValue;  // because of the precision error
     }
 
-    public static double[] scale(final double[] a, double scale) {
-        return Arrays.stream(a).parallel().map(x -> x * scale).toArray();
+    public static void scale(final double[] a, double scale) {
+        for (int i = 0; i < a.length; i++) {
+            a[i] = a[i] * scale;
+        }
+//        return Arrays.stream(a).parallel().map(x -> x * scale).toArray();
     }
 
     public static double gaussianPDF(double mean, double variance, double x) {
@@ -81,20 +76,32 @@ public class VectorUtils {
         return (e2z - 1) / (e2z + 1);
     };
 
-    public static float[] doubleToFloat(double[] vector) {
+    public static float[] doubleToFloat(final double[] vector) {
         float[] result = new float[vector.length];
-        IntStream.range(0, vector.length).parallel().forEach(i -> result[i] = (float) vector[i]);
+        for (int i = 0; i < vector.length; i++) {
+            result[i] = (float) vector[i];
+        }
+
+//        IntStream.range(0, vector.length).parallel().forEach(i -> result[i] = (float) vector[i]);
         return result;
     }
 
     public static double[] floatToDouble(float[] vector) {
         double[] result = new double[vector.length];
-        IntStream.range(0, vector.length).parallel().forEach(i -> result[i] = vector[i]);
+        for (int i = 0; i < vector.length; i++) {
+            result[i] = vector[i];
+        }
+//        IntStream.range(0, vector.length).parallel().forEach(i -> result[i] = vector[i]);
         return result;
     }
 
     public static String[] intToString(int[] vectorIndex) {
-        return Arrays.stream(vectorIndex).parallel().mapToObj(String::valueOf).toArray(String[]::new);
+        String[] result = new String[vectorIndex.length];
+        for (int i = 0; i < vectorIndex.length; i++) {
+            result[i] = String.valueOf(vectorIndex[i]);
+        }
+        return result;
+//        return Arrays.stream(vectorIndex).parallel().mapToObj(String::valueOf).toArray(String[]::new);
     }
 
 }

@@ -19,12 +19,11 @@ public class Viterbi {
     private static final Logger LOG = LoggerFactory.getLogger(Viterbi.class);
 
     public static List<String> resolve(HMMModel model, String[] words) {
-        Set<String> tagSet = Arrays.stream(words).map(x -> model.emission.row(x).keySet()).reduce((s1, s2) -> {
-            Set<String> s = new HashSet<>();
-            s.addAll(s1);
-            s.addAll(s2);
-            return s;
-        }).orElse(null);
+        Set<String> tagSet = new HashSet<>();
+
+        for (String word : words) {
+            tagSet.addAll(model.emission.row(word).keySet());
+        }
 
         List<String> tags = new ArrayList<>(tagSet);
         tags.add(0, HMM.START);
@@ -40,10 +39,11 @@ public class Viterbi {
 
         matrix[0][0] = 1;
         for (int col = 1; col < matrix[0].length; col++) {
+            String word = colString.get(col);
+
             for (int row = 1; row < matrix.length; row++) {
 
                 String currentTag = rowString.get(row);
-                String word = colString.get(col);
 
                 for (int prevRow = 0; prevRow < matrix.length; prevRow++) {
                     if (matrix[prevRow][col - 1] == 0) {

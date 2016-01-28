@@ -86,7 +86,7 @@ public class StanfordPCFGParser extends StanfordParser {
     private GrammaticalStructure tagDependencies(Tree tree, boolean makeCopulaVerbHead) {
         SemanticHeadFinder headFinder = new SemanticHeadFinder(!makeCopulaVerbHead); // keep copula verbs as head
         // string -> true return all tokens including punctuations.
-        GrammaticalStructure gs = new EnglishGrammaticalStructure(tree, string -> true, headFinder, true);
+        GrammaticalStructure gs = new EnglishGrammaticalStructure(tree, string -> true, headFinder);
         return gs;
     }
 

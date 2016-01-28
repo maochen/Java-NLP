@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -99,9 +98,8 @@ public class HMM {
         HMMModel model = new HMMModel();
 
         for (SequenceTuple seqTuple : data) {
-            LabeledVector vector = (LabeledVector) seqTuple.entries.get(WORD_INDEX).vector;
-            List<String> words = new ArrayList<>(Arrays.asList(vector.featsName));
-            List<String> tag = seqTuple.tag;
+            List<String> words = seqTuple.entries.stream().map(entry -> ((LabeledVector) entry.vector).featsName[WORD_INDEX]).collect(Collectors.toList());
+            List<String> tag = seqTuple.getLabel();
 
             words.add(0, START);
             words.add(END);
@@ -109,15 +107,15 @@ public class HMM {
             tag.add(END);
 
             for (int i = 0; i < words.size(); i++) {
-                Double ct = model.emission.get(words.get(i), seqTuple.tag.get(i));
+                Double ct = model.emission.get(words.get(i), tag.get(i));
                 ct = ct == null ? 1 : ct + 1;
-                model.emission.put(words.get(i), seqTuple.tag.get(i), ct);
+                model.emission.put(words.get(i), tag.get(i), ct);
             }
 
-            for (int i = 0; i < seqTuple.tag.size() - 1; i++) {
-                Double ct = model.transition.get(seqTuple.tag.get(i), seqTuple.tag.get(i + 1));
+            for (int i = 0; i < seqTuple.entries.size() - 1; i++) {
+                Double ct = model.transition.get(tag.get(i), tag.get(i + 1));
                 ct = ct == null ? 1 : ct + 1;
-                model.transition.put(seqTuple.tag.get(i), seqTuple.tag.get(i + 1), ct);
+                model.transition.put(tag.get(i), tag.get(i + 1), ct);
             }
         }
 
@@ -135,15 +133,15 @@ public class HMM {
         int totalCount = 0;
         int errCount = 0;
 
-        for (SequenceTuple tuple : testData) {
-            List<String> result = viterbi(model, ((LabeledVector) tuple.entries.get(WORD_INDEX).vector).featsName);
+        for (SequenceTuple sequenceTuple : testData) {
+            String[] words = sequenceTuple.entries.stream().map(entry -> ((LabeledVector) entry.vector).featsName[WORD_INDEX]).toArray(String[]::new);
+            List<String> result = viterbi(model, words);
 
             for (int i = 0; i < result.size(); i++) {
                 totalCount++;
-                String expected = WordUtils.normalizeTag(tuple.tag.get(i));
+                String expected = WordUtils.normalizeTag(sequenceTuple.entries.get(i).label);
                 String actual = WordUtils.normalizeTag(result.get(i));
                 if (!(actual.startsWith(expected) || expected.startsWith(actual))) {
-                    String[] words = ((LabeledVector) tuple.entries.get(WORD_INDEX).vector).featsName;
                     System.out.println(words[i] + " exp: " + expected + " actual: " + result.get(i));
                     errCount++;
                 }
@@ -183,7 +181,8 @@ public class HMM {
         HMMModel model = train(data);
         eval(model, prefix + "/training.pos", "\t", 0, 1);
 
-        String str = "The quick brown fox jumped over the lazy dog";
+        // Please add dot in the end. All training data ends with dot, so the transition from anything other than dot to <END> is 0
+        String str = "The quick brown fox jumped over the lazy dog .";
         List<String> result = viterbi(model, str.split("\\s"));
         System.out.println(str);
         System.out.println(result);

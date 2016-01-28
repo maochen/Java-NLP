@@ -33,7 +33,7 @@ final class NBTrainingEngine {
         for (int i = 0; i < model.meanVectors.length; i++) {
             // Get each label and normalize
             double[] meanVector = model.meanVectors[i]; // feat(label)
-            meanVector = VectorUtils.scale(meanVector, 1.0 / count[i]);
+            VectorUtils.scale(meanVector, 1.0 / count[i]);
             model.meanVectors[i] = meanVector;
         }
 
@@ -61,7 +61,7 @@ final class NBTrainingEngine {
         for (int i = 0; i < model.varianceVectors.length; i++) {
             double[] varianceVector = model.varianceVectors[i];
             // Denominator is Sample Var instead of Population Var
-            varianceVector = VectorUtils.scale(varianceVector, 1.0 / (count[i] - 1));
+            VectorUtils.scale(varianceVector, 1.0 / (count[i] - 1));
             model.varianceVectors[i] = varianceVector;
         }
 
