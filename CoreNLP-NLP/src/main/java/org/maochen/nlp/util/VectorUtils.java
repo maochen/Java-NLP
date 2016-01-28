@@ -26,12 +26,18 @@ public class VectorUtils {
     }
 
     public static double[] addition(final double[]... vectors) {
-        return Arrays.stream(vectors).reduce((vec1, vec2) -> zip(vec1, vec2, (f1, f2) -> f1 + f2)).orElse(null);
+        return Arrays.stream(vectors).filter(x -> x != null && x.length > 0)
+                .reduce((vec1, vec2) -> zip(vec1, vec2, (f1, f2) -> f1 + f2)).orElse(null);
     }
 
     public static double dotProduct(final double[] vec1, final double[] vec2) {
-        double[] result = zip(vec1, vec2, (f1, f2) -> f1 * f2);
-        return Arrays.stream(result).parallel().sum();
+        double sum = 0;
+        for (int i = 0; i < vec1.length; i++) {
+            sum += vec1[i] * vec2[i];
+        }
+
+        return sum;
+//        return Arrays.stream(result).sum();
     }
 
     public static double vectorLen(double[] vector) {
