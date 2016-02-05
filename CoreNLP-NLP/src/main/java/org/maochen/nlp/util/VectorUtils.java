@@ -26,8 +26,20 @@ public class VectorUtils {
     }
 
     public static double[] addition(final double[]... vectors) {
-        double[] result = new double[vectors[0].length];
+        int dim = 0;
+        for (double[] vector : vectors) {
+            if (vector != null && vector.length != 0) {
+                dim = vector.length;
+                break;
+            }
+        }
+
+        double[] result = new double[dim];
+
         for (int i = 0; i < vectors.length; i++) {
+            if (vectors[i] == null || vectors[i].length == 0) {
+                continue;
+            }
             for (int dimension = 0; dimension < vectors[i].length; dimension++) {
                 result[dimension] += vectors[i][dimension];
             }
