@@ -27,7 +27,8 @@ final class NBTrainingEngine {
         for (Tuple t : trainingData) {
             int index = model.labelIndexer.getIndex(t.label);
             count[index]++;
-            model.meanVectors[index] = VectorUtils.zip(model.meanVectors[index], t.vector.getVector(), (x, y) -> x + y);
+            model.meanVectors[index] = VectorUtils.addition(model.meanVectors[index], t.vector.getVector());
+//                    VectorUtils.zip(model.meanVectors[index], t.vector.getVector(), (x, y) -> x + y); // Performance
         }
 
         for (int i = 0; i < model.meanVectors.length; i++) {
@@ -51,10 +52,15 @@ final class NBTrainingEngine {
     private void calculateVariance() {
         for (Tuple t : trainingData) {
             int index = model.labelIndexer.getIndex(t.label);
-            double[] diff = VectorUtils.zip(t.vector.getVector(), model.meanVectors[index], (x, y) -> x - y);
+
+            double[] meanVector = Arrays.copyOf(model.meanVectors[index], model.meanVectors[index].length);
+            VectorUtils.scale(meanVector, -1);
+            double[] diff = VectorUtils.addition(t.vector.getVector(), meanVector);
+//                    VectorUtils.zip(t.vector.getVector(), model.meanVectors[index], (x, y) -> x - y);
             diff = Arrays.stream(diff).map(x -> x * x).toArray();
 
-            double[] varianceVector = VectorUtils.zip(model.varianceVectors[index], diff, (x, y) -> x + y);
+            double[] varianceVector = VectorUtils.addition(model.varianceVectors[index], diff);
+            //  VectorUtils.zip(model.varianceVectors[index], diff, (x, y) -> x + y);
             model.varianceVectors[index] = varianceVector;
         }
 
