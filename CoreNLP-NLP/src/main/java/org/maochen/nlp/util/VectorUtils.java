@@ -1,6 +1,5 @@
 package org.maochen.nlp.util;
 
-import java.util.Arrays;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -131,7 +130,17 @@ public class VectorUtils {
         return (e2z - 1) / (e2z + 1);
     };
 
-    public static final BiFunction<double[], double[], Double> euclideanDistance = (v1, v2) ->
-            Math.sqrt(Arrays.stream(VectorUtils.zip(v1, v2, (x1, y1) -> Math.pow(x1 - y1, 2))).sum());
+    public static final BiFunction<double[], double[], Double> euclideanDistance = (v1, v2) -> {
+        double result = 0;
 
+        for (int i = 0; i < v1.length; i++) {
+            double diff = v1[i] - v2[i];
+            diff *= diff;
+            result += diff;
+        }
+
+        result = Math.sqrt(result);
+        return result;
+//         Math.sqrt(Arrays.stream(VectorUtils.zip(v1, v2, (x1, y1) -> Math.pow(x1 - y1, 2))).sum());
+    };
 }
