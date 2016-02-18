@@ -1,5 +1,6 @@
 package org.maochen.nlp.parser.stanford.util;
 
+import org.apache.commons.lang3.StringUtils;
 import org.maochen.nlp.parser.DNode;
 import org.maochen.nlp.parser.DTree;
 import org.maochen.nlp.parser.LangTools;
@@ -10,6 +11,8 @@ import org.maochen.nlp.parser.stanford.pcfg.StanfordTreeBuilder;
 import java.io.FileFilter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -18,6 +21,11 @@ import java.util.stream.Collectors;
 
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
+import edu.stanford.nlp.process.CoreLabelTokenFactory;
+import edu.stanford.nlp.process.PTBTokenizer;
+import edu.stanford.nlp.process.Tokenizer;
+import edu.stanford.nlp.process.TokenizerFactory;
+import edu.stanford.nlp.process.WordToSentenceProcessor;
 import edu.stanford.nlp.trees.DiskTreebank;
 import edu.stanford.nlp.trees.EnglishGrammaticalStructure;
 import edu.stanford.nlp.trees.SemanticHeadFinder;
@@ -28,6 +36,36 @@ import edu.stanford.nlp.trees.TypedDependency;
  * Created by Maochen on 4/6/15.
  */
 public class StanfordParserUtils {
+
+    public static List<String> tokenize(final String sentence) {
+        if (sentence == null) {
+            return null;
+        }
+
+        List<CoreLabel> coreLabels = StanfordParser.stanfordTokenize(sentence);
+        return coreLabels.stream().map(CoreLabel::word).collect(Collectors.toList());
+    }
+
+    public static List<String> segmenter(final String blob) {
+        if (blob == null) {
+            return null;
+        }
+
+        TokenizerFactory<CoreLabel> tokenizerFactory = PTBTokenizer
+                .factory(new CoreLabelTokenFactory(), "normalizeCurrency=false,ptb3Escaping=false");
+
+        Tokenizer<CoreLabel> tokenizer = tokenizerFactory.getTokenizer(new StringReader(blob));
+        List<CoreLabel> tokens = new ArrayList<>();
+        while (tokenizer.hasNext()) {
+            tokens.add(tokenizer.next());
+        }
+
+        List<String> sentenceList = new WordToSentenceProcessor<CoreLabel>().process(tokens).stream()
+                .map(coreLabelList -> coreLabelList.stream().map(CoreLabel::word).collect(Collectors.joining(StringUtils.SPACE))
+                ).collect(Collectors.toList());
+
+        return sentenceList;
+    }
 
     public static DTree getDTreeFromCoreNLP(Collection<TypedDependency> deps, List<CoreLabel> tokens) {
         Map<Integer, TypedDependency> indexedDeps = new HashMap<>(deps.size());
