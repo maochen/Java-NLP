@@ -1,6 +1,5 @@
 package org.maochen.nlp.parser.stanford.util;
 
-import org.apache.commons.lang3.StringUtils;
 import org.maochen.nlp.parser.DNode;
 import org.maochen.nlp.parser.DTree;
 import org.maochen.nlp.parser.LangTools;
@@ -60,10 +59,17 @@ public class StanfordParserUtils {
             tokens.add(tokenizer.next());
         }
 
-        List<String> sentenceList = new WordToSentenceProcessor<CoreLabel>().process(tokens).stream()
-                .map(coreLabelList -> coreLabelList.stream().map(CoreLabel::word).collect(Collectors.joining(StringUtils.SPACE))
-                ).collect(Collectors.toList());
+        List<List<CoreLabel>> sentences = new WordToSentenceProcessor<CoreLabel>().process(tokens);
 
+        int end;
+        int start = 0;
+        List<String> sentenceList = new ArrayList<>();
+
+        for (List<CoreLabel> sentence : sentences) {
+            end = sentence.get(sentence.size() - 1).endPosition();
+            sentenceList.add(blob.substring(start, end).trim());
+            start = end;
+        }
         return sentenceList;
     }
 
