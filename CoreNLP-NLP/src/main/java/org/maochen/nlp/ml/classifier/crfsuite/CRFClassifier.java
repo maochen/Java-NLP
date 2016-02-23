@@ -234,7 +234,10 @@ public class CRFClassifier implements ISeqClassifier {
             throw new IllegalArgumentException("Please set model path parameter to load model");
         } else {
             tagger = new Tagger();
-            tagger.open(modelPath);
+            boolean ret = tagger.open(modelPath);
+            if (!ret) {
+                LOG.error("Unable load model: " + modelPath);
+            }
         }
     }
 

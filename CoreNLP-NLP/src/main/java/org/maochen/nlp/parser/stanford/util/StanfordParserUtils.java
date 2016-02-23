@@ -42,7 +42,7 @@ public class StanfordParserUtils {
         }
 
         List<CoreLabel> coreLabels = StanfordParser.stanfordTokenize(sentence);
-        return coreLabels.stream().map(CoreLabel::word).collect(Collectors.toList());
+        return coreLabels.stream().map(CoreLabel::originalText).collect(Collectors.toList());
     }
 
     public static List<String> segmenter(final String blob) {

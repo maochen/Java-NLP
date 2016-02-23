@@ -30,7 +30,7 @@ public class ChunkerFeatureExtractorTest {
 
     @Test
     public void testExtractFeatFromString() {
-        List<String> feats = ChunkerFeatureExtractor.extractFeatSingle(3, MOCK_TOKENS, MOCK_POS);
+        List<String> feats = new ChunkerFeatureExtractor().extractFeatSingle(3, MOCK_TOKENS, MOCK_POS);
 
         assertEquals(39, feats.size());
 //        assertTrue(feats.contains("pos-10+1=DT_NN_NNS"));
@@ -106,7 +106,7 @@ public class ChunkerFeatureExtractorTest {
         feats.put(ChunkerFeatureExtractor.POS_INDEX, Arrays.asList(MOCK_POS));
         SequenceTuple st = new SequenceTuple(feats, Arrays.asList(MOCK_TAGS));
 
-        List<Tuple> tuples = ChunkerFeatureExtractor.extractFeat(st);
+        List<Tuple> tuples = new ChunkerFeatureExtractor().extractFeat(st);
 
         assertEquals(7, tuples.size());
 

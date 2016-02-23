@@ -23,6 +23,14 @@ public class StanfordParserUtilsTest {
     }
 
     @Test
+    public void testTokenizer2() {
+        String sentence = "<ENAMEX TYPE=\"PERSON\">Danasia</ENAMEX> was traveling.";
+        List<String> result = StanfordParserUtils.tokenize(sentence);
+        assertEquals(6, result.size());
+        assertEquals("<ENAMEX TYPE=\"PERSON\">", result.get(0));
+    }
+
+    @Test
     public void testSegmenter() {
         String blob = "I have a \"car\". T.J. Watson is located in (NYC).";
 

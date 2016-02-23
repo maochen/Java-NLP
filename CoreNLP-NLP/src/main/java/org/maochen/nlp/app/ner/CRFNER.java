@@ -1,4 +1,4 @@
-package org.maochen.nlp.app.chunker;
+package org.maochen.nlp.app.ner;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -9,7 +9,6 @@ import org.maochen.nlp.ml.classifier.crfsuite.CRFClassifier;
 import org.maochen.nlp.ml.util.TrainingDataUtils;
 import org.maochen.nlp.ml.vector.IVector;
 import org.maochen.nlp.ml.vector.LabeledVector;
-import org.maochen.nlp.parser.stanford.util.StanfordConst;
 import org.maochen.nlp.util.ValidationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,30 +18,27 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
-import edu.stanford.nlp.ling.CoreLabel;
-import edu.stanford.nlp.ling.TaggedWord;
-import edu.stanford.nlp.tagger.maxent.MaxentTagger;
-
 /**
- * Created by Maochen on 11/10/15.
+ * Created by Maochen on 2/22/16.
  */
-public class CRFChunker extends CRFClassifier {
+public class CRFNER extends CRFClassifier {
 
-    private static final Logger LOG = LoggerFactory.getLogger(CRFChunker.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CRFNER.class);
 
     public static String TRAIN_FILE_DELIMITER = "\t";
+    public static final int TRAIN_FILE_TAG_COL = 1;
 
     public IFeatureExtractor featureExtractor;
 
     public void train(final String trainFilePath) throws FileNotFoundException {
+
         // Preparing training data
-        List<SequenceTuple> trainingData = TrainingDataUtils.readSeqFile(new FileInputStream(new File(trainFilePath)), TRAIN_FILE_DELIMITER, 2);
+        List<SequenceTuple> trainingData = TrainingDataUtils.readSeqFile(new FileInputStream(new File(trainFilePath)), TRAIN_FILE_DELIMITER, TRAIN_FILE_TAG_COL);
         // -----------
         LOG.info("Loaded Training data.");
 
@@ -53,11 +49,11 @@ public class CRFChunker extends CRFClassifier {
         super.train(trainingData);
     }
 
-    public SequenceTuple predict(final String[] words, final String[] pos) {
+    public SequenceTuple predict(final String[] words) {
         SequenceTuple st = new SequenceTuple();
         st.entries = new ArrayList<>();
         for (int i = 0; i < words.length; i++) {
-            IVector v = new LabeledVector(new String[]{words[i], pos[i]});
+            IVector v = new LabeledVector(new String[]{words[i]});
             st.entries.add(new Tuple(v));
         }
 
@@ -73,17 +69,16 @@ public class CRFChunker extends CRFClassifier {
     }
 
     public void validate(String testFile) throws FileNotFoundException {
-        List<SequenceTuple> testData = TrainingDataUtils.readSeqFile(new FileInputStream(new File(testFile)), TRAIN_FILE_DELIMITER, 2);
+        List<SequenceTuple> testData = TrainingDataUtils.readSeqFile(new FileInputStream(new File(testFile)), TRAIN_FILE_DELIMITER, TRAIN_FILE_TAG_COL);
         int errCount = 0;
         int total = 0;
 
         for (SequenceTuple st : testData) {
             total += st.entries.size();
             List<String> expectedTags = new ArrayList<>(st.getLabel());
-            String[] words = st.entries.stream().map(x -> ((LabeledVector) x.vector).featsName[ChunkerFeatureExtractor.WORD_INDEX]).toArray(String[]::new);
-            String[] pos = st.entries.stream().map(x -> ((LabeledVector) x.vector).featsName[ChunkerFeatureExtractor.POS_INDEX]).toArray(String[]::new);
+            String[] words = st.entries.stream().map(x -> ((LabeledVector) x.vector).featsName[0]).toArray(String[]::new);
 
-            st = predict(words, pos);
+            st = predict(words);
 
             boolean isThisSeqPrinted = false;
             for (int i = 0; i < expectedTags.size(); i++) {
@@ -103,11 +98,9 @@ public class CRFChunker extends CRFClassifier {
     }
 
     public static void main(String[] args) throws IOException {
-        CRFChunker chunker = new CRFChunker();
-        chunker.featureExtractor = new ChunkerFeatureExtractor();
-
-        CRFChunker.TRAIN_FILE_DELIMITER = StringUtils.SPACE;
-        String modelPath = "/Users/mguan/Desktop/chunker.crf.model";
+        CRFNER ner = new CRFNER();
+        ner.featureExtractor = new NERFeatureExtractor();
+        String modelPath = "/Users/mguan/Desktop/ner.crf.model";
 
         Properties para = new Properties();
         para.setProperty("model", modelPath);
@@ -115,19 +108,17 @@ public class CRFChunker extends CRFClassifier {
         para.setProperty("feature.possible_transitions", "1");
         para.setProperty("feature.possible_states", "1");
 
-        chunker.setParameter(para);
+        ner.setParameter(para);
 
-        String trainFile = "/Users/mguan/workspace/nlp-training-data/corpora/CoNLL_Shared_Task/CoNLL_2000_Chunking/train.txt";
+        String trainFile = "/Users/mguan/Desktop/npaper.collx.txt";
 
-        chunker.train(trainFile);
-//        chunker.persistModel(modelPath + ".dup");
-//        para.setProperty("model", modelPath + ".dup");
-//        chunker.setParameter(para);
-//        chunker.loadModel(null);
+        ner.train(trainFile);
+        para.setProperty("model", modelPath);
+        ner.setParameter(para);
+        ner.loadModel(null);
 
-        chunker.validate("/Users/mguan/workspace/nlp-training-data/corpora/CoNLL_Shared_Task/CoNLL_2000_Chunking/test.txt");
+        ner.validate("/Users/mguan/Desktop/npaper.collx.txt");
 
-        MaxentTagger posTagger = new MaxentTagger(StanfordConst.STANFORD_DEFAULT_POS_EN_MODEL);
         Scanner scan = new Scanner(System.in);
         String input = StringUtils.EMPTY;
         String quitRegex = "q|quit|exit";
@@ -137,27 +128,9 @@ public class CRFChunker extends CRFClassifier {
             if (!input.trim().isEmpty() && !input.matches(quitRegex)) {
                 String[] words = input.split("\\s");
 
-                List<CoreLabel> tokens = Arrays.stream(words).map(word -> {
-                    CoreLabel coreLabel = new CoreLabel();
-                    coreLabel.setWord(word);
-                    coreLabel.setOriginalText(word);
-                    coreLabel.setValue(word);
-                    return coreLabel;
-                }).collect(Collectors.toList());
-
-                List<TaggedWord> posList = posTagger.tagSentence(tokens);
-                for (int i = 0; i < tokens.size(); i++) {
-                    String pos = posList.get(i).tag();
-                    tokens.get(i).setTag(pos);
-                }
-
-                String[] pos = tokens.stream().map(CoreLabel::tag).toArray(String[]::new);
-
-                SequenceTuple st = chunker.predict(words, pos);
+                SequenceTuple st = ner.predict(words);
                 ValidationUtils.printSequenceTuple(st, null);
             }
         }
-
-
     }
 }
