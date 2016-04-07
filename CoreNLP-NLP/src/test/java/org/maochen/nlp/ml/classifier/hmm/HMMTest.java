@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 /**
@@ -31,6 +32,7 @@ public class HMMTest {
             String path = tempDir.toAbsolutePath().toString() + "/hmm_model.dat";
             HMM.saveModel(path, model);
             HMMModel newModel = HMM.loadModel(path);
+            assertNotNull(newModel);
             assertEquals(5D, newModel.emission.get("fish", "VB"), Double.MIN_NORMAL);
         } catch (IOException e) {
             fail(e.getMessage());

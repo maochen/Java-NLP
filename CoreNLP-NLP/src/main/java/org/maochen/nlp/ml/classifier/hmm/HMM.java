@@ -1,21 +1,18 @@
 package org.maochen.nlp.ml.classifier.hmm;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.maochen.nlp.ml.SequenceTuple;
 import org.maochen.nlp.ml.vector.LabeledVector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -65,16 +62,16 @@ public class HMM {
         return data;
     }
 
-    public static void normalizeEmission(HMMModel model) {
-        model.emission.columnMap().values().parallelStream().map(cols -> {
-                    double total = cols.values().stream().mapToDouble(x -> x).sum();
-                    for (String row : cols.keySet()) {
-                        cols.put(row, cols.get(row) / total);
-                    }
+    private static Consumer<Map<String, Double>> normalize = map -> {
+        double total = map.values().stream().mapToDouble(x -> x).sum();
 
-                    return null;
-                }
-        ).collect(Collectors.toSet());
+        for (String key : map.keySet()) {
+            map.put(key, map.get(key) / total);
+        }
+    };
+
+    static void normalizeEmission(HMMModel model) {
+        model.emission.columnMap().values().stream().forEach(normalize);
 
         for (String tag : model.emission.columnKeySet()) { //use for oov pos tag.
             double minProb = model.emission.column(tag).values().stream().min(Double::compareTo).orElse(0.0);
@@ -82,37 +79,40 @@ public class HMM {
         }
     }
 
-    public static void normalizeTrans(HMMModel model) {
-        model.transition.rowMap().values().parallelStream().map(rows -> {
-                    double total = rows.values().stream().mapToDouble(x -> x).sum();
-                    for (String col : rows.keySet()) {
-                        rows.put(col, rows.get(col) / total);
-                    }
+    static void normalizeTrans(HMMModel model) {
+        model.transition.rowMap().values().stream().forEach(normalize);
+    }
 
-                    return null;
-                }
-        ).collect(Collectors.toSet());
+    private static Pair<List<String>, List<String>> getXSeqOSeq(SequenceTuple seqTuple) {
+        List<String> words = seqTuple.entries.stream()
+                .map(entry -> ((LabeledVector) entry.vector).featsName[WORD_INDEX])
+                .collect(Collectors.toList());
+        List<String> tag = seqTuple.getLabel();
+
+        words.add(0, START);
+        words.add(END);
+        tag.add(0, START);
+        tag.add(END);
+
+        return new ImmutablePair<>(words, tag);
     }
 
     public static HMMModel train(List<SequenceTuple> data) {
         HMMModel model = new HMMModel();
 
         for (SequenceTuple seqTuple : data) {
-            List<String> words = seqTuple.entries.stream().map(entry -> ((LabeledVector) entry.vector).featsName[WORD_INDEX]).collect(Collectors.toList());
-            List<String> tag = seqTuple.getLabel();
 
-            words.add(0, START);
-            words.add(END);
-            tag.add(0, START);
-            tag.add(END);
+            Pair<List<String>, List<String>> wordTagPair = getXSeqOSeq(seqTuple);
+            List<String> words = wordTagPair.getLeft();
+            List<String> tag = wordTagPair.getRight();
 
             for (int i = 0; i < words.size(); i++) {
-                Double ct = model.emission.get(words.get(i), tag.get(i));
+                Double ct = model.emission.get(words.get(i), tag.get(i));  // Oi, Xi
                 ct = ct == null ? 1 : ct + 1;
                 model.emission.put(words.get(i), tag.get(i), ct);
             }
 
-            for (int i = 0; i < seqTuple.entries.size() - 1; i++) {
+            for (int i = 0; i < seqTuple.entries.size() - 1; i++) {  // Xi -> X_i+1
                 Double ct = model.transition.get(tag.get(i), tag.get(i + 1));
                 ct = ct == null ? 1 : ct + 1;
                 model.transition.put(tag.get(i), tag.get(i + 1), ct);
