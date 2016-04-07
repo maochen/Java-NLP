@@ -1,17 +1,17 @@
 package org.maochen.nlp.ml.classifier.hmm;
 
 import com.google.common.collect.Lists;
-
 import org.junit.Test;
+import org.maochen.nlp.ml.SequenceTuple;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 /**
  * Created by Maochen on 8/5/15.
@@ -96,4 +96,23 @@ public class HMMTest {
         List<String> expected = Lists.newArrayList("NN", "VB");
         assertEquals(result, expected);
     }
+
+    @Test
+    public void testEnd2end() {
+        String trainingFile = HMMTest.class.getResource("/brown_masc_pos/training.pos").getPath();
+        String devFile = HMMTest.class.getResource("/brown_masc_pos/development.pos").getPath();
+
+        List<SequenceTuple> trainData = HMM.readTrainFile(trainingFile, "\t", 0, 1);
+
+        HMMModel model = HMM.train(trainData);
+        Map<String, Double> result = HMM.eval(model, devFile, "\t", 0, 1, false);
+        assertEquals(0.8778, result.get("accuracy"), 0.001);
+
+        // Please add dot in the end. All training data ends with dot, so the transition from anything other than dot to <END> is 0
+        String str = "The quick brown fox jumped over the lazy dog .";
+        String[] predictions = HMM.viterbi(model, str.split("\\s")).stream().toArray(String[]::new);
+        String[] expected = new String[]{"DT", "JJ", "NN", "NN", "VBD", "IN", "DT", "JJ", "NN", "."};
+        assertEquals(Arrays.toString(expected), Arrays.toString(predictions));
+    }
+
 }

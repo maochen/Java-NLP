@@ -2,7 +2,6 @@ package org.maochen.nlp.ml.util;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.maochen.nlp.ml.util.CrossValidation;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -37,14 +36,14 @@ public class CrossValidationTest {
             InvocationTargetException {
 
         CrossValidation.Score score = new CrossValidation.Score();
-        score.trueNeg = 9760;
-        score.truePos = 60;
-        score.falseNeg = 40;
-        score.falsePos = 140;
+        score.tn = 9760;
+        score.tp = 60;
+        score.fn = 40;
+        score.fp = 140;
 
         assertEquals(0.3, score.getPrecision(), Double.MIN_NORMAL);
         assertEquals(0.6, score.getRecall(), Double.MIN_NORMAL);
         assertEquals(0.4, score.getF1(), Double.MIN_NORMAL);
-        assertEquals(0.982, score.getAccurancy(), Double.MIN_NORMAL);
+        assertEquals(0.982, score.getAccuracy(), Double.MIN_NORMAL);
     }
 }

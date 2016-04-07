@@ -4,12 +4,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -18,10 +15,13 @@ import java.util.stream.Collectors;
 public class Viterbi {
     private static final Logger LOG = LoggerFactory.getLogger(Viterbi.class);
 
+    private static Predicate<String> isPunct = str -> Pattern.compile("\\p{Punct}+").matcher(str).find();
+
     public static List<String> resolve(HMMModel model, String[] words) {
         Set<String> tagSet = new HashSet<>();
 
-        for (String word : words) {
+        for (int i = 0; i < words.length; i++) {
+            String word = words[i];
             tagSet.addAll(model.emission.row(word).keySet());
         }
 
@@ -59,7 +59,11 @@ public class Viterbi {
                     if (emission == null) {
                         if (!model.emission.rowKeySet().contains(word)) {
                             LOG.debug("Missing word: " + word);
-                            emission = model.emissionMin.get(currentTag); //OOV
+                            if (isPunct.test(currentTag) && !isPunct.test(word)) {
+                                emission = 0D; // eliminate punct tag with non-punct word.
+                            } else {
+                                emission = model.emissionMin.get(currentTag); // OOV
+                            }
                         }
 
                         if (emission == null) { // Has word, just word wont get that tag.
@@ -87,7 +91,7 @@ public class Viterbi {
                     if (j == 0) {
                         stringBuilder.append(rowString.get(i)).append("\t");
                     }
-                    stringBuilder.append(String.format("%.4f", matrix[i][j])).append("\t");
+                    stringBuilder.append(matrix[i][j]).append("\t");
                 }
                 stringBuilder.append(System.lineSeparator());
             }

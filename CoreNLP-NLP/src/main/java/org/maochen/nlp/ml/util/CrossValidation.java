@@ -21,12 +21,12 @@ public class CrossValidation {
     private static final Logger LOG = LoggerFactory.getLogger(CrossValidation.class);
 
     static class Score {
-        int round;
+        int nfold;
         String label;
-        int truePos = 0;
-        int trueNeg = 0;
-        int falsePos = 0;
-        int falseNeg = 0;
+        int tp = 0;
+        int tn = 0;
+        int fp = 0;
+        int fn = 0;
 
         public double getF1() {
             double precision = getPrecision();
@@ -35,27 +35,26 @@ public class CrossValidation {
         }
 
         public double getPrecision() {
-            return truePos / (double) (truePos + falsePos);
+            return tp / (double) (tp + fp);
         }
 
         public double getRecall() {
-            return truePos / (double) (truePos + falseNeg);
+            return tp / (double) (tp + fn);
         }
 
-        public double getAccurancy() {
-            return (trueNeg + truePos) / (double) (truePos + trueNeg + falseNeg + falsePos);
+        public double getAccuracy() {
+            return (tn + tp) / (double) (tp + tn + fn + fp);
         }
     }
 
-    private int round;
+    private int nfold;
 
     private IClassifier classifier;
 
     private Set<String> labels;
     private Set<Score> scores = new HashSet<>();
 
-    private boolean shuffledata;
-
+    private boolean shuffleData;
 
     /**
      * Cross validation.
@@ -63,13 +62,13 @@ public class CrossValidation {
      * @param data whole testing data collection
      */
     public void run(final List<Tuple> data) {
-        List<Tuple> data1 = new ArrayList<>(data);
+        List<Tuple> dataCopy = new ArrayList<>(data);
         this.labels = data.parallelStream().map(x -> x.label).collect(Collectors.toSet());
-        if (shuffledata) {
-            Collections.shuffle(data1);
+        if (shuffleData) {
+            Collections.shuffle(dataCopy);
         }
 
-        int chunkSize = data.size() / round;
+        int chunkSize = data.size() / nfold;
 
         int reminder = data.size() % chunkSize;
 
@@ -77,7 +76,7 @@ public class CrossValidation {
             LOG.info("Dropping the tail id: " + data.get(i).id);
         }
 
-        for (int i = 0; i < round; i++) {
+        for (int i = 0; i < nfold; i++) {
             List<Tuple> testing = data.subList(i, i + chunkSize);
             List<Tuple> training = data.subList(0, i);
             training.addAll(data.subList(i + chunkSize, data.size()));
@@ -86,65 +85,64 @@ public class CrossValidation {
         }
     }
 
-    // This is for one round.
-    private void eval(List<Tuple> training, List<Tuple> testing, int round) {
+    // This is for one fold.
+    private void eval(List<Tuple> training, List<Tuple> testing, int nfold) {
         classifier.train(training);
 
         for (Tuple tuple : testing) {
             String actual = classifier.predict(tuple).entrySet().stream()
                     .max((e1, e2) -> e1.getValue().compareTo(e2.getValue()))
                     .map(Map.Entry::getKey).orElse(StringUtils.EMPTY);
-            updateScore(tuple, actual, round);
+            updateScore(tuple, actual, nfold);
         }
     }
 
-    private void updateScore(Tuple testingTuple, String actual, int round) {
-
+    private void updateScore(Tuple testingTuple, String actual, int nfold) {
         labels.stream().forEach(label -> { // Init score.
             Score score = new Score();
-            score.round = round;
+            score.nfold = nfold;
             score.label = label;
             scores.add(score);
         });
 
         if (testingTuple.label.equals(actual)) { // Correct Predicted
-            scores.stream().filter(x -> x.round == round)
+            scores.stream().filter(x -> x.nfold == nfold)
                     .filter(x -> x.label.equals(testingTuple.label))
-                    .forEach(score -> score.truePos += 1);
+                    .forEach(score -> score.tp += 1);
 
-            scores.stream().filter(x -> x.round == round)
+            scores.stream().filter(x -> x.nfold == nfold)
                     .filter(x -> !x.label.equals(testingTuple.label))
-                    .forEach(score -> score.trueNeg += 1);
+                    .forEach(score -> score.tn += 1);
         } else { // Wrong predicted
             String wrongLabel = actual;
             String correctLabel = testingTuple.label;
 
-            scores.stream().filter(x -> x.round == round)
+            scores.stream().filter(x -> x.nfold == nfold)
                     .filter(x -> x.label.equals(wrongLabel))
-                    .forEach(score -> score.falsePos += 1);
+                    .forEach(score -> score.fp += 1);
 
-            scores.stream().filter(x -> x.round == round)
+            scores.stream().filter(x -> x.nfold == nfold)
                     .filter(x -> !x.label.equals(correctLabel))
-                    .forEach(score -> score.falseNeg += 1);
+                    .forEach(score -> score.fn += 1);
 
-            scores.stream().filter(x -> x.round == round) //Rest
+            scores.stream().filter(x -> x.nfold == nfold) //Rest
                     .filter(x -> !x.label.equals(correctLabel) && !x.label.equals(wrongLabel))
-                    .forEach(score -> score.trueNeg += 1);
+                    .forEach(score -> score.tn += 1);
         }
     }
 
     /**
      * Constructor
      *
-     * @param round       iterations for the cross validation.
+     * @param nfold       nfold for the cross validation. (Recommand: 10-fold)
      * @param classifier  the actual classifier need to test.
      * @param shuffleData whether the data needs to be shuffled at the begining of the whole
      *                    process.
      */
-    public CrossValidation(final int round, final IClassifier classifier,
+    public CrossValidation(final int nfold, final IClassifier classifier,
                            final boolean shuffleData) {
-        this.round = round;
+        this.nfold = nfold;
         this.classifier = classifier;
-        this.shuffledata = shuffleData;
+        this.shuffleData = shuffleData;
     }
 }

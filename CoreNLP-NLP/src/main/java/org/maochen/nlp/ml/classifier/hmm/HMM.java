@@ -112,7 +112,7 @@ public class HMM {
                 model.emission.put(words.get(i), tag.get(i), ct);
             }
 
-            for (int i = 0; i < seqTuple.entries.size() - 1; i++) {  // Xi -> X_i+1
+            for (int i = 0; i < tag.size() - 1; i++) {  // Xi -> X_i+1
                 Double ct = model.transition.get(tag.get(i), tag.get(i + 1));
                 ct = ct == null ? 1 : ct + 1;
                 model.transition.put(tag.get(i), tag.get(i + 1), ct);
@@ -128,7 +128,7 @@ public class HMM {
         return Viterbi.resolve(model, words);
     }
 
-    public static void eval(HMMModel model, String testFile, String delimiter, int wordColIndex, int tagColIndex) {
+    public static Map<String, Double> eval(HMMModel model, String testFile, String delimiter, int wordColIndex, int tagColIndex, boolean print) {
         List<SequenceTuple> testData = readTrainFile(testFile, delimiter, wordColIndex, tagColIndex);
         int totalCount = 0;
         int errCount = 0;
@@ -142,15 +142,22 @@ public class HMM {
                 String expected = WordUtils.normalizeTag(sequenceTuple.entries.get(i).label);
                 String actual = WordUtils.normalizeTag(result.get(i));
                 if (!(actual.startsWith(expected) || expected.startsWith(actual))) {
-                    System.out.println(words[i] + " exp: " + expected + " actual: " + result.get(i));
+                    if (print) {
+                        LOG.info(words[i] + " exp: " + expected + " actual: " + result.get(i));
+                    }
                     errCount++;
                 }
             }
 
         }
 
-        double accurancy = (1 - errCount / (double) totalCount) * 100;
-        System.out.println("accurancy: " + errCount + "/" + totalCount + " -> " + String.format("%.2f", accurancy) + "%");
+        Map<String, Double> result = new HashMap<>();
+        double accuracy = (1 - errCount / (double) totalCount);
+        if (print) {
+            LOG.info("accuracy: " + errCount + "/" + totalCount + " -> " + String.format("%.2f", accuracy * 100) + "%");
+        }
+        result.put("accuracy", accuracy);
+        return result;
     }
 
     public static HMMModel loadModel(String modelPath) {
@@ -168,23 +175,5 @@ public class HMM {
         } catch (IOException e) {
             LOG.error("Persist model err.", e);
         }
-    }
-
-    public static void main(String[] args) throws InterruptedException {
-//        Thread.sleep(5000);
-
-        String prefix = "/Users/mguan/Dropbox/Course/Natural Lang Processing/HW/HW4_POSTagger_HMM/Homework4_corpus/POSData";
-        List<SequenceTuple> data = HMM.readTrainFile(prefix + "/development.pos", "\t", 0, 1);
-        List<SequenceTuple> data2 = HMM.readTrainFile(prefix + "/training.pos", "\t", 0, 1);
-        data.addAll(data2);
-
-        HMMModel model = train(data);
-        eval(model, prefix + "/training.pos", "\t", 0, 1);
-
-        // Please add dot in the end. All training data ends with dot, so the transition from anything other than dot to <END> is 0
-        String str = "The quick brown fox jumped over the lazy dog .";
-        List<String> result = viterbi(model, str.split("\\s"));
-        System.out.println(str);
-        System.out.println(result);
     }
 }
