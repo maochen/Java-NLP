@@ -6,12 +6,7 @@ import org.maochen.nlp.ml.Tuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -20,7 +15,7 @@ import java.util.stream.Collectors;
 public class CrossValidation {
     private static final Logger LOG = LoggerFactory.getLogger(CrossValidation.class);
 
-    static class Score {
+    public static class Score {
         int nfold;
         String label;
         int tp = 0;
@@ -52,7 +47,7 @@ public class CrossValidation {
     private IClassifier classifier;
 
     private Set<String> labels;
-    private Set<Score> scores = new HashSet<>();
+    public Set<Score> scores = new HashSet<>();
 
     private boolean shuffleData;
 
@@ -77,8 +72,8 @@ public class CrossValidation {
         }
 
         for (int i = 0; i < nfold; i++) {
-            List<Tuple> testing = data.subList(i, i + chunkSize);
-            List<Tuple> training = data.subList(0, i);
+            List<Tuple> testing = new ArrayList<>(data.subList(i, i + chunkSize));
+            List<Tuple> training = new ArrayList<>(data.subList(0, i));
             training.addAll(data.subList(i + chunkSize, data.size()));
 
             eval(training, testing, i);
@@ -131,10 +126,20 @@ public class CrossValidation {
         }
     }
 
+
+    public Score getResult() {
+        Score result = new Score();
+        result.fn = (int) scores.stream().mapToDouble(s -> s.fn).sum() / scores.size();
+        result.fp = (int) scores.stream().mapToDouble(s -> s.fp).sum() / scores.size();
+        result.tn = (int) scores.stream().mapToDouble(s -> s.tn).sum() / scores.size();
+        result.tp = (int) scores.stream().mapToDouble(s -> s.tp).sum() / scores.size();
+        return result;
+    }
+
     /**
      * Constructor
      *
-     * @param nfold       nfold for the cross validation. (Recommand: 10-fold)
+     * @param nfold       nfold for the cross validation. (Recommend: 10-fold)
      * @param classifier  the actual classifier need to test.
      * @param shuffleData whether the data needs to be shuffled at the begining of the whole
      *                    process.
