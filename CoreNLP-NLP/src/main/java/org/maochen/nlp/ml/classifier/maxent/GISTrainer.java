@@ -41,14 +41,14 @@ import java.util.concurrent.Future;
  * An implementation of Generalized Iterative Scaling.  The reference paper for this implementation
  * was Adwait Ratnaparkhi's tech report at the University of Pennsylvania's Institute for Research
  * in Cognitive Science, and is available at <a href ="ftp://ftp.cis.upenn.edu/pub/ircs/tr/97-08.ps.Z"><code>ftp://ftp.cis.upenn.edu/pub/ircs/tr/97-08.ps.Z</code></a>.
- *
+ * <p>
  * The slack parameter used in the above implementation has been removed by default from the
  * computation and a method for updating with Gaussian smoothing has been added per Investigating
  * GIS and Smoothing for Maximum Entropy Taggers, Clark and Curran (2002). <a
  * href="http://acl.ldc.upenn.edu/E/E03/E03-1071.pdf"><code>http://acl.ldc.upenn.edu/E/E03/E03-1071.pdf</code></a>
  * The slack parameter can be used by setting <code>useSlackParameter</code> to true. Gaussian
  * smoothing can be used by setting <code>useGaussianSmoothing</code> to true.
- *
+ * <p>
  * A prior can be used to train models which converge to the distribution which minimizes the
  * relative entropy between the distribution specified by the empirical constraints of the training
  * data and the specified prior.  By default, the uniform distribution is used as the prior.
@@ -334,12 +334,12 @@ class GISTrainer {
 
         double prevLL = 0.0;
         for (int i = 1; i <= iterations; i++) {
-            LOG.info("Iteration " + i);
+            LOG.debug("Iteration " + i);
             double currLL = nextIteration(correctionConstant); // Core
 
             if (i > 1) {
                 if (prevLL > currLL) {
-                    LOG.error("Model Diverging: loglikelihood decreased");
+                    LOG.error("Model Diverging: log likelihood decreased");
                     break;
                 }
                 if (currLL - prevLL < LLThreshold) {
@@ -356,8 +356,8 @@ class GISTrainer {
         trainingDataFeatNameIndices = null;
     }
 
-    //modeled on implementation in  Zhang Le's maxent kit
-    private double gaussianUpdate(int predicate, int oid, int n, double correctionConstant) {
+    //modeled on implementation in Zhang Le's maxent kit
+    private double gaussianUpdate(int predicate, int oid, double correctionConstant) {
         double param = params[predicate].getParameters()[oid];
         double x0 = 0.0;
         double modelValue = modelExpects[0][predicate].getParameters()[oid];
@@ -429,18 +429,17 @@ class GISTrainer {
                 loglikelihood += Math.log(modelDistribution[outcomeList[ei]]) * numTimesEventsSeen[ei];
 
                 numEvents += numTimesEventsSeen[ei];
-                if (LOG.isDebugEnabled()) {
-                    int maxIndex = 0;
-                    for (int labelIndex = 1; labelIndex < labels.length; labelIndex++) {
-                        if (modelDistribution[labelIndex] > modelDistribution[maxIndex]) {
-                            maxIndex = labelIndex;
-                        }
-                    }
-                    if (maxIndex == outcomeList[ei]) {
-                        numCorrect += numTimesEventsSeen[ei];
+                // The following is just for debug purpose.
+                int maxIndex = 0;
+                for (int labelIndex = 1; labelIndex < labels.length; labelIndex++) {
+                    if (modelDistribution[labelIndex] > modelDistribution[maxIndex]) {
+                        maxIndex = labelIndex;
                     }
                 }
-
+                if (maxIndex == outcomeList[ei]) {
+                    numCorrect += numTimesEventsSeen[ei];
+                }
+                // End
             }
 
             return this;
@@ -472,13 +471,11 @@ class GISTrainer {
         int taskSize = numUniqueEvents / numberOfThreads;
         int leftOver = numUniqueEvents % numberOfThreads;
 
-        List<Future<?>> futures = new ArrayList<Future<?>>();
+        List<Future<?>> futures = new ArrayList<>();
 
         for (int i = 0; i < numberOfThreads; i++) {
-            if (i != numberOfThreads - 1)
-                futures.add(executor.submit(new ModelExpactationComputeTask(i, i * taskSize, taskSize)));
-            else
-                futures.add(executor.submit(new ModelExpactationComputeTask(i, i * taskSize, taskSize + leftOver)));
+            int len = i == numberOfThreads - 1 ? taskSize + leftOver : taskSize;
+            futures.add(executor.submit(new ModelExpactationComputeTask(i, i * taskSize, len)));
         }
 
         for (Future<?> future : futures) {
@@ -524,7 +521,7 @@ class GISTrainer {
             int[] activeOutcomes = params[pi].getOutcomes();
             for (int aoi = 0; aoi < activeOutcomes.length; aoi++) {
                 if (useGaussianSmoothing) {
-                    params[pi].updateParameter(aoi, gaussianUpdate(pi, aoi, numEvents, correctionConstant));
+                    params[pi].updateParameter(aoi, gaussianUpdate(pi, aoi, correctionConstant));
                 } else {
                     if (model[aoi] == 0) {
                         LOG.error("Model expects == 0 for " + featNames[pi] + " " + labels[aoi]);
@@ -539,7 +536,7 @@ class GISTrainer {
             }
         }
 
-        LOG.info("loglikelihood = " + loglikelihood + "\taccurancy:\t" + ((double) numCorrect / numEvents));
+        LOG.debug("loglikelihood = " + loglikelihood + "\taccuracy: " + ((double) numCorrect / numEvents) * 100);
 
         return loglikelihood;
     }

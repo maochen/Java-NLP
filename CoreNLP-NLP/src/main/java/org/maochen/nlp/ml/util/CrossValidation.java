@@ -1,11 +1,16 @@
 package org.maochen.nlp.ml.util;
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import org.apache.commons.lang3.StringUtils;
 import org.maochen.nlp.ml.IClassifier;
 import org.maochen.nlp.ml.Tuple;
+import org.maochen.nlp.ml.classifier.maxent.MaxEntClassifier;
+import org.maochen.nlp.ml.util.dataio.CSVDataReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -29,6 +34,12 @@ public class CrossValidation {
             return 2 * precision * recall / (precision + recall);
         }
 
+        public double getF2() {
+            double precision = getPrecision();
+            double recall = getRecall();
+            return 5 * precision * recall / (4 * precision + recall);
+        }
+
         public double getPrecision() {
             return tp / (double) (tp + fp);
         }
@@ -40,6 +51,14 @@ public class CrossValidation {
         public double getAccuracy() {
             return (tn + tp) / (double) (tp + tn + fn + fp);
         }
+
+        @Override
+        public String toString() {
+            return "P: " + String.format("%.2f", getPrecision())
+                    + "\tR: " + String.format("%.2f", getRecall())
+                    + "\tA: " + String.format("%.2f", getAccuracy())
+                    + "\tF1: " + String.format("%.2f", getF1());
+        }
     }
 
     private int nfold;
@@ -47,7 +66,9 @@ public class CrossValidation {
     private IClassifier classifier;
 
     private Set<String> labels;
-    public Set<Score> scores = new HashSet<>();
+
+    // R, C, V -- nfold, label, score
+    public Table<Integer, String, Score> scores = HashBasedTable.create();
 
     private boolean shuffleData;
 
@@ -72,6 +93,7 @@ public class CrossValidation {
         }
 
         for (int i = 0; i < nfold; i++) {
+            System.err.println("Cross validation round " + (i + 1) + "/" + nfold);
             List<Tuple> testing = new ArrayList<>(data.subList(i, i + chunkSize));
             List<Tuple> training = new ArrayList<>(data.subList(0, i));
             training.addAll(data.subList(i + chunkSize, data.size()));
@@ -93,46 +115,61 @@ public class CrossValidation {
     }
 
     private void updateScore(Tuple testingTuple, String actual, int nfold) {
-        labels.stream().forEach(label -> { // Init score.
-            Score score = new Score();
-            score.nfold = nfold;
-            score.label = label;
-            scores.add(score);
-        });
+        labels.stream()
+                .filter(label -> !scores.contains(nfold, label))
+                .forEach(label -> { // Init score.
+                    Score score = new Score();
+                    score.nfold = nfold;
+                    score.label = label;
+                    scores.put(nfold, label, score);
+                });
+
+        // Label, Score
+        Map<String, Score> nfoldResult = scores.row(nfold);
 
         if (testingTuple.label.equals(actual)) { // Correct Predicted
-            scores.stream().filter(x -> x.nfold == nfold)
-                    .filter(x -> x.label.equals(testingTuple.label))
-                    .forEach(score -> score.tp += 1);
+            Score score = nfoldResult.get(testingTuple.label);
+            score.tp++;
 
-            scores.stream().filter(x -> x.nfold == nfold)
-                    .filter(x -> !x.label.equals(testingTuple.label))
-                    .forEach(score -> score.tn += 1);
+            // update all others.
+            nfoldResult.entrySet().stream()
+                    .filter(x -> !x.getKey().equals(testingTuple.label))
+                    .map(Map.Entry::getValue)
+                    .forEach(s -> s.tn++);
+
         } else { // Wrong predicted
             String wrongLabel = actual;
             String correctLabel = testingTuple.label;
 
-            scores.stream().filter(x -> x.nfold == nfold)
-                    .filter(x -> x.label.equals(wrongLabel))
-                    .forEach(score -> score.fp += 1);
+            nfoldResult.get(wrongLabel).fp++;
 
-            scores.stream().filter(x -> x.nfold == nfold)
-                    .filter(x -> !x.label.equals(correctLabel))
-                    .forEach(score -> score.fn += 1);
+            nfoldResult.entrySet().stream()
+                    .filter(x -> !x.getKey().equals(correctLabel))
+                    .map(Map.Entry::getValue)
+                    .forEach(score -> score.fn++);
 
-            scores.stream().filter(x -> x.nfold == nfold) //Rest
-                    .filter(x -> !x.label.equals(correctLabel) && !x.label.equals(wrongLabel))
-                    .forEach(score -> score.tn += 1);
+            //Rest
+            nfoldResult.entrySet().stream()
+                    .filter(x -> !x.getKey().equals(correctLabel) && !x.getKey().equals(wrongLabel))
+                    .map(Map.Entry::getValue)
+                    .forEach(score -> score.tn++);
         }
     }
 
 
     public Score getResult() {
         Score result = new Score();
-        result.fn = (int) scores.stream().mapToDouble(s -> s.fn).sum() / scores.size();
-        result.fp = (int) scores.stream().mapToDouble(s -> s.fp).sum() / scores.size();
-        result.tn = (int) scores.stream().mapToDouble(s -> s.tn).sum() / scores.size();
-        result.tp = (int) scores.stream().mapToDouble(s -> s.tp).sum() / scores.size();
+        scores.values().stream().forEach(s -> {
+            result.fn += s.fn;
+            result.fp += s.fp;
+            result.tn += s.tn;
+            result.tp += s.tp;
+        });
+
+        result.fn /= scores.size();
+        result.fp /= scores.size();
+        result.tn /= scores.size();
+        result.tp /= scores.size();
         return result;
     }
 
@@ -144,10 +181,31 @@ public class CrossValidation {
      * @param shuffleData whether the data needs to be shuffled at the begining of the whole
      *                    process.
      */
-    public CrossValidation(final int nfold, final IClassifier classifier,
-                           final boolean shuffleData) {
+    public CrossValidation(final int nfold, final IClassifier classifier, final boolean shuffleData) {
+        if (nfold < 2) {
+            throw new RuntimeException("CV expects n-fold greater than 1.");
+        }
         this.nfold = nfold;
         this.classifier = classifier;
         this.shuffleData = shuffleData;
+    }
+
+
+    public static void main(String[] args) throws IOException {
+        IClassifier maxEntClassifier = new MaxEntClassifier();
+        Properties properties = new Properties();
+        properties.put("iter", "500");
+        maxEntClassifier.setParameter(properties);
+        String fileName = "/Users/mguan/Desktop/train.balanced.csv";
+        CSVDataReader dataReader = new CSVDataReader(fileName, -1, ",", false);
+        List<Tuple> data = dataReader.read();
+        CrossValidation cv = new CrossValidation(10, maxEntClassifier, true);
+
+        cv.run(data);
+        CrossValidation.Score score = cv.getResult();
+        System.out.println("Precision: " + score.getPrecision());
+        System.out.println("Recall: " + score.getRecall());
+        System.out.println("F1: " + score.getF1());
+        System.out.println("F2: " + score.getF2());
     }
 }

@@ -42,7 +42,7 @@ public class NaiveBayesTest {
         Comparator<Map.Entry<String, Double>> reverseCmp = Collections.reverseOrder(Comparator.comparing(Map.Entry::getValue));
         probs.entrySet().stream().sorted(reverseCmp).forEach(result::add);
 
-        System.out.println("Result: " + predict);
+//        System.out.println("Result: " + predict);
         result.forEach(e -> System.out.println(e.getKey() + "\t:\t" + e.getValue()));
     }
 }

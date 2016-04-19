@@ -1,9 +1,7 @@
 package org.maochen.nlp.ml.util;
 
-import org.junit.Before;
 import org.junit.Test;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 
 import static org.junit.Assert.assertEquals;
@@ -13,21 +11,21 @@ import static org.junit.Assert.assertEquals;
  */
 public class CrossValidationTest {
 
-    private CrossValidation crossValidation;
-
-
-    @Before
-    public void setUp() {
-        crossValidation = new CrossValidation(1, null, false);
-    }
-
-    private Object getField(Object instance, String fieldName) throws NoSuchFieldException,
-            ClassNotFoundException, IllegalAccessException {
-        Class cls = Class.forName("org.maochen.nlp.ml.util.CrossValidation");
-        Field dataField = cls.getDeclaredField(fieldName);
-        dataField.setAccessible(true);
-        return dataField.get(instance);
-    }
+//    private CrossValidation crossValidation;
+//
+//
+//    @Before
+//    public void setUp() {
+//        crossValidation = new CrossValidation(10, null, false);
+//    }
+//
+//    private Object getField(Object instance, String fieldName) throws NoSuchFieldException,
+//            ClassNotFoundException, IllegalAccessException {
+//        Class cls = Class.forName("org.maochen.nlp.ml.util.CrossValidation");
+//        Field dataField = cls.getDeclaredField(fieldName);
+//        dataField.setAccessible(true);
+//        return dataField.get(instance);
+//    }
 
 
     @Test

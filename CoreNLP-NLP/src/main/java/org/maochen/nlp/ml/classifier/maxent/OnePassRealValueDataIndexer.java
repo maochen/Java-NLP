@@ -77,17 +77,17 @@ public class OnePassRealValueDataIndexer implements DataIndexer {
     public OnePassRealValueDataIndexer(EventStream eventStream, int cutoff, boolean sort) {
         Map<String, Integer> predicateIndex = new HashMap<>();
 
-        LOG.info("Indexing events using cutoff of " + cutoff);
+        LOG.debug("Indexing events using cutoff of " + cutoff);
         
         LinkedList<Event> events = computeEventCounts(eventStream, predicateIndex, cutoff);
-        LOG.info("Computed event counts... " + events.size());
+        LOG.debug("Computed event counts... " + events.size());
 
         List<ComparableEvent> eventsToCompare = index(events, predicateIndex);
-        LOG.info("Indexing... done.");
+        LOG.debug("Indexing... done.");
 
-        LOG.info("Sorting and merging events... ");
+        LOG.debug("Sorting and merging events... ");
         sortAndMerge(eventsToCompare, sort);
-        LOG.info("Done indexing.");
+        LOG.debug("Done indexing.");
     }
 
     /**
@@ -161,7 +161,7 @@ public class OnePassRealValueDataIndexer implements DataIndexer {
                     numUniqueEvents++; // increment the # of unique events
                 }
             }
-            LOG.info("done. Reduced " + numEvents + " events to " + numUniqueEvents + ".");
+            LOG.debug("done. Reduced " + numEvents + " events to " + numUniqueEvents + ".");
         } else {
             numUniqueEvents = eventsToCompare.size();
         }
