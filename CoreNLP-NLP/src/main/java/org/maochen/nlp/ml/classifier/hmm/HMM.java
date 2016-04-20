@@ -83,6 +83,11 @@ public class HMM {
         model.transition.rowMap().values().stream().forEach(normalize);
     }
 
+    /**
+     *
+     * @param seqTuple sequence tuple.
+     * @return left -> list of Xi_j, right -> list of labels (y).
+     */
     private static Pair<List<String>, List<String>> getXSeqOSeq(SequenceTuple seqTuple) {
         List<String> words = seqTuple.entries.stream()
                 .map(entry -> ((LabeledVector) entry.vector).featsName[WORD_INDEX])
@@ -97,11 +102,15 @@ public class HMM {
         return new ImmutablePair<>(words, tag);
     }
 
+    /**
+     * Tag (Latent Var) is Xi, words (Observed Var) yi (or oi) ...
+     * @param data
+     * @return
+     */
     public static HMMModel train(List<SequenceTuple> data) {
         HMMModel model = new HMMModel();
 
         for (SequenceTuple seqTuple : data) {
-
             Pair<List<String>, List<String>> wordTagPair = getXSeqOSeq(seqTuple);
             List<String> words = wordTagPair.getLeft();
             List<String> tag = wordTagPair.getRight();

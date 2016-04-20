@@ -20,6 +20,7 @@ public class Viterbi {
     public static List<String> resolve(HMMModel model, String[] words) {
         Set<String> tagSet = new HashSet<>();
 
+        // Get all possible tags. Don't worry about OOV for this step.
         for (int i = 0; i < words.length; i++) {
             String word = words[i];
             tagSet.addAll(model.emission.row(word).keySet());
@@ -28,7 +29,14 @@ public class Viterbi {
         List<String> tags = new ArrayList<>(tagSet);
         tags.add(0, HMM.START);
         tags.add(HMM.END);
+        // ----------
 
+        // row - tags | col - words
+        //           <START> fish sleep <END>
+        // <START>
+        // VB
+        // NN
+        // <END>
         List<String> rowString = tags;
         List<String> colString = Arrays.stream(words).collect(Collectors.toList());
         colString.add(0, HMM.START);
@@ -42,7 +50,6 @@ public class Viterbi {
             String word = colString.get(col);
 
             for (int row = 1; row < matrix.length; row++) {
-
                 String currentTag = rowString.get(row);
 
                 for (int prevRow = 0; prevRow < matrix.length; prevRow++) {
