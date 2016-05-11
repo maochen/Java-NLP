@@ -2,8 +2,8 @@ package org.maochen.nlp.ml.util.dataio;
 
 import org.maochen.nlp.ml.Tuple;
 import org.maochen.nlp.ml.util.TrainingDataUtils;
+import org.maochen.nlp.ml.vector.FeatNamedVector;
 import org.maochen.nlp.ml.vector.IVector;
-import org.maochen.nlp.ml.vector.LabeledVector;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -50,7 +50,7 @@ public class CSVDataReader {
                     name.add(header[i] + "=" + values[i]);
                 }
 
-                IVector v = new LabeledVector(name.stream().toArray(String[]::new));
+                IVector v = new FeatNamedVector(name.stream().toArray(String[]::new));
                 if (isRealVal) {
                     double[] realV = IntStream.range(0, values.length).filter(i -> i != actualLabelCol)
                             .mapToObj(i -> values[i]).mapToDouble(Double::parseDouble).toArray();
@@ -89,8 +89,8 @@ public class CSVDataReader {
 
         balancedData = balancedData.stream()
                 .sorted((t1, t2) -> {
-                    int id1 = Integer.parseInt(((LabeledVector) (t1.vector)).featsName[0]);
-                    int id2 = Integer.parseInt(((LabeledVector) (t2.vector)).featsName[0]);
+                    int id1 = Integer.parseInt(((FeatNamedVector) (t1.vector)).featsName[0]);
+                    int id2 = Integer.parseInt(((FeatNamedVector) (t2.vector)).featsName[0]);
                     return Integer.compare(id1, id2);
                 }).collect(Collectors.toList());
 

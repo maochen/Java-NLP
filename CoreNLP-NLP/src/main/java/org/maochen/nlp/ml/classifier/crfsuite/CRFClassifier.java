@@ -1,15 +1,15 @@
 package org.maochen.nlp.ml.classifier.crfsuite;
 
 import com.github.jcrfsuite.util.CrfSuiteLoader;
-
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.maochen.nlp.ml.ISeqClassifier;
 import org.maochen.nlp.ml.SequenceTuple;
 import org.maochen.nlp.ml.Tuple;
-import org.maochen.nlp.ml.vector.LabeledVector;
+import org.maochen.nlp.ml.vector.FeatNamedVector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import third_party.org.chokkan.crfsuite.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,13 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
-
-import third_party.org.chokkan.crfsuite.Attribute;
-import third_party.org.chokkan.crfsuite.Item;
-import third_party.org.chokkan.crfsuite.ItemSequence;
-import third_party.org.chokkan.crfsuite.StringList;
-import third_party.org.chokkan.crfsuite.Tagger;
-import third_party.org.chokkan.crfsuite.Trainer;
 
 /**
  * Created by Maochen on 1/11/16.
@@ -74,8 +67,8 @@ public class CRFClassifier implements ISeqClassifier {
             for (int i = 0; i < t.vector.getVector().length; i++) {
                 Attribute attr;
 
-                if (t.vector instanceof LabeledVector) {
-                    attr = new Attribute(((LabeledVector) t.vector).featsName[i]);
+                if (t.vector instanceof FeatNamedVector) {
+                    attr = new Attribute(((FeatNamedVector) t.vector).featsName[i]);
                 } else {
                     attr = new Attribute(String.valueOf(i), t.vector.getVector()[i]);
                 }

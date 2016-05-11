@@ -7,8 +7,8 @@ import org.maochen.nlp.ml.SequenceTuple;
 import org.maochen.nlp.ml.Tuple;
 import org.maochen.nlp.ml.classifier.crfsuite.CRFClassifier;
 import org.maochen.nlp.ml.util.TrainingDataUtils;
+import org.maochen.nlp.ml.vector.FeatNamedVector;
 import org.maochen.nlp.ml.vector.IVector;
-import org.maochen.nlp.ml.vector.LabeledVector;
 import org.maochen.nlp.parser.stanford.util.StanfordConst;
 import org.maochen.nlp.util.ValidationUtils;
 import org.slf4j.Logger;
@@ -57,7 +57,7 @@ public class CRFChunker extends CRFClassifier {
         SequenceTuple st = new SequenceTuple();
         st.entries = new ArrayList<>();
         for (int i = 0; i < words.length; i++) {
-            IVector v = new LabeledVector(new String[]{words[i], pos[i]});
+            IVector v = new FeatNamedVector(new String[]{words[i], pos[i]});
             st.entries.add(new Tuple(v));
         }
 
@@ -80,8 +80,8 @@ public class CRFChunker extends CRFClassifier {
         for (SequenceTuple st : testData) {
             total += st.entries.size();
             List<String> expectedTags = new ArrayList<>(st.getLabel());
-            String[] words = st.entries.stream().map(x -> ((LabeledVector) x.vector).featsName[ChunkerFeatureExtractor.WORD_INDEX]).toArray(String[]::new);
-            String[] pos = st.entries.stream().map(x -> ((LabeledVector) x.vector).featsName[ChunkerFeatureExtractor.POS_INDEX]).toArray(String[]::new);
+            String[] words = st.entries.stream().map(x -> ((FeatNamedVector) x.vector).featsName[ChunkerFeatureExtractor.WORD_INDEX]).toArray(String[]::new);
+            String[] pos = st.entries.stream().map(x -> ((FeatNamedVector) x.vector).featsName[ChunkerFeatureExtractor.POS_INDEX]).toArray(String[]::new);
 
             st = predict(words, pos);
 

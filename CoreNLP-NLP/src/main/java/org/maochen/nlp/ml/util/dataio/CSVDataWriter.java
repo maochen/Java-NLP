@@ -1,7 +1,7 @@
 package org.maochen.nlp.ml.util.dataio;
 
 import org.maochen.nlp.ml.Tuple;
-import org.maochen.nlp.ml.vector.LabeledVector;
+import org.maochen.nlp.ml.vector.FeatNamedVector;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -51,8 +51,8 @@ public class CSVDataWriter {
                     continue;
                 }
 
-                if (t.vector instanceof LabeledVector && writeFeatName) {
-                    LabeledVector lv = (LabeledVector) t.vector;
+                if (t.vector instanceof FeatNamedVector && writeFeatName) {
+                    FeatNamedVector lv = (FeatNamedVector) t.vector;
                     stringBuilder.append(lv.featsName[i]);
                     if (writeFeatValue) {
                         stringBuilder.append("=");

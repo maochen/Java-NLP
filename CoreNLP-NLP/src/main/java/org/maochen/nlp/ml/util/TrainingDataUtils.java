@@ -4,7 +4,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.maochen.nlp.ml.SequenceTuple;
 import org.maochen.nlp.ml.Tuple;
-import org.maochen.nlp.ml.vector.LabeledVector;
+import org.maochen.nlp.ml.vector.FeatNamedVector;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -120,7 +120,7 @@ public class TrainingDataUtils {
                 } else {
                     String[] fields = line.trim().split(delimiter);
                     String[] feats = IntStream.range(0, fields.length).filter(i -> i != tagCol).mapToObj(i -> fields[i]).toArray(String[]::new);
-                    LabeledVector v = new LabeledVector(feats);
+                    FeatNamedVector v = new FeatNamedVector(feats);
                     sequenceTuple.entries.add(new Tuple(tupleId++, v, fields[tagCol]));
                 }
                 line = br.readLine();

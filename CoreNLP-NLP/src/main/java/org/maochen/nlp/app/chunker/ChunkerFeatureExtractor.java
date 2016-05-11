@@ -4,7 +4,7 @@ import org.maochen.nlp.app.featextractor.BrownFeatExtractor;
 import org.maochen.nlp.app.featextractor.IFeatureExtractor;
 import org.maochen.nlp.ml.SequenceTuple;
 import org.maochen.nlp.ml.Tuple;
-import org.maochen.nlp.ml.vector.LabeledVector;
+import org.maochen.nlp.ml.vector.FeatNamedVector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,8 +62,8 @@ public class ChunkerFeatureExtractor implements IFeatureExtractor {
      */
     @Override
     public List<Tuple> extractFeat(final SequenceTuple entry) {
-        String[] tokens = entry.entries.stream().map(tuple -> ((LabeledVector) tuple.vector).featsName[WORD_INDEX]).toArray(String[]::new);
-        String[] pos = entry.entries.stream().map(tuple -> ((LabeledVector) tuple.vector).featsName[POS_INDEX]).toArray(String[]::new);
+        String[] tokens = entry.entries.stream().map(tuple -> ((FeatNamedVector) tuple.vector).featsName[WORD_INDEX]).toArray(String[]::new);
+        String[] pos = entry.entries.stream().map(tuple -> ((FeatNamedVector) tuple.vector).featsName[POS_INDEX]).toArray(String[]::new);
 
         List<List<String>> feats = IntStream.range(0, tokens.length)
                 .mapToObj(i -> extractFeatSingle(i, tokens, pos))
@@ -73,7 +73,7 @@ public class ChunkerFeatureExtractor implements IFeatureExtractor {
 
         for (int i = 0; i < feats.size(); i++) {
             List<String> singleTokenFeat = feats.get(i);
-            LabeledVector v = new LabeledVector(singleTokenFeat.stream().toArray(String[]::new));
+            FeatNamedVector v = new FeatNamedVector(singleTokenFeat.stream().toArray(String[]::new));
 
             Tuple t = new Tuple(v);
             t.label = entry.entries.get(i).label;

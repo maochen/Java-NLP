@@ -3,7 +3,7 @@ package org.maochen.nlp.ml.classifier.hmm;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.maochen.nlp.ml.SequenceTuple;
-import org.maochen.nlp.ml.vector.LabeledVector;
+import org.maochen.nlp.ml.vector.FeatNamedVector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,7 +90,7 @@ public class HMM {
      */
     private static Pair<List<String>, List<String>> getXSeqOSeq(SequenceTuple seqTuple) {
         List<String> words = seqTuple.entries.stream()
-                .map(entry -> ((LabeledVector) entry.vector).featsName[WORD_INDEX])
+                .map(entry -> ((FeatNamedVector) entry.vector).featsName[WORD_INDEX])
                 .collect(Collectors.toList());
         List<String> tag = seqTuple.getLabel();
 
@@ -143,7 +143,7 @@ public class HMM {
         int errCount = 0;
 
         for (SequenceTuple sequenceTuple : testData) {
-            String[] words = sequenceTuple.entries.stream().map(entry -> ((LabeledVector) entry.vector).featsName[WORD_INDEX]).toArray(String[]::new);
+            String[] words = sequenceTuple.entries.stream().map(entry -> ((FeatNamedVector) entry.vector).featsName[WORD_INDEX]).toArray(String[]::new);
             List<String> result = viterbi(model, words);
 
             for (int i = 0; i < result.size(); i++) {

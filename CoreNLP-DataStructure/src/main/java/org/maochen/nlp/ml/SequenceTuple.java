@@ -1,7 +1,7 @@
 package org.maochen.nlp.ml;
 
 import org.maochen.nlp.ml.vector.IVector;
-import org.maochen.nlp.ml.vector.LabeledVector;
+import org.maochen.nlp.ml.vector.FeatNamedVector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +57,7 @@ public class SequenceTuple {
                 featString.add(matrix[row][col]);
             }
 
-            IVector v = new LabeledVector(featString.stream().toArray(String[]::new));
+            IVector v = new FeatNamedVector(featString.stream().toArray(String[]::new));
             tuples.add(new Tuple(0, v, tags.get(col)));
         }
 

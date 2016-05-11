@@ -1,7 +1,7 @@
 package org.maochen.nlp.ml;
 
 import org.junit.Test;
-import org.maochen.nlp.ml.vector.LabeledVector;
+import org.maochen.nlp.ml.vector.FeatNamedVector;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,7 +37,7 @@ public class SequenceTupleTest {
         assertEquals("B-NP", entry.label);
 
         String expected = Arrays.toString(new String[]{"Energy", "NNP"});
-        String actual = Arrays.toString(((LabeledVector) entry.vector).featsName);
+        String actual = Arrays.toString(((FeatNamedVector) entry.vector).featsName);
         assertEquals(expected, actual);
 
     }

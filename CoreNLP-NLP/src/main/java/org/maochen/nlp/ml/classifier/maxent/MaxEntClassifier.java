@@ -16,7 +16,7 @@ import org.maochen.nlp.ml.Tuple;
 import org.maochen.nlp.ml.classifier.maxent.eventstream.EventStream;
 import org.maochen.nlp.ml.classifier.maxent.eventstream.StringEventStream;
 import org.maochen.nlp.ml.classifier.maxent.eventstream.TupleEventStream;
-import org.maochen.nlp.ml.vector.LabeledVector;
+import org.maochen.nlp.ml.vector.FeatNamedVector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,10 +63,10 @@ public class MaxEntClassifier implements IClassifier {
             vector[i] = val[i];
         }
 
-        LabeledVector labeledVector = new LabeledVector(vector);
-        Tuple predict = new Tuple(labeledVector);
+        FeatNamedVector featNamedVector = new FeatNamedVector(vector);
+        Tuple predict = new Tuple(featNamedVector);
 
-        labeledVector.featsName = feats;
+        featNamedVector.featsName = feats;
         return predict(predict);
     }
 
@@ -78,8 +78,8 @@ public class MaxEntClassifier implements IClassifier {
 
     @Override
     public Map<String, Double> predict(Tuple predict) {
-        if (!(predict.vector instanceof LabeledVector)) {
-            throw new IllegalArgumentException("Please use LabeledVector");
+        if (!(predict.vector instanceof FeatNamedVector)) {
+            throw new IllegalArgumentException("Please use FeatNamedVector");
         }
 
         float[] featureVector = new float[predict.vector.getVector().length];
@@ -87,7 +87,7 @@ public class MaxEntClassifier implements IClassifier {
             featureVector[i] = (float) predict.vector.getVector()[i]; // So damn stupid.
         }
 
-        double[] prob = model.eval(((LabeledVector) predict.vector).featsName, featureVector, new double[model.getNumOutcomes()]);
+        double[] prob = model.eval(((FeatNamedVector) predict.vector).featsName, featureVector, new double[model.getNumOutcomes()]);
 
         Map<String, Double> resultMap = new HashMap<>();
         for (int i = 0; i < prob.length; i++) {

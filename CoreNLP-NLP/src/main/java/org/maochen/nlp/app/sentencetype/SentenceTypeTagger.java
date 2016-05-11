@@ -5,7 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.maochen.nlp.app.ITagger;
 import org.maochen.nlp.ml.Tuple;
 import org.maochen.nlp.ml.classifier.maxent.MaxEntClassifier;
-import org.maochen.nlp.ml.vector.LabeledVector;
+import org.maochen.nlp.ml.vector.FeatNamedVector;
 import org.maochen.nlp.parser.DTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,8 +57,8 @@ public class SentenceTypeTagger extends MaxEntClassifier implements ITagger {
             List<String> feats = featureExtractor.generateFeats(sentence.split("\\s"));
 
             String[] featsName = feats.stream().toArray(String[]::new);
-            LabeledVector labeledVector = new LabeledVector(featsName);
-            Tuple t = new Tuple(1, labeledVector, label);
+            FeatNamedVector featNamedVector = new FeatNamedVector(featsName);
+            Tuple t = new Tuple(1, featNamedVector, label);
             t.addExtra("sentence", sentence);
             return t;
         }).collect(Collectors.toList());
@@ -93,7 +93,7 @@ public class SentenceTypeTagger extends MaxEntClassifier implements ITagger {
         String[] featsName = feats.stream().toArray(String[]::new);
         double[] feat = feats.stream().mapToDouble(x -> 1.0).toArray();
 
-        LabeledVector vector = new LabeledVector(feat);
+        FeatNamedVector vector = new FeatNamedVector(feat);
         vector.featsName = featsName;
         Tuple predict = new Tuple(vector);
         return super.predict(predict);

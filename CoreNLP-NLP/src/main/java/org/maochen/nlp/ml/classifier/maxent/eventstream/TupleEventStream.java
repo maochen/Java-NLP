@@ -2,8 +2,11 @@ package org.maochen.nlp.ml.classifier.maxent.eventstream;
 
 import opennlp.model.Event;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.maochen.nlp.ml.Tuple;
-import org.maochen.nlp.ml.vector.LabeledVector;
+import org.maochen.nlp.ml.vector.DenseVector;
+import org.maochen.nlp.ml.vector.FeatNamedVector;
+import org.maochen.nlp.ml.vector.SparseVector;
 import org.maochen.nlp.util.VectorUtils;
 
 import java.util.Iterator;
@@ -19,12 +22,23 @@ public class TupleEventStream implements EventStream {
     @Override
     public Event next() {
         Tuple tuple = dataIter.next();
-        if (!(tuple.vector instanceof LabeledVector)) {
-            throw new IllegalArgumentException("Please use LabeledVector to set feat label");
+
+        String[] featName;
+        float[] featVal = VectorUtils.doubleToFloat(tuple.vector.getVector());
+
+        if (tuple.vector instanceof FeatNamedVector) {
+            featName = ((FeatNamedVector) tuple.vector).featsName;
+        } else if (tuple.vector instanceof SparseVector || tuple.vector instanceof DenseVector) {
+            featName = new String[tuple.vector.getVector().length];
+            for (int i = 0; i < featName.length; i++) {
+                featName[i] = String.valueOf(i);
+            }
+
+        } else {
+            throw new NotImplementedException("Unknown vector type");
         }
-        // Label, feature name, feature value
-        return new Event(tuple.label, ((LabeledVector) tuple.vector).featsName,
-                VectorUtils.doubleToFloat(tuple.vector.getVector()));
+
+        return new Event(tuple.label, featName, featVal);
     }
 
     @Override

@@ -2,7 +2,7 @@ package org.maochen.nlp.util;
 
 import org.apache.commons.lang3.StringUtils;
 import org.maochen.nlp.ml.SequenceTuple;
-import org.maochen.nlp.ml.vector.LabeledVector;
+import org.maochen.nlp.ml.vector.FeatNamedVector;
 
 import java.util.Arrays;
 import java.util.List;
@@ -13,14 +13,14 @@ import java.util.List;
 public class ValidationUtils {
     public static void printSequenceTuple(final SequenceTuple st, List<String> correctTag) {
         String[] tokens = st.entries.stream()
-                .map(tuple -> Arrays.stream(((LabeledVector) tuple.vector).featsName)
+                .map(tuple -> Arrays.stream(((FeatNamedVector) tuple.vector).featsName)
                         .filter(x -> x.startsWith("w0="))
                         .map(t -> t.split("=")[1])
                         .findFirst().orElse(StringUtils.EMPTY))
                 .toArray(String[]::new);
 
         String[] pos = st.entries.stream()
-                .map(tuple -> Arrays.stream(((LabeledVector) tuple.vector).featsName)
+                .map(tuple -> Arrays.stream(((FeatNamedVector) tuple.vector).featsName)
                         .filter(x -> x.startsWith("pos0="))
                         .map(t -> t.split("=")[1])
                         .findFirst().orElse(StringUtils.EMPTY))

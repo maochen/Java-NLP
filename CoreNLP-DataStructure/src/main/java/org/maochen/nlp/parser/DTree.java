@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Author: Maochen.G   contact@maochen.org License: check the LICENSE file. <p> This follows CoNLL-X
@@ -23,8 +24,8 @@ public class DTree extends ArrayList<DNode> {
     @Override
     public String toString() {
         return this.stream()
-                .map(x -> x.toString() + System.lineSeparator())
-                .reduce((x, y) -> x + y).get().trim();
+                .map(DNode::toString)
+                .collect(Collectors.joining(System.lineSeparator())).trim();
     }
 
     @Override
@@ -45,8 +46,7 @@ public class DTree extends ArrayList<DNode> {
     }
 
     public UUID getUUID() {
-        UUID uuid = UUID.fromString(padding.getFeature(UUID_KEY));
-        return uuid;
+        return UUID.fromString(padding.getFeature(UUID_KEY));
     }
 
     public void setUUID(UUID id) {
