@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -97,7 +96,7 @@ public class CRFNER extends CRFClassifier {
         System.out.println("Accuracy:\t" + (1 - (errCount / (double) total)) * 100 + "%");
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws FileNotFoundException {
         CRFNER ner = new CRFNER();
         ner.featureExtractor = new NERFeatureExtractor();
         String modelPath = "/Users/mguan/Desktop/ner.crf.model";

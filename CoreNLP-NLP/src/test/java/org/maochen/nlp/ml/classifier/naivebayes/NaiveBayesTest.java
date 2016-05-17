@@ -5,11 +5,9 @@ import org.maochen.nlp.ml.IClassifier;
 import org.maochen.nlp.ml.Tuple;
 import org.maochen.nlp.ml.vector.DenseVector;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by Maochen on 9/19/15.
@@ -42,7 +40,13 @@ public class NaiveBayesTest {
         Comparator<Map.Entry<String, Double>> reverseCmp = Collections.reverseOrder(Comparator.comparing(Map.Entry::getValue));
         probs.entrySet().stream().sorted(reverseCmp).forEach(result::add);
 
-//        System.out.println("Result: " + predict);
-        result.forEach(e -> System.out.println(e.getKey() + "\t:\t" + e.getValue()));
+        assertEquals(2, result.size());
+        for (Map.Entry<String, Double> entry : result) {
+            if ("male".equals(entry.getKey())) {
+                assertEquals(1.1523066349783823E-5, entry.getValue(), Double.MIN_VALUE);
+            } else {
+                assertEquals(0.9999884769336502, entry.getValue(), Double.MIN_VALUE);
+            }
+        }
     }
 }

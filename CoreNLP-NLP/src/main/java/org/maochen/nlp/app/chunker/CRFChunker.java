@@ -102,7 +102,7 @@ public class CRFChunker extends CRFClassifier {
         System.out.println("Accuracy:\t" + (1 - (errCount / (double) total)) * 100 + "%");
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws FileNotFoundException {
         CRFChunker chunker = new CRFChunker();
         chunker.featureExtractor = new ChunkerFeatureExtractor();
 

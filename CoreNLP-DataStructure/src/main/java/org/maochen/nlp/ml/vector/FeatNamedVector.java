@@ -18,6 +18,22 @@ public class FeatNamedVector extends DenseVector {
         this.featsName = feats;
     }
 
+    public FeatNamedVector(String[] feats, String delimiter) {
+        super(new double[feats.length]);
+
+        this.featsName = new String[feats.length];
+
+        for (int i = 0; i < feats.length; i++) {
+            String[] fields = feats[i].split(delimiter);
+            if (fields.length != 2) {
+                throw new RuntimeException("Error feats format: " + Arrays.toString(feats));
+            }
+
+            featsName[i] = fields[0];
+            super.getVector()[i] = Double.parseDouble(fields[1]);
+        }
+    }
+
     @Override
     public String toString() {
         return Arrays.toString(this.featsName);

@@ -1,14 +1,10 @@
 package org.maochen.nlp.ml.util.dataio;
 
 import org.maochen.nlp.ml.Tuple;
-import org.maochen.nlp.ml.util.TrainingDataUtils;
 import org.maochen.nlp.ml.vector.FeatNamedVector;
 import org.maochen.nlp.ml.vector.IVector;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -25,17 +21,23 @@ public class CSVDataReader {
     private String delim;
     private boolean isRealVal;
 
+    private boolean hasHeader;
     private String[] header;
 
     public List<Tuple> read() throws IOException {
+        FileInputStream fileInputStream = new FileInputStream(filename);
+        return read(fileInputStream);
+    }
+
+    public List<Tuple> read(InputStream is) throws IOException {
         List<Tuple> ds = new ArrayList<>();
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filename)));
+        BufferedReader br = new BufferedReader(new InputStreamReader(is));
         String line = br.readLine();
 
         int count = 0;
         while (line != null) {
-            if (count == 0) {
+            if (count == 0 && hasHeader) {
                 header = line.split(delim);
             } else {
                 String[] values = line.split(delim);
@@ -47,7 +49,12 @@ public class CSVDataReader {
                     if (i == actualLabelCol) {
                         continue;
                     }
-                    name.add(header[i] + "=" + values[i]);
+
+                    if (hasHeader) {
+                        name.add(header[i] + "=" + values[i]);
+                    } else {
+                        name.add(i + "=" + values[i]);
+                    }
                 }
 
                 IVector v = new FeatNamedVector(name.stream().toArray(String[]::new));
@@ -72,31 +79,11 @@ public class CSVDataReader {
         return Arrays.stream(this.header).collect(Collectors.joining(delim));
     }
 
-    public CSVDataReader(String filename, int labelCol, String delim, boolean isRealVal) {
+    public CSVDataReader(String filename, int labelCol, String delim, boolean isRealVal, boolean hasHeader) {
         this.filename = filename;
         this.labelCol = labelCol;
         this.delim = delim;
         this.isRealVal = isRealVal;
-    }
-
-    public static void main(String[] args) throws IOException {
-        String filename = "/Users/mguan/Desktop/train.csv";
-        CSVDataReader csvDataReader = new CSVDataReader(filename, -1, ",", true);
-
-        List<Tuple> data = csvDataReader.read();
-
-        List<Tuple> balancedData = TrainingDataUtils.createBalancedTrainingData(data);
-
-        balancedData = balancedData.stream()
-                .sorted((t1, t2) -> {
-                    int id1 = Integer.parseInt(((FeatNamedVector) (t1.vector)).featsName[0]);
-                    int id2 = Integer.parseInt(((FeatNamedVector) (t2.vector)).featsName[0]);
-                    return Integer.compare(id1, id2);
-                }).collect(Collectors.toList());
-
-        String header = csvDataReader.getHeader();
-        CSVDataWriter csvDataWriter = new CSVDataWriter(filename.split("\\.")[0] + ".balanced.csv", -1, ",", header);
-        csvDataWriter.excludingCols.add(0); // Bypass write id.
-        csvDataWriter.write(balancedData, true, false);
+        this.hasHeader = hasHeader;
     }
 }

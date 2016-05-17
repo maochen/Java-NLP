@@ -1,5 +1,6 @@
 package org.maochen.nlp.app.sentencetype;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
 import org.maochen.nlp.app.ITagger;
@@ -10,10 +11,8 @@ import org.maochen.nlp.parser.DTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.Charset;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -35,15 +34,13 @@ public class SentenceTypeTagger extends MaxEntClassifier implements ITagger {
         super.setParameter(props);
 
         // Preparing training data
-        Set<String> trainingData = new HashSet<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(trainFilePath))) {
-            String line = br.readLine();
-            while (line != null) {
-                trainingData.add(line);
-                line = br.readLine();
-            }
+        Set<String> trainingData = null;
+        try {
+            List<String> stringList = FileUtils.readLines(new File(trainFilePath), Charset.defaultCharset());
+            trainingData = new HashSet<>(stringList);
         } catch (IOException e) {
             LOG.error("load data err.", e);
+            return;
         }
 
         // -----------
