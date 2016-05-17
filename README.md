@@ -5,6 +5,8 @@ NLP classifiers and tools (Since 03/03/2013)
 ---------
 
 <ul>
+	<li>CRFSuite Wrapper</li>
+	<li>LibSVM Wrapper</li>
 	<li>KNN Algorithm</li>
 	<li>Single word correction</li>
 	<li>Naive Bayes classifier</li>
