@@ -1,7 +1,5 @@
 package org.maochen.nlp.ml.classifier;
 
-import com.google.common.collect.ImmutableSet;
-import org.maochen.nlp.ml.util.dataio.CSVDataReader;
 import org.maochen.nlp.ml.vector.FeatNamedVector;
 
 import java.util.*;
@@ -40,9 +38,9 @@ public class FeatureIndexer {
             FeatNamedVector featureVector = trainingSamples.get(i);
             double[] vector = new double[nameIndexMap.size()];
             for (int j = 0; j < featureVector.featsName.length; j++) {
-                String[] featFields = featureVector.featsName[j].split("=");
-                String featName = featFields[0];
-                double featVal = featFields.length > 1 ? featureVector.getVector()[j] : Double.parseDouble(featFields[1]);
+                String[] featNameFields = featureVector.featsName[j].split("=");
+                String featName = featNameFields[0];
+                double featVal = featNameFields.length < 2 ? featureVector.getVector()[j] : Double.parseDouble(featNameFields[1]);
                 int featIndex = nameIndexMap.get(featName);
                 vector[featIndex] = featVal;
             }
@@ -65,10 +63,5 @@ public class FeatureIndexer {
         }
 
         return namesArray;
-    }
-
-    public static void main(String[] args) {
-        String filename = "";
-        CSVDataReader csvDataReader = new CSVDataReader(filename, 6, "\t", true, ImmutableSet.of(1, 2, 3, 4,9), 0);
     }
 }

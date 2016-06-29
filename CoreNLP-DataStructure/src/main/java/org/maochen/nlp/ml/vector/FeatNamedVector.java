@@ -34,6 +34,35 @@ public class FeatNamedVector extends DenseVector {
         }
     }
 
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof FeatNamedVector)) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
+
+        String[] oFeatName = ((FeatNamedVector) o).featsName;
+        if (featsName.length != oFeatName.length) {
+            return false;
+        }
+
+        for (int i = 0; i < featsName.length; i++) {
+            if (!featsName[i].equalsIgnoreCase(oFeatName[i])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode() + Arrays.hashCode(featsName);
+    }
+
     @Override
     public String toString() {
         return Arrays.toString(this.featsName);

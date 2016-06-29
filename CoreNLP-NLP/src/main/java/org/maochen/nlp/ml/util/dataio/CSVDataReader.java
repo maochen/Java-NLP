@@ -1,5 +1,6 @@
 package org.maochen.nlp.ml.util.dataio;
 
+import org.apache.commons.lang3.StringUtils;
 import org.maochen.nlp.ml.Tuple;
 import org.maochen.nlp.ml.vector.FeatNamedVector;
 
@@ -17,7 +18,7 @@ public class CSVDataReader {
     private String delim;
 
     private boolean hasHeader;
-    private String[] header;
+    private String[] header = null;
 
     private Set<Integer> ignoredColumns = new HashSet<>();
     private int posNegIndex = -1; // Column determine pos or neg example.
@@ -27,28 +28,41 @@ public class CSVDataReader {
         return read(fileInputStream);
     }
 
-    /**
-     * only extract feats, wont do label recognition or posneg recog.
-     */
-    private void extractValuedFeat(String[] fields, Tuple tuple, int labelCol) {
-        FeatNamedVector vector = (FeatNamedVector) tuple.vector;
+    protected Tuple extractValuedFeat(String[] fields, int labelCol, Set<Integer> ignoredColumns, String[] header, int posNegIndex) {
+        FeatNamedVector featNamedVector = new FeatNamedVector(new double[fields.length - 1 - ignoredColumns.size()]);
+        featNamedVector.featsName = new String[fields.length];
+
+        Tuple tuple = new Tuple(featNamedVector);
+        tuple.label = fields[labelCol];
+
+        if (posNegIndex > -1) {
+            tuple.isPosExample = Integer.parseInt(fields[posNegIndex]) > -1;
+        }
+
         for (int i = 0; i < fields.length; i++) {
             if (i == labelCol || ignoredColumns.contains(i)) {
                 continue;
             }
 
-            if (hasHeader) {
-                vector.featsName[i] = header[i];
+            if (header != null) {
+                featNamedVector.featsName[i] = header[i];
+            } else {
+                featNamedVector.featsName[i] = String.valueOf(i);
             }
 
             try {
                 double val = Double.parseDouble(fields[i]);
                 tuple.vector.getVector()[i] = val;
             } catch (NumberFormatException e) {
-                tuple.vector.getVector()[i] = 1;
+                if (header != null) {
+                    featNamedVector.featsName[i] += "_" + fields[i].toLowerCase().trim();
+                }
+                double val = fields[i].trim().isEmpty() ? 0 : 1;
+                tuple.vector.getVector()[i] = val;
             }
         }
 
+        return tuple;
     }
 
     public List<Tuple> read(InputStream is) throws IOException {
@@ -64,16 +78,7 @@ public class CSVDataReader {
             } else {
                 String[] values = line.split(delim);
                 final int actualLabelCol = labelCol == -1 ? values.length - 1 : labelCol;
-
-                FeatNamedVector featNamedVector = new FeatNamedVector(new double[values.length - 1 - ignoredColumns.size()]);
-                Tuple tuple = new Tuple(featNamedVector);
-                tuple.label = values[actualLabelCol];
-
-                if (posNegIndex > -1) {
-                    tuple.isPosExample = Integer.parseInt(values[posNegIndex]) > -1;
-                }
-
-                extractValuedFeat(values, tuple, actualLabelCol);
+                Tuple tuple = extractValuedFeat(values, actualLabelCol, ignoredColumns, header, posNegIndex);
                 ds.add(tuple);
             }
 
@@ -85,7 +90,7 @@ public class CSVDataReader {
     }
 
     public String getHeader() {
-        return Arrays.stream(this.header).collect(Collectors.joining(delim));
+        return this.header == null ? StringUtils.EMPTY : Arrays.stream(this.header).collect(Collectors.joining(delim));
     }
 
     public CSVDataReader(String filename, int labelCol, String delim, boolean hasHeader, Set<Integer> ignoredColumns, int posNegIndex) {
