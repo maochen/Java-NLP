@@ -55,7 +55,7 @@ public class LibSVMClassifierTest {
     public void testOnStudentExam() throws IOException {
         InputStream trainIs = this.getClass().getResourceAsStream("/training_data/student_exam_data.txt");
 
-        List<Tuple> trainingData = new CSVDataReader(null, -1, ",", true, false).read(trainIs);
+        List<Tuple> trainingData = new CSVDataReader(null, -1, ",", false, null, -1).read(trainIs);
 
         LibSVMClassifier libSVMClassifier = new LibSVMClassifier();
         libSVMClassifier.train(trainingData);
