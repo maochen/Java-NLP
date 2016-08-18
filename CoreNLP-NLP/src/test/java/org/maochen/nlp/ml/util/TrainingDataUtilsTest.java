@@ -20,27 +20,20 @@ public class TrainingDataUtilsTest {
         List<Tuple> originalList = new ArrayList<>();
         for (int i = 0; i < 40; i++) {
             originalList.add(new Tuple(1, null, "a"));
-        }
-
-        for (int i = 0; i < 200; i++) {
-            originalList.add(new Tuple(1, null, "b"));
-        }
-
-        for (int i = 0; i < 320; i++) {
-            originalList.add(new Tuple(1, null, "c"));
+            originalList.forEach(x -> x.isPosExample = true);
         }
 
         for (int i = 0; i < 2; i++) {
-            originalList.add(new Tuple(1, null, "d"));
+            Tuple t = new Tuple(1, null, "a");
+            t.isPosExample = false;
+            originalList.add(t);
+
         }
 
         Collections.shuffle(originalList);
-        List<Tuple> balanced = TrainingDataUtils.createBalancedTrainingData(originalList);
-        assertEquals(562, originalList.size());
-        assertEquals(2, balanced.stream().filter(x -> x.label.equals("a")).count());
-        assertEquals(2, balanced.stream().filter(x -> x.label.equals("b")).count());
-        assertEquals(2, balanced.stream().filter(x -> x.label.equals("c")).count());
-        assertEquals(2, balanced.stream().filter(x -> x.label.equals("d")).count());
+        List<Tuple> balanced = TrainingDataUtils.createBalancedTrainingDataBasedOnLabel(originalList, 0);
+        assertEquals(42, originalList.size());
+        assertEquals(2, balanced.stream().filter(x -> x.label.equals("a")).filter(x -> x.isPosExample).count());
     }
 
     @Test
