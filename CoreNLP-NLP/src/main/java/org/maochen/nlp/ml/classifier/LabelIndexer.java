@@ -49,14 +49,14 @@ public class LabelIndexer {
     // Convert Index to actual string.
     public Map<String, Double> convertMapKey(Map<Integer, Double> probs) {
         Map<String, Double> stringKeyProb = new HashMap<>();
-        probs.entrySet().stream().forEach(e -> stringKeyProb.put(getLabel(e.getKey()), e.getValue()));
+        probs.entrySet().forEach(e -> stringKeyProb.put(getLabel(e.getKey()), e.getValue()));
         return stringKeyProb;
     }
 
     public String serializeToString() {
         return labelIndexer.entrySet().stream()
-                .map(e -> e.getKey() + System.lineSeparator() + e.getValue())
-                .collect(Collectors.joining(System.lineSeparator()));
+                .map(e -> e.getKey() + ":" + e.getValue())
+                .collect(Collectors.joining(","));
     }
 
     public void readFromSerializedString(String str) {
@@ -64,9 +64,10 @@ public class LabelIndexer {
             throw new IllegalArgumentException("serialized string is invalid.");
         }
 
-        String[] fields = str.split(System.lineSeparator());
-        for (int i = 0; i < fields.length; i += 2) {
-            labelIndexer.put(fields[i], Integer.parseInt(fields[i + 1]));
+        String[] fields = str.split(",");
+        for (int i = 0; i < fields.length; i++) {
+            String[] field=fields[i].split(":");
+            labelIndexer.put(field[0], Integer.parseInt(field[1]));
         }
 
         LOG.info("Successfully loaded " + labelIndexer.size() + " indices.");

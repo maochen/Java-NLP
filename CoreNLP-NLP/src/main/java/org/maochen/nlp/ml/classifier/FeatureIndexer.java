@@ -40,9 +40,15 @@ public class FeatureIndexer {
             for (int j = 0; j < featureVector.featsName.length; j++) {
                 String[] featNameFields = featureVector.featsName[j].split("=");
                 String featName = featNameFields[0];
-                double featVal = featNameFields.length < 2 ? featureVector.getVector()[j] : Double.parseDouble(featNameFields[1]);
-                int featIndex = nameIndexMap.get(featName);
-                vector[featIndex] = featVal;
+                try {
+                    double featVal = featNameFields.length < 2 ? featureVector.getVector()[j] : Double.parseDouble(featNameFields[1]);
+                    int featIndex = nameIndexMap.get(featName);
+                    vector[featIndex] = featVal;
+                }catch (Exception e){
+                    System.out.println(featName);
+                    throw e;
+                }
+
             }
             vectors[i] = vector;
         }

@@ -25,8 +25,8 @@ public class TrainingDataUtils {
     /**
      * Regardless of the label, just consider isPosExample and !isPosExample
      *
-     * @param trainingData
-     * @return
+     * @param trainingData input training data.
+     * @return List of balanced tuples.
      */
     public static List<Tuple> createBalancedTrainingDataForAll(final List<Tuple> trainingData) {
         List<Tuple> pos = trainingData.stream().filter(x -> x.isPosExample).collect(Collectors.toList());
@@ -41,12 +41,17 @@ public class TrainingDataUtils {
         return pos;
     }
 
+    /**
+     * reduce the dimension of training data. Remove feats that has the same value across all examples.
+     *
+     * @param trainingData inputdata.
+     */
     public static void reduceDimension(final List<Tuple> trainingData) {
-        // FeatName, feat possible vals.
+        // FeatName - <feat possible vals, count of instances that has this val>
         // Do NOT store index for featname, index might not be same among tuples for the same featname.
-        Map<String, Set<Double>> featNameValues = new HashMap<>();
+        Map<String, Map<Double, Integer>> featNameValues = new HashMap<>();
         for (Tuple t : trainingData) {
-            double[] val = t.vector.getVector();
+            double[] featValues = t.vector.getVector();
             String[] name;
             if (t.vector instanceof FeatNamedVector) {
                 name = ((FeatNamedVector) t.vector).featsName;
@@ -54,16 +59,36 @@ public class TrainingDataUtils {
                 name = IntStream.range(0, t.vector.getVector().length).mapToObj(String::valueOf).toArray(String[]::new);
             }
 
-            for (int i = 0; i < val.length; i++) {
+            for (int i = 0; i < featValues.length; i++) {
                 if (!featNameValues.containsKey(name[i])) {
-                    featNameValues.put(name[i], new HashSet<>());
+                    featNameValues.put(name[i], new HashMap<>());
                 }
 
-                featNameValues.get(name[i]).add(val[i]);
+                Map<Double, Integer> valMap = featNameValues.get(name[i]);
+                int newCount = 0;
+                if (valMap.containsKey(featValues[i])) {
+                    newCount = valMap.get(featValues[i]);
+                }
+
+                newCount++;
+                valMap.put(featValues[i], newCount);
             }
         }
 
-        Set<String> singleValFeats = featNameValues.entrySet().stream().filter(x -> x.getValue().size() == 1).map(Map.Entry::getKey).collect(Collectors.toSet());
+        Set<String> singleValFeats = featNameValues.entrySet().stream()
+                .filter(e -> {
+                    Set<Map.Entry<Double, Integer>> detailEntry = e.getValue().entrySet();
+
+                    if (detailEntry.size() == 1 && detailEntry.iterator().next().getValue() == 1) {
+                        return true;
+                    } else if (detailEntry.size() == 1 && detailEntry.iterator().next().getValue().equals(trainingData.size())) {
+                        return true;
+                    }
+
+                    return false;
+                })
+
+                .map(Map.Entry::getKey).collect(Collectors.toSet());
 
         LOG.debug("Single value feats: ");
         LOG.debug(singleValFeats.toString().replaceAll(", ", System.lineSeparator()));
@@ -115,9 +140,9 @@ public class TrainingDataUtils {
     /**
      * Balance the pos/neg data for every label.
      *
-     * @param trainingData
-     * @param cutoff       C(training data | Label) < cutoff won't be balanced.
-     * @return
+     * @param trainingData input data
+     * @param cutoff       C(training data | Label) less than cutoff won't be balanced.
+     * @return all balanced training examples.
      */
     public static List<Tuple> createBalancedTrainingDataBasedOnLabel(final List<Tuple> trainingData, int cutoff) {
         LOG.debug("Original size:" + trainingData.size());

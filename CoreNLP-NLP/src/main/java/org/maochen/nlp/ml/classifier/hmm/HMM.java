@@ -84,7 +84,6 @@ public class HMM {
     }
 
     /**
-     *
      * @param seqTuple sequence tuple.
      * @return left -> list of Xi_j, right -> list of labels (y).
      */
@@ -104,8 +103,9 @@ public class HMM {
 
     /**
      * Tag (Latent Var) is Xi, words (Observed Var) yi (or oi) ...
-     * @param data
-     * @return
+     *
+     * @param data input sequence examples.
+     * @return HMM model.
      */
     public static HMMModel train(List<SequenceTuple> data) {
         HMMModel model = new HMMModel();

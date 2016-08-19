@@ -1,63 +1,72 @@
 package org.maochen.nlp.ml.util.dataio;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.maochen.nlp.ml.Tuple;
 import org.maochen.nlp.ml.vector.FeatNamedVector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.*;
-import java.util.*;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
  * Created by mguan on 4/8/16.
  */
 public class CSVDataReader {
+    @SuppressWarnings("unused")
+    private static final Logger LOG = LoggerFactory.getLogger(CSVDataReader.class);
 
     private String filename;
-    private int labelCol;
     private String delim;
 
-    private boolean hasHeader;
-    private String[] header = null;
+    int labelCol;
 
-    private Set<Integer> ignoredColumns = new HashSet<>();
-    private int posNegIndex = -1; // Column determine pos or neg example.
+    String[] header = null;
+
+    Set<Integer> ignoredColumns = new HashSet<>();
+    int posNegIndex = -1; // Column determine pos or neg example.
 
     public List<Tuple> read() throws IOException {
         FileInputStream fileInputStream = new FileInputStream(filename);
         return read(fileInputStream);
     }
 
-    protected Tuple extractValuedFeat(String[] fields, int labelCol, Set<Integer> ignoredColumns, String[] header, int posNegIndex) {
-        FeatNamedVector featNamedVector = new FeatNamedVector(new double[fields.length - 1 - ignoredColumns.size()]);
-        featNamedVector.featsName = new String[fields.length];
+    protected Tuple extractValuedFeat(CSVRecord record) {
+        FeatNamedVector featNamedVector = new FeatNamedVector(new double[record.size() - 1 - ignoredColumns.size()]);
+        featNamedVector.featsName = new String[record.size()];
 
         Tuple tuple = new Tuple(featNamedVector);
-        tuple.label = fields[labelCol];
+        tuple.label = record.get(labelCol);
 
         if (posNegIndex > -1) {
-            tuple.isPosExample = Integer.parseInt(fields[posNegIndex]) > -1;
+            tuple.isPosExample = Integer.parseInt(record.get(posNegIndex)) > -1;
         }
 
-        for (int i = 0; i < fields.length; i++) {
+        for (int i = 0; i < record.size(); i++) {
             if (i == labelCol || ignoredColumns.contains(i)) {
                 continue;
             }
 
-            if (header != null) {
-                featNamedVector.featsName[i] = header[i];
-            } else {
-                featNamedVector.featsName[i] = String.valueOf(i);
-            }
+            featNamedVector.featsName[i] = header[i];
 
             try {
-                double val = Double.parseDouble(fields[i]);
+                double val = Double.parseDouble(record.get(i));
                 tuple.vector.getVector()[i] = val;
             } catch (NumberFormatException e) {
                 if (header != null) {
-                    featNamedVector.featsName[i] += "_" + fields[i].toLowerCase().trim();
+                    featNamedVector.featsName[i] += "_" + record.get(i).toLowerCase().trim();
                 }
-                double val = fields[i].trim().isEmpty() ? 0 : 1;
+
+                double val = record.get(i).trim().isEmpty() ? 0 : 1;
                 tuple.vector.getVector()[i] = val;
             }
         }
@@ -66,38 +75,24 @@ public class CSVDataReader {
     }
 
     public List<Tuple> read(InputStream is) throws IOException {
-        List<Tuple> ds = new ArrayList<>();
+        CSVFormat format = CSVFormat.RFC4180.withHeader().withDelimiter(delim.charAt(0));
+        CSVParser csvParser = new CSVParser(new InputStreamReader(is), format);
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(is));
-        String line = br.readLine();
+        List<CSVRecord> records = csvParser.getRecords();
+        header = csvParser.getHeaderMap().entrySet().stream()
+                .sorted((e1, e2) -> e1.getValue().compareTo(e2.getValue()))
+                .map(Map.Entry::getKey).toArray(String[]::new);
 
-        int count = 0;
-        while (line != null) {
-            if (count == 0 && hasHeader) {
-                header = line.split(delim);
-            } else {
-                String[] values = line.split(delim);
-                final int actualLabelCol = labelCol == -1 ? values.length - 1 : labelCol;
-                Tuple tuple = extractValuedFeat(values, actualLabelCol, ignoredColumns, header, posNegIndex);
-                ds.add(tuple);
-            }
+        labelCol = labelCol == -1 ? records.get(0).size() - 1 : labelCol;
 
-            count++;
-            line = br.readLine();
-        }
-
+        List<Tuple> ds = records.stream().parallel().map(this::extractValuedFeat).collect(Collectors.toList());
         return ds;
     }
 
-    public String getHeader() {
-        return this.header == null ? StringUtils.EMPTY : Arrays.stream(this.header).collect(Collectors.joining(delim));
-    }
-
-    public CSVDataReader(String filename, int labelCol, String delim, boolean hasHeader, Set<Integer> ignoredColumns, int posNegIndex) {
+    public CSVDataReader(String filename, int labelCol, String delim, Set<Integer> ignoredColumns, int posNegIndex) {
         this.filename = filename;
         this.labelCol = labelCol;
         this.delim = delim;
-        this.hasHeader = hasHeader;
         this.posNegIndex = posNegIndex;
         if (ignoredColumns != null) {
             this.ignoredColumns = ignoredColumns;

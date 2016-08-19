@@ -197,7 +197,7 @@ public class CrossValidation {
         properties.put("iter", "500");
         maxEntClassifier.setParameter(properties);
         String fileName = "/Users/mguan/Desktop/train.balanced.csv";
-        CSVDataReader dataReader = new CSVDataReader(fileName, -1, ",", true, null, -1);
+        CSVDataReader dataReader = new CSVDataReader(fileName, -1, ",", null, -1);
         List<Tuple> data = dataReader.read();
         CrossValidation cv = new CrossValidation(10, maxEntClassifier, true);
 
