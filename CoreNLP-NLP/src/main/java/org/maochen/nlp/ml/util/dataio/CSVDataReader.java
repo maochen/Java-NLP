@@ -47,10 +47,6 @@ public class CSVDataReader {
         Tuple tuple = new Tuple(featNamedVector);
         tuple.label = record.get(labelCol);
 
-        if (posNegIndex > -1) {
-            tuple.isPosExample = Integer.parseInt(record.get(posNegIndex)) > -1;
-        }
-
         for (int i = 0; i < record.size(); i++) {
             if (i == labelCol || ignoredColumns.contains(i)) {
                 continue;

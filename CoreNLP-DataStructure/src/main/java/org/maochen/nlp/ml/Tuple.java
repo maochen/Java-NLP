@@ -13,7 +13,6 @@ import java.util.Map;
 public class Tuple {
     public int id;
     public String label;
-    public boolean isPosExample = true; // determine whether given training data is positive or negative for that label.
     public IVector vector;
 
     private Map<String, Object> extra = null;

@@ -22,20 +22,17 @@ public class TrainingDataUtilsTest {
         List<Tuple> originalList = new ArrayList<>();
         for (int i = 0; i < 40; i++) {
             originalList.add(new Tuple(1, null, "a"));
-            originalList.forEach(x -> x.isPosExample = true);
         }
 
         for (int i = 0; i < 2; i++) {
-            Tuple t = new Tuple(1, null, "a");
-            t.isPosExample = false;
+            Tuple t = new Tuple(1, null, "b");
             originalList.add(t);
-
         }
 
         Collections.shuffle(originalList);
-        List<Tuple> balanced = TrainingDataUtils.createBalancedTrainingDataBasedOnLabel(originalList, 0);
+        List<Tuple> balanced = TrainingDataUtils.createBalancedTrainingData(originalList);
         assertEquals(42, originalList.size());
-        assertEquals(2, balanced.stream().filter(x -> x.label.equals("a")).filter(x -> x.isPosExample).count());
+        assertEquals(2, balanced.stream().filter(x -> x.label.equals("a")).count());
     }
 
     @Test
@@ -56,7 +53,7 @@ public class TrainingDataUtilsTest {
     public void reduceDimensionTest() {
         List<Tuple> tuples = new ArrayList<>();
         tuples.add(new Tuple(new double[]{1, 1, 3, 0}));
-        tuples.add(new Tuple(new double[]{1, 0.4, 2, 0}));
+        tuples.add(new Tuple(new double[]{1, 0.4, 3, 0}));
         tuples.add(new Tuple(new double[]{1, 0.1, 2, 0}));
         tuples.add(new Tuple(new double[]{1, 0.9, 2, 0}));
         TrainingDataUtils.reduceDimension(tuples);
@@ -68,6 +65,9 @@ public class TrainingDataUtilsTest {
     }
 
     @Test
+    /**
+     * for this test, please read comment in TrainingDataUtils.getSingleValFeat()
+     */
     public void reduceDimensionTest1() {
         List<Tuple> tuples = new ArrayList<>();
         tuples.add(new Tuple(new double[]{1, 0, 0, 0}));
@@ -78,7 +78,7 @@ public class TrainingDataUtilsTest {
 
         for (Tuple t : tuples) {
             int vLen = t.vector.getVector().length;
-            assertEquals(4, vLen);
+            assertEquals(0, vLen);
         }
     }
 

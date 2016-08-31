@@ -28,17 +28,49 @@ public class TrainingDataUtils {
      * @param trainingData input training data.
      * @return List of balanced tuples.
      */
-    public static List<Tuple> createBalancedTrainingDataForAll(final List<Tuple> trainingData) {
-        List<Tuple> pos = trainingData.stream().filter(x -> x.isPosExample).collect(Collectors.toList());
-        List<Tuple> neg = trainingData.stream().filter(x -> !x.isPosExample).collect(Collectors.toList());
-        if (pos.size() < neg.size()) {
-            neg = neg.subList(0, pos.size());
-        } else if (pos.size() > neg.size()) {
-            pos = pos.subList(0, neg.size());
+    public static List<Tuple> createBalancedTrainingData(final List<Tuple> trainingData) {
+        Map<String, Long> tagCount = trainingData.parallelStream()
+                .map(x -> new AbstractMap.SimpleImmutableEntry<>(x.label, 1))
+                .collect(Collectors.groupingBy(Map.Entry::getKey, Collectors.counting()));
+
+        Map.Entry<String, Long> minCountEntry = tagCount.entrySet().stream()
+                .min((e1, e2) -> e1.getValue().compareTo(e2.getValue()))
+                .orElse(null);
+
+        tagCount.clear();
+
+        List<Tuple> newData = new ArrayList<>();
+        for (Tuple t : trainingData) {
+            String label = t.label;
+            if (!tagCount.containsKey(label)) {
+                tagCount.put(t.label, 0L);
+            }
+
+            if (tagCount.get(label) < minCountEntry.getValue()) {
+                tagCount.put(label, tagCount.get(label) + 1);
+                newData.add(t);
+            }
         }
 
-        pos.addAll(neg);
-        return pos;
+        return newData;
+    }
+
+    private static Set<String> getSingleValFeat(final Map<String, Map<Double, Integer>> featNameValues, final int trainingDataSize) {
+        return featNameValues.entrySet().stream()
+                .filter(e -> {
+                    List<Map.Entry<Double, Integer>> detailEntry = e.getValue().entrySet().stream().collect(Collectors.toList());
+
+                    if (detailEntry.size() == 1 && detailEntry.get(0).getValue() == 1) {
+                        return true; // Only one sample
+                    } else if (detailEntry.size() == 1 && detailEntry.get(0).getValue().equals(trainingDataSize)) {
+                        return true; // All samples has same feat val for this col
+                    } else if (detailEntry.size() == 2) {
+                        return detailEntry.get(0).getValue() == 1 || detailEntry.get(1).getValue() == 1;// Two cats with 1 cat has only 1 val.
+                    }
+
+                    return false;
+                })
+                .map(Map.Entry::getKey).collect(Collectors.toSet());
     }
 
     /**
@@ -75,21 +107,7 @@ public class TrainingDataUtils {
             }
         }
 
-        Set<String> singleValFeats = featNameValues.entrySet().stream()
-                .filter(e -> {
-                    Set<Map.Entry<Double, Integer>> detailEntry = e.getValue().entrySet();
-
-                    if (detailEntry.size() == 1 && detailEntry.iterator().next().getValue() == 1) {
-                        return true;
-                    } else if (detailEntry.size() == 1 && detailEntry.iterator().next().getValue().equals(trainingData.size())) {
-                        return true;
-                    }
-
-                    return false;
-                })
-
-                .map(Map.Entry::getKey).collect(Collectors.toSet());
-
+        Set<String> singleValFeats = getSingleValFeat(featNameValues, trainingData.size());
         LOG.debug("Single value feats: ");
         LOG.debug(singleValFeats.toString().replaceAll(", ", System.lineSeparator()));
 
@@ -133,62 +151,10 @@ public class TrainingDataUtils {
 
                 ((FeatNamedVector) t.vector).featsName = featName.stream().toArray(String[]::new);
             }
+
+
         }
 
-    }
-
-    /**
-     * Balance the pos/neg data for every label.
-     *
-     * @param trainingData input data
-     * @param cutoff       C(training data | Label) less than cutoff won't be balanced.
-     * @return all balanced training examples.
-     */
-    public static List<Tuple> createBalancedTrainingDataBasedOnLabel(final List<Tuple> trainingData, int cutoff) {
-        LOG.debug("Original size:" + trainingData.size());
-        Map<String, Long> tagCount = trainingData.parallelStream()
-                .map(x -> new AbstractMap.SimpleImmutableEntry<>(x.label, 1))
-                .collect(Collectors.groupingBy(Map.Entry::getKey, Collectors.counting()));
-
-        LOG.debug(tagCount.toString());
-
-        List<Tuple> copyTrainingData = new ArrayList<>();
-
-        for (String tag : tagCount.keySet()) {
-            List<Tuple> examples = trainingData.stream().filter(x -> tag.equals(x.label)).collect(Collectors.toList());
-            if (examples.size() < cutoff) {
-                LOG.debug("Keep all for " + tag + " -> " + tagCount.get(tag));
-                copyTrainingData.addAll(examples);
-                continue;
-            }
-
-            List<Tuple> posExample = examples.stream().filter(x -> x.isPosExample).collect(Collectors.toList());
-            if (posExample.isEmpty()) {
-                LOG.warn("Missing positive examples for: " + tag);
-                copyTrainingData.addAll(examples);
-                continue;
-            }
-            examples.removeAll(posExample);
-            if (examples.isEmpty()) {
-                LOG.warn("Missing negative examples for " + tag);
-                copyTrainingData.addAll(examples);
-                continue;
-            }
-
-            int minCount = Math.min(posExample.size(), examples.size());
-
-            if (examples.size() == minCount) {
-                posExample = posExample.subList(0, minCount);
-            } else {
-                examples = examples.subList(0, minCount);
-            }
-
-            copyTrainingData.addAll(posExample);
-            copyTrainingData.addAll(examples);
-        }
-
-        LOG.debug("Size after balancing: " + trainingData.size());
-        return copyTrainingData;
     }
 
     /**
@@ -267,4 +233,5 @@ public class TrainingDataUtils {
 
         return data;
     }
+
 }
