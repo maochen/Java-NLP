@@ -28,12 +28,11 @@ public class CSVDataReader {
     private String filename;
     private String delim;
 
-    int labelCol;
+    public int labelCol;
 
-    String[] header = null;
+    public String[] header = null;
 
-    Set<Integer> ignoredColumns = new HashSet<>();
-    int posNegIndex = -1; // Column determine pos or neg example.
+    public Set<Integer> ignoredColumns = new HashSet<>();
 
     public List<Tuple> read() throws IOException {
         FileInputStream fileInputStream = new FileInputStream(filename);
@@ -85,11 +84,10 @@ public class CSVDataReader {
         return ds;
     }
 
-    public CSVDataReader(String filename, int labelCol, String delim, Set<Integer> ignoredColumns, int posNegIndex) {
+    public CSVDataReader(String filename, int labelCol, String delim, Set<Integer> ignoredColumns) {
         this.filename = filename;
         this.labelCol = labelCol;
         this.delim = delim;
-        this.posNegIndex = posNegIndex;
         if (ignoredColumns != null) {
             this.ignoredColumns = ignoredColumns;
         }
