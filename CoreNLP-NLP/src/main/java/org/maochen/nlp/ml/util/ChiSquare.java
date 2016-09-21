@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * http://stattrek.com/chi-square-test/independence.aspx
+ *
  * Created by Maochen on 8/7/15.
  */
 public class ChiSquare {
