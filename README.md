@@ -1,4 +1,4 @@
-NLP Suite
+NLP Suite [![Build Status](https://travis-ci.org/maochen/NLP.svg?branch=master)](https://travis-ci.org/maochen/NLP)
 ===
 
 Core NLP Project (Since 03/03/2013)
