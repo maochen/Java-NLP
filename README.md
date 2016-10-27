@@ -16,7 +16,7 @@ Core NLP Project (Since 03/03/2013)
 	<li>And more ...</li>
 </ul>
 
-A GNU license based project.<br />
+Please refer to LICENSE file to check the copyright
 
 Maochen<br />
 12/13/2014
