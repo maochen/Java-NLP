@@ -3,6 +3,8 @@ language: java
 jdk:
   - oraclejdk8
 
+install: true
+
 script: mvn clean verify -Dgpg.skip
 
 sudo: false 
