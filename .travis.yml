@@ -3,6 +3,6 @@ language: java
 jdk:
   - oraclejdk8
 
-script: "mvn clean verify"
+script: "mvn clean verify -Dgpg.skip"
 
 sudo: false 
