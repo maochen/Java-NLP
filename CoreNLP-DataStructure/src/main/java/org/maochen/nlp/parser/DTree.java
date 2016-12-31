@@ -12,80 +12,90 @@ import java.util.stream.Collectors;
  * shared task: Multi-Lingual Dependency Parsing Format <p> Created by Maochen on 12/8/14.
  */
 public class DTree extends ArrayList<DNode> {
-    private DNode padding;
+  private DNode padding;
 
-    private static final String UUID_KEY = "uuid";
-    private static final String SENTENCE_TYPE_KEY = "sentence_type";
-    private static final String ORIGINAL_SENTENCE_KEY = "original_sentence";
+  private static final String UUID_KEY = "uuid";
+  private static final String SENTENCE_TYPE_KEY = "sentence_type";
 
-    private String originalSentence = StringUtils.EMPTY;
+  @Override
+  public String toString() {
+    return this.stream()
+        .map(DNode::toString)
+        .collect(Collectors.joining(System.lineSeparator())).trim();
+  }
 
+  @Override
+  public boolean add(DNode node) {
+    if (node == null) return false;
+    if (this.contains(node)) return false;
 
-    @Override
-    public String toString() {
-        return this.stream()
-                .map(DNode::toString)
-                .collect(Collectors.joining(System.lineSeparator())).trim();
+    node.setTree(this);
+    return super.add(node);
+  }
+
+  public List<DNode> getRoots() {
+    return padding.getChildren();
+  }
+
+  public DNode getPaddingNode() {
+    return padding;
+  }
+
+  public UUID getUUID() {
+    return UUID.fromString(padding.getFeature(UUID_KEY));
+  }
+
+  public void setUUID(UUID id) {
+    padding.addFeature(UUID_KEY, id.toString());
+  }
+
+  public String sentence() {
+
+    if (!this.padding.getChildren().iterator().hasNext()) {
+      return StringUtils.EMPTY;
     }
 
-    @Override
-    public boolean add(DNode node) {
-        if (node == null) return false;
-        if (this.contains(node)) return false;
-
-        node.setTree(this);
-        return super.add(node);
+    // No index_start
+    if (this.padding.getChildren().iterator().next().getFeature("index_start") == null) {
+      throw new RuntimeException("No idx_start, idx_end");
     }
 
-    public List<DNode> getRoots() {
-        return padding.getChildren();
+    int lastIndex = 0;
+    StringBuilder stringBuilder = new StringBuilder();
+
+    for (int i = 1; i < this.size(); i++) {
+      DNode node = this.get(i);
+      int idxStart = Integer.parseInt(node.getFeature("index_start"));
+      int idxEnd = Integer.parseInt(node.getFeature("index_end"));
+
+      if (lastIndex + 1 == idxStart) {
+        stringBuilder.append(StringUtils.SPACE);
+      }
+      stringBuilder.append(node.getForm());
+      lastIndex = idxEnd;
     }
+    return stringBuilder.toString();
+  }
 
-    public DNode getPaddingNode() {
-        return padding;
-    }
+  public String getSentenceType() {
+    String sentenceType = padding.getFeature(SENTENCE_TYPE_KEY);
+    return sentenceType == null ? StringUtils.EMPTY : sentenceType;
+  }
 
-    public UUID getUUID() {
-        return UUID.fromString(padding.getFeature(UUID_KEY));
-    }
+  public void setSentenceType(String sentenceType) {
+    padding.addFeature(SENTENCE_TYPE_KEY, sentenceType);
+  }
 
-    public void setUUID(UUID id) {
-        padding.addFeature(UUID_KEY, id.toString());
-    }
+  public DTree() {
+    padding = new DNode();
+    this.add(padding);
 
-    public String getOriginalSentence() {
-        if (!originalSentence.trim().isEmpty()) {
-            return originalSentence;
-        }
-
-        String originFromFeats = padding.getFeature(ORIGINAL_SENTENCE_KEY);
-        return originFromFeats == null ? StringUtils.EMPTY : originFromFeats;
-    }
-
-    public void setOriginalSentence(String originalSentence) {
-        this.originalSentence = originalSentence;
-        padding.addFeature(ORIGINAL_SENTENCE_KEY, originalSentence);
-    }
-
-    public String getSentenceType() {
-        String sentenceType = padding.getFeature(SENTENCE_TYPE_KEY);
-        return sentenceType == null ? StringUtils.EMPTY : sentenceType;
-    }
-
-    public void setSentenceType(String sentenceType) {
-        padding.addFeature(SENTENCE_TYPE_KEY, sentenceType);
-    }
-
-    public DTree() {
-        padding = new DNode();
-        this.add(padding);
-
-        padding.setId(0);
-        padding.setForm("^");
-        padding.setLemma("^");
-        padding.setcPOSTag(LangLib.CPOSTAG_X);
-        padding.setPOS(LangLib.POS_FW);
-        padding.setDepLabel(LangLib.DEP_ATTR);
-        setUUID(UUID.randomUUID());
-    }
+    padding.setId(0);
+    padding.setForm("^");
+    padding.setLemma("^");
+    padding.setcPOSTag(LangLib.CPOSTAG_X);
+    padding.setPOS(LangLib.POS_FW);
+    padding.setDepLabel(LangLib.DEP_ATTR);
+    setUUID(UUID.randomUUID());
+  }
 }

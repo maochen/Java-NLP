@@ -1,8 +1,8 @@
 package org.maochen.nlp.ml.util;
 
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
 
 /**
  * Created by Maochen on 8/7/15.
@@ -35,7 +35,7 @@ public class ChiSquareTest {
 
         assertEquals(1000, chiSquare.total);
         assertEquals(2, chiSquare.df);
-        assertEquals(16.203703703703702, chiSquare.totalChiSquare, Double.MIN_NORMAL);
+        assertEquals(16.203703703703702, chiSquare.totalChiSquare, 0.001);
         assertEquals(3.0297754871455584E-4, chiSquare.totalPVal, Double.MIN_NORMAL);
     }
 

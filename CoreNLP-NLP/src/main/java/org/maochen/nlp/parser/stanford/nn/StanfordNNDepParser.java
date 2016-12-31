@@ -1,15 +1,14 @@
 package org.maochen.nlp.parser.stanford.nn;
 
-import org.maochen.nlp.parser.DTree;
-import org.maochen.nlp.parser.stanford.util.StanfordParserUtils;
-import org.maochen.nlp.parser.stanford.StanfordParser;
-
-import java.util.List;
-
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.ling.HasWord;
 import edu.stanford.nlp.parser.nndep.DependencyParser;
 import edu.stanford.nlp.trees.GrammaticalStructure;
+import org.maochen.nlp.parser.DTree;
+import org.maochen.nlp.parser.stanford.StanfordParser;
+import org.maochen.nlp.parser.stanford.util.StanfordParserUtils;
+
+import java.util.List;
 
 /**
  * Created by Maochen on 4/6/15.
@@ -36,7 +35,6 @@ public class StanfordNNDepParser extends StanfordParser {
         GrammaticalStructure gs = tagDependencies(tokenizedSentence);
         tagNamedEntity(tokenizedSentence);
         DTree dTree = StanfordParserUtils.getDTreeFromCoreNLP(gs.typedDependencies(), tokenizedSentence);
-        dTree.setOriginalSentence(sentence);
         return dTree;
     }
 

@@ -2,16 +2,16 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>CoreNLP-UI</artifactId>
+  <artifactId>CoreNLP-WEB</artifactId>
   <packaging>war</packaging>
   <name>${project.groupId}:${project.artifactId}</name>
-  <description>UI Project</description>
+  <description>Web Project</description>
   <url>${project.parent.url}</url>
 
   <parent>
     <groupId>org.maochen.nlp</groupId>
     <artifactId>NLP</artifactId>
-    <version>1.0.17</version>
+    <version>1.0.19</version>
   </parent>
 
   <licenses>
@@ -94,13 +94,11 @@
       <version>1.4.193</version>
     </dependency>
 
-
     <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
       <version>LATEST</version>
     </dependency>
-
 
   </dependencies>
 
@@ -118,6 +116,14 @@
       </plugin>
 
       <plugin>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>3.0.0</version>
+        <configuration>
+          <failOnMissingWebXml>false</failOnMissingWebXml>
+        </configuration>
+      </plugin>
+
+      <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
         <version>${spring.boot.version}</version>
@@ -128,9 +134,9 @@
             </goals>
           </execution>
         </executions>
-        <!--<configuration>-->
-        <!--<mainClass>${start-class}</mainClass>-->
-        <!--</configuration>-->
+        <configuration>
+          <!--<mainClass>${start-class}</mainClass>-->
+        </configuration>
       </plugin>
 
     </plugins>

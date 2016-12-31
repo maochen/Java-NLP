@@ -6,7 +6,7 @@
     <groupId>org.maochen.nlp</groupId>
     <artifactId>NLP</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.18</version>
+    <version>1.0.19</version>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Maochen.org Natural Lang Processing Suite</description>
     <url>http://maven.apache.org</url>
@@ -55,7 +55,7 @@
         <module>CoreNLP-DataStructure</module>
         <module>CoreNLP-NLP</module>
         <!--<module>CoreNLP-Experiment</module>-->
-        <!--<module>CoreNLP-UI</module>-->
+        <!--<module>CoreNLP-WEB</module>-->
     </modules>
 
     <build>
