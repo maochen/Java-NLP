@@ -25,50 +25,50 @@
     <div class="span10 mycontent-left">
       <svg class="legend-svg">
         <g transform="translate(20, 15)">
-          <rect class="legend" style="fill: #b997ff" rx="5" ry="5" width="70" height="37"></rect>
+          <rect class="legend" style="fill: #b997ff" rx="2" ry="2" width="70" height="37"></rect>
           <g transform="translate(10, 10)">
             <text>
-              <tspan dy="1em">Person</tspan>
+              <tspan dy="1em">PERSON</tspan>
             </text>
           </g>
         </g>
         <g transform="translate(110, 15)">
-          <rect class="legend" style="fill: #ffae6a" rx="5" ry="5" width="50" height="37"></rect>
+          <rect class="legend" style="fill: #ffae6a" rx="2" ry="2" width="50" height="37"></rect>
           <g transform="translate(10, 10)">
             <text>
-              <tspan dy="1em">Date</tspan>
+              <tspan dy="1em">DATE</tspan>
             </text>
           </g>
         </g>
         <g transform="translate(180, 15)">
-          <rect class="legend" style="fill: #96c2ff" rx="5" ry="5" width="100" height="37"></rect>
+          <rect class="legend" style="fill: #96c2ff" rx="2" ry="2" width="110" height="37"></rect>
           <g transform="translate(10, 10)">
             <text>
-              <tspan dy="1em">Organization</tspan>
+              <tspan dy="1em">ORGANIZATION</tspan>
             </text>
           </g>
         </g>
         <g transform="translate(300, 15)">
-          <rect class="legend" style="fill: #7e7e7e" rx="5" ry="5" width="80" height="37"></rect>
+          <rect class="legend" style="fill: #7e7e7e" rx="2" ry="2" width="80" height="37"></rect>
           <g transform="translate(10, 10)">
             <text>
-              <tspan dy="1em">Location</tspan>
+              <tspan dy="1em">LOCATION</tspan>
             </text>
           </g>
         </g>
         <g transform="translate(400, 15)">
-          <rect class="legend" style="fill: #92ff7d" rx="5" ry="5" width="70" height="37"></rect>
+          <rect class="legend" style="fill: #92ff7d" rx="2" ry="2" width="70" height="37"></rect>
           <g transform="translate(10, 10)">
             <text>
-              <tspan dy="1em">Ordinal</tspan>
+              <tspan dy="1em">ORDINAL</tspan>
             </text>
           </g>
         </g>
         <g transform="translate(490, 15)">
-          <rect class="legend" style="fill: #fdb9ff" rx="5" ry="5" width="70" height="37"></rect>
+          <rect class="legend" style="fill: #fdb9ff" rx="2" ry="2" width="70" height="37"></rect>
           <g transform="translate(10, 10)">
             <text>
-              <tspan dy="1em">Number</tspan>
+              <tspan dy="1em">NUMBER</tspan>
             </text>
           </g>
         </g>
@@ -96,7 +96,7 @@
     $.ajax({
       type: 'GET',
       dataType: 'html',
-      url: "parse",
+      url: "api/parse",
       data: {
         sentence: text
       },
@@ -124,8 +124,8 @@
             label: node.label,
             class: node.nodeclass,
             //  round edges
-            rx: 5,
-            ry: 5
+            rx: 2,
+            ry: 2
           });
         }
 
@@ -158,10 +158,18 @@
   function populate(data, nodes, edges) {
     var nodeID = Object.keys(nodes).length;
 
+    var text;
+
+    if (data.data.type == "TK") {
+      text = data.data.word + "\n" + data.data.pos + " | " + data.data.deplabel
+    }
+    else {
+      text = data.data.type;
+    }
+
     var newNode = {
-      label: (data.data.type == "TK") ? data.data.word + " | " + data.data.pos + " | " + data.data.deplabel :
-        data.data.type,
-      id: nodeID + ""
+      label: text,
+      id: nodeID
     };
 
     var classes = ["type-" + data.data.type];
