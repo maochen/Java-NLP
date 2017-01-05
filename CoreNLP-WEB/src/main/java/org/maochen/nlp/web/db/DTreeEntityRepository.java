@@ -10,6 +10,6 @@ import java.util.UUID;
  * Created by mguan on 12/30/16.
  */
 @Repository
-public interface AnnotatedParseTreeEntityRepository extends CrudRepository<AnnotatedParseTreeEntity, UUID> {
-  List<AnnotatedParseTreeEntity> findBySentence(String sentence);
+public interface DTreeEntityRepository extends CrudRepository<DTreeEntity, UUID> {
+  List<DTreeEntity> findBySentence(String sentence);
 }
