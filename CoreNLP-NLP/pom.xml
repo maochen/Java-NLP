@@ -12,13 +12,13 @@
   <parent>
     <groupId>org.maochen.nlp</groupId>
     <artifactId>NLP</artifactId>
-    <version>1.0.19</version>
+    <version>1.1</version>
   </parent>
 
   <licenses>
     <license>
-      <name>The Apache License, Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <name>GPL, Version 3.0</name>
+      <url>https://www.gnu.org/licenses/gpl-3.0.txt</url>
     </license>
   </licenses>
 
@@ -56,7 +56,7 @@
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.5.1</version>
+        <version>3.6.1</version>
         <configuration>
           <source>1.8</source>
           <target>1.8</target>
@@ -129,13 +129,13 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
-      <version>1.7.22</version>
+      <version>1.8.0-alpha2</version>
     </dependency>
 
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <version>21.0-rc1</version>
+      <version>22.0-android</version>
     </dependency>
 
     <dependency>
@@ -165,7 +165,7 @@
     <dependency>
       <groupId>com.github.vinhkhuc</groupId>
       <artifactId>jcrfsuite</artifactId>
-      <version>0.6</version>
+      <version>0.6.1</version>
     </dependency>
 
     <dependency>
@@ -177,16 +177,16 @@
     <dependency>
       <groupId>edu.stanford.nlp</groupId>
       <artifactId>stanford-corenlp</artifactId>
-      <version>3.6.0</version>
+      <version>3.7.0</version>
     </dependency>
 
     <!-- models for stanford parser -->
     <dependency>
       <groupId>edu.stanford.nlp</groupId>
       <artifactId>stanford-corenlp</artifactId>
-      <version>3.6.0</version>
+      <version>3.7.0</version>
       <classifier>models</classifier>
-      <scope>test</scope>
+      <!--<scope>test</scope>-->
     </dependency>
 
     <dependency>

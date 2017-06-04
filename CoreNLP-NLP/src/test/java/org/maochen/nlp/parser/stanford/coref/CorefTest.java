@@ -4,9 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 import org.junit.Test;
-import org.maochen.nlp.parser.stanford.pcfg.StanfordPCFGParser;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -17,14 +15,13 @@ import static org.junit.Assert.assertEquals;
  */
 public class CorefTest {
 
-    private static StanfordPCFGParser parser = new StanfordPCFGParser(null, null, new ArrayList<>());
-    private static StanfordCoref coref = new StanfordCoref(parser);
+    private static StanfordCoref coref = new StanfordCoref();
 
     @Test
     public void test() {
         List<String> texts = Lists.newArrayList("Google invests in companies since they have more choices.", "They understand it is hard.");
         List<String> actualList = coref.getCoref(texts);
-        List<String> expectedList = ImmutableList.of("Google invests in companies since companies have more choices .", "companies understand Google is hard .");
+        List<String> expectedList = ImmutableList.of("Google invests in companies since companies have more choices .", "Companies understand it is hard .");
 
         for (int i = 0; i < actualList.size(); i++) {
             assertEquals(expectedList.get(i), actualList.get(i));

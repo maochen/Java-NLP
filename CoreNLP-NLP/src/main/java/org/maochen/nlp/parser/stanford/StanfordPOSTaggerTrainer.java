@@ -18,7 +18,7 @@ import java.util.concurrent.Future;
 
 import edu.stanford.nlp.io.ExtensionFileFilter;
 import edu.stanford.nlp.io.NumberRangeFileFilter;
-import edu.stanford.nlp.ling.Sentence;
+import edu.stanford.nlp.ling.SentenceUtils;
 import edu.stanford.nlp.tagger.maxent.MaxentTagger;
 import edu.stanford.nlp.tagger.maxent.TaggerConfig;
 import edu.stanford.nlp.trees.BobChrisTreeNormalizer;
@@ -55,7 +55,7 @@ public class StanfordPOSTaggerTrainer {
         final TreeNormalizer tn = new BobChrisTreeNormalizer();
         trainTreeBank.apply(treeVisitor -> {
             Tree tPrime = tn.normalizeWholeTree(treeVisitor, treeVisitor.treeFactory());
-            data.add(Sentence.listToString(tPrime.taggedYield(), false, "_"));
+            data.add(SentenceUtils.listToString(tPrime.taggedYield(), false, "_"));
         });
     }
 

@@ -1,73 +1,105 @@
 package org.maochen.nlp.parser.stanford.coref;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
-import org.maochen.nlp.parser.stanford.pcfg.StanfordPCFGParser;
 
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
-import edu.stanford.nlp.dcoref.CorefChain;
-import edu.stanford.nlp.dcoref.Dictionaries;
+import edu.stanford.nlp.coref.CorefAlgorithm;
+import edu.stanford.nlp.coref.CorefCoreAnnotations;
+import edu.stanford.nlp.coref.data.Dictionaries;
+import edu.stanford.nlp.coref.data.Document;
+import edu.stanford.nlp.coref.data.DocumentMaker;
+import edu.stanford.nlp.coref.data.InputDoc;
+import edu.stanford.nlp.coref.data.Mention;
+import edu.stanford.nlp.coref.neural.NeuralCorefAlgorithm;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
-import edu.stanford.nlp.trees.GrammaticalStructure;
-import edu.stanford.nlp.util.CoreMap;
+import edu.stanford.nlp.pipeline.Annotation;
+import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 
 /**
  * Created by Maochen on 4/14/15.
  */
 public class StanfordCoref {
 
-    private static CorefAnnotator corefAnnotator = new CorefAnnotator();
-    private static StanfordPCFGParser parser;
+    private final CorefAlgorithm corefAlgorithm;
+    private final Dictionaries dictionaries;
 
-    public Pair<List<CoreMap>, Map<Integer, CorefChain>> getCorefChain(List<String> texts) {
-        List<Pair<CoreMap, GrammaticalStructure>> sentencesWithGS = texts.stream().filter(x -> !x.trim().isEmpty()).map(parser::parseForCoref).collect(Collectors.toList());
+    private Properties props;
+//    private final StanfordNNDepParser parser;
 
-        // Plural Coref gonna have multiple clusters ...
-        Map<Integer, CorefChain> corefChainMap = corefAnnotator.annotate(sentencesWithGS);
+    public StanfordCoref() {
+        try {
+            props = new Properties();
+            dictionaries = new Dictionaries();
+            corefAlgorithm = new NeuralCorefAlgorithm(props, dictionaries);
+        } catch (ClassNotFoundException | IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
 
-        List<CoreMap> sentences = sentencesWithGS.stream().map(Pair::getLeft).collect(Collectors.toList());
-
-        return new ImmutablePair<>(sentences, corefChainMap);
     }
 
     public List<String> getCoref(List<String> texts) {
-        Pair<List<CoreMap>, Map<Integer, CorefChain>> result = getCorefChain(texts);
-        List<CoreMap> sentences = result.getLeft();
-        Map<Integer, CorefChain> corefChainMap = result.getRight();
+        Properties props = new Properties();
+        props.put("annotators", "tokenize, ssplit, pos, lemma, ner, parse, mention");
+        StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
 
-        for (Integer clusterID : corefChainMap.keySet()) {
-            List<CorefChain.CorefMention> mentions = corefChainMap.get(clusterID).getMentionsInTextualOrder();
-            if (mentions.size() < 2) {
-                continue;
-            }
+        String text = texts.stream().collect(Collectors.joining(StringUtils.SPACE));
+        Annotation annotation = new Annotation(text);
+        pipeline.annotate(annotation);
 
-            List<String> realEntities = mentions.stream().filter(x -> !x.mentionType.equals(Dictionaries.MentionType.PRONOMINAL)).map(x -> x.mentionSpan).collect(Collectors.toList());
-            if (realEntities.isEmpty()) {
-                continue;
-            }
-            mentions.stream().filter(x -> x.mentionType.equals(Dictionaries.MentionType.PRONOMINAL)).forEach(mention -> {
-                List<CoreLabel> sentence = sentences.get(mention.sentNum - 1).get(CoreAnnotations.TokensAnnotation.class);
-                // XXX: Handling plural coreferencing. "They", seems Stanford Plural doesn't work well. For example of the following, both of three entities are in 3 groups.
-                // List<String> texts = Lists.newArrayList("Tom is nice.", "Mary is hard.", "They are all good.");
-
-                // String replacedName = true ? realEntities.stream().reduce((s1, s2) -> s1 + ", " + s2).get() : realEntities.get(0);
-                sentence.get(mention.startIndex - 1).setWord(realEntities.get(0));
-                // Reset all possible trailing tokens.
-                for (int i = mention.startIndex; i < mention.endIndex - 1; i++) {
-                    sentence.get(i).setWord(StringUtils.EMPTY);
-                }
-            });
+        InputDoc inputDoc = new InputDoc(annotation);
+        Document document;
+        try {
+            DocumentMaker documentMaker = new DocumentMaker(props, new Dictionaries());
+            document = documentMaker.makeDocument(inputDoc);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
 
-        return sentences.stream().map(sentence -> sentence.get(CoreAnnotations.TokensAnnotation.class).stream().map(CoreLabel::word).reduce((w1, w2) -> w1 + StringUtils.SPACE + w2).get()).collect(Collectors.toList());
-    }
+        corefAlgorithm.runCoref(document);
 
-    public StanfordCoref(StanfordPCFGParser parser) {
-        StanfordCoref.parser = parser;
+        Map<Mention, Mention> pronToNoun = new HashMap<>();
+        document.corefClusters.values().forEach(x -> {
+
+            x.corefMentions.forEach(mentionEntity -> {
+                if (mentionEntity.mentionType == Dictionaries.MentionType.PRONOMINAL) {
+                    pronToNoun.put(mentionEntity, x.representative);
+                }
+            });
+        });
+
+
+        return document.annotation.get(CoreAnnotations.SentencesAnnotation.class).stream().map(singleSentence -> {
+            List<Mention> mentions = singleSentence.get(CorefCoreAnnotations.CorefMentionsAnnotation.class);
+            Map<CoreLabel, String> tokenToWord = new HashMap<>();
+            for (Mention mention : mentions) {
+                if (pronToNoun.containsKey(mention)) {
+                    tokenToWord.put(mention.headIndexedWord.backingLabel(), pronToNoun.get(mention).headString);
+                }
+            }
+
+            return singleSentence.get(CoreAnnotations.TokensAnnotation.class).stream()
+                    .map(token -> {
+                        if (tokenToWord.containsKey(token)) {
+                            String word = tokenToWord.get(token);
+
+                            if (token.get(CoreAnnotations.IndexAnnotation.class) == 1) {
+                                word = StringUtils.capitalize(word);
+                            }
+
+                            return word;
+                        } else {
+                            return token.get(CoreAnnotations.TextAnnotation.class);
+                        }
+                    })
+                    .collect(Collectors.joining(StringUtils.SPACE));
+        }).collect(Collectors.toList());
     }
 }
