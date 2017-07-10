@@ -34,7 +34,7 @@ public class TrainingDataUtils {
                 .collect(Collectors.groupingBy(Map.Entry::getKey, Collectors.counting()));
 
         Map.Entry<String, Long> minCountEntry = tagCount.entrySet().stream()
-                .min((e1, e2) -> e1.getValue().compareTo(e2.getValue()))
+                .min(Comparator.comparing(Map.Entry::getValue))
                 .orElse(null);
 
         tagCount.clear();

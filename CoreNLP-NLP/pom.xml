@@ -93,7 +93,7 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-staging-maven-plugin</artifactId>
-        <version>1.6.7</version>
+        <version>1.6.8</version>
         <extensions>true</extensions>
         <configuration>
           <serverId>ossrh</serverId>
@@ -177,14 +177,14 @@
     <dependency>
       <groupId>edu.stanford.nlp</groupId>
       <artifactId>stanford-corenlp</artifactId>
-      <version>3.7.0</version>
+      <version>3.8.0</version>
     </dependency>
 
     <!-- models for stanford parser -->
     <dependency>
       <groupId>edu.stanford.nlp</groupId>
       <artifactId>stanford-corenlp</artifactId>
-      <version>3.7.0</version>
+      <version>3.8.0</version>
       <classifier>models</classifier>
       <scope>test</scope>
     </dependency>
