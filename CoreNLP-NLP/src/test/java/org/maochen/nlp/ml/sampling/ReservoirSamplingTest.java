@@ -14,7 +14,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class ReservoirSamplingTest {
 
-    private static List<Integer> list = IntStream.range(0, 100).mapToObj(x -> x).collect(Collectors.toList());
+    private static List<Integer> list = IntStream.range(0, 100).boxed().collect(Collectors.toList());
 
     @Test
     public void testAll() {

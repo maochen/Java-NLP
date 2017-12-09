@@ -42,7 +42,7 @@ public class CRFNER extends CRFClassifier {
         LOG.info("Loaded Training data.");
 
         LOG.info("Generating feats");
-        trainingData.stream().forEach(seq -> seq.entries = featureExtractor.extractFeat(seq));
+        trainingData.forEach(seq -> seq.entries = featureExtractor.extractFeat(seq));
         LOG.info("Extracted Feats.");
 
         super.train(trainingData);
@@ -51,8 +51,8 @@ public class CRFNER extends CRFClassifier {
     public SequenceTuple predict(final String[] words) {
         SequenceTuple st = new SequenceTuple();
         st.entries = new ArrayList<>();
-        for (int i = 0; i < words.length; i++) {
-            IVector v = new FeatNamedVector(new String[]{words[i]});
+        for (String word : words) {
+            IVector v = new FeatNamedVector(new String[]{word});
             st.entries.add(new Tuple(v));
         }
 
