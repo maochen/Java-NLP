@@ -11,7 +11,7 @@
     <description>Maochen.org Natural Lang Processing Suite</description>
     <url>http://maven.apache.org</url>
     <prerequisites>
-        <maven>3.0.4</maven>
+        <maven>3.0.5</maven>
     </prerequisites>
 
     <licenses>
@@ -139,7 +139,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.7</version>
+            <version>3.8.1</version>
         </dependency>
     </dependencies>
 </project>
